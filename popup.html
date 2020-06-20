@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<link href="https://fonts.googleapis.com/css?family=Montserrat:600&display=swap&subset=latin-ext" rel="stylesheet">
+	<script src="jquery.js"></script>
+	<link rel="stylesheet" href="styles.css">
+	<script src="popup.js"></script>
+</head>
+
+<body>
+	<div id="title">
+		<div id="aligncenter">
+			<p id="text">Prime Video Together</p>
+		</div>
+	</div>
+	<div id="rowCreate">
+		<div id="bt1"><button class="button" id="create">Nova Sessão</button></div>
+		<div id="testButton"><button class="button" id="play" style="display: none;">Play</button></div>
+		<div id="testButton"><button class="button" id="pause" style="display: none;">Pause</button></div>
+	</div>
+	<div id="rowHomepage" style="display: none;">
+		<div id="aligncenter">
+			<p id="text">Você precisa estar assistindo!</p>
+		</div>
+	</div>
+	<div id="rowInSession" style="display: none;">
+		<div id="aligncenter">
+			<div id="titleInSession">
+				<div id="aligncenter">
+					<p id="text">Conectado a Sessão</p>
+				</div>
+			</div>
+			<div id="label">
+				<label id="urlLabel" for="url">URL:</label><br>
+			</div>
+			<div id="npt">
+				<input type="text" id="url" name="url"></input>
+				<a href="" id="copy">Copiar</a>
+			</div>
+		</div>
+		<div id="bt1"><button class="button" id="disconnect">Desconectar</button></div>
+	</div>
+	<div id="rowError" style="display: none;">
+		<div id="aligncenter">
+			<p id="text">Algo deu errado!</p>
+		</div>
+	</div>
+
+
+</body>
+
+</html>
