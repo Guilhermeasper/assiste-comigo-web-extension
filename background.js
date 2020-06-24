@@ -42,7 +42,7 @@ chrome.runtime.onInstalled.addListener(function (details) {
         conditions: [
           new chrome.declarativeContent.PageStateMatcher({
             pageUrl: {
-              urlMatches: '(primevideo|viki)\.com',
+              urlMatches: '(primevideo|viki|youtube|anitube|netflix)\.(com|site)',
             },
           }),
         ],
