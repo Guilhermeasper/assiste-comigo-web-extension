@@ -17,6 +17,14 @@ export function tabSendMessage(message) {
     });
 }
 
+export function genericSendMessage(msg) {
+    chrome.runtime.sendMessage(msg);
+}
+
+/**
+ * Copy the received string to clipboard
+ * @param {string} url - 
+ */
 export function copyToClipboard(url) {
     const textAreaElement = document.createElement("textarea");
     textAreaElement.value = url;
@@ -27,7 +35,10 @@ export function copyToClipboard(url) {
     document.execCommand("copy");
     document.body.removeChild(textAreaElement);
 }
-
+/**
+ * Delay the current asynchronous process for a given amount of time
+ * @param {Integer} ms - Amount of time to be delayed in milisseconds
+ */
 function sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -61,3 +72,4 @@ export function getTabId() {
         });
     });
 }
+
