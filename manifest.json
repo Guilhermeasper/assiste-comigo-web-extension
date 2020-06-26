@@ -21,7 +21,8 @@
             "js": [
                 "./libs/socket.io.js",
                 "./libs/jquery.js",
-                "content_script.js"
+                "/utils/utils.js",
+                "./contentScripts/mainContentScript.js"
             ],
             "matches": [
                 "*://*.primevideo.com/*",
