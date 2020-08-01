@@ -1,127 +1,85 @@
 var serverSeek = false;
 var serverPlay = false;
 var serverPause = false;
+var socket;
+var html5VideoElement;
+document.addEventListener("DOMContentLoaded", domLoaded());
 
-function main(){
-    document.addEventListener("DOMContentLoaded", () => {
-        console.log("Main content script loaded");
+function domLoaded() {
+    console.log("Main content script loaded");
     
-        let contentScriptsOptions = {
-            "www.primevideo.com": primevideoScript,
-            "www.anitube.site": anitubeScript,
-            "www.youtube.com": youtubeScript,
-            "www.viki.com": vikiScript,
-            "www.netflix.com": netflixScript,
-        };
-    
-        let pageHost = getPageHost();
-        contentScriptsOptions[pageHost]();
-    
-    
-        var videoUrl;
-    
-        chrome.runtime.onMessage.addListener((msg, sender, response) => {
-            var html5VideoElement = getHtml5VideoElement();
-    
-            // homescreen return
+    let contentScriptsOptions = {
+        "www.primevideo.com": primevideoScript,
+        "www.anitube.site": anitubeScript,
+        "www.youtube.com": youtubeScript,
+        "www.viki.com": vikiScript,
+        "www.netflix.com": netflixScript,
+    };
+    let pageHost = getPageHost();
+
+    var videoUrl;
+
+    chrome.runtime.onMessage.addListener((message, sender, response) => {
+        console.log(`Message`);
+        console.log(message);
+
+        if (message.command == "info") {
+            var info;
+            html5VideoElement = getHtml5VideoElement();
             if (!html5VideoElement) {
-                response({ page: "homepage" });
-                return true;
+                info = { page: "homepage", address: document.location.href, type: "information", status: "completed"};
+            } else {
+                info = { page: "player", address: document.location.href, type: "information", status: "completed"};
             }
-    
-            if (!document.location.href.includes("primevideo")) {
-                videoUrl = document.location.href;
-            }
-    
-            if (msg.command == "info") {
-                var info;
-                try {
-                    getSessionId().then((result) => {
-                        if (result) {
-                            info = {
-                                page: "playerWithtId",
-                                address: document.location.href,
-                                time: html5VideoElement.currentTime,
-                                url: videoUrl,
-                            };
-                        } else {
-                            info = {
-                                page: "playerWithoutId",
-                                address: document.location.href,
-                                time: html5VideoElement.currentTime,
-                                url: videoUrl,
-                            };
-                        }
-                        console.log(info);
-                        response(info);
-                    });
-                } catch (err) {
-                    console.log(err);
-                    response("err");
-                }
-            } else if (msg.command == "createSession") {
-                
-                html5VideoElement.addEventListener("pause", () => {
-                    if (!serverPause) {
-                        client.emit("pause", { id: msg.sessionId });
-                    }
-                    serverPause = false;
-                });
-                html5VideoElement.addEventListener("play", () => {
-                    if (!serverPlay) {
-                        client.emit("play", { id: msg.sessionId });
-                    }
-                    serverPlay = false;
-                });
-    
-                html5VideoElement.addEventListener("seeking", () => {
-                    if (!serverSeek) {
-                        client.emit("seek", {
-                            id: msg.sessionId,
-                            time: html5VideoElement.currentTime,
-                        });
-                        console.log(
-                            `Video seeked to ${html5VideoElement.currentTime}`
-                        );
-                    }
-                    serverSeek = false;
-                });
-                client.on("room_play", (data) => {
-                    serverPlay = true;
-                    html5VideoElement.play();
-                });
-    
-                client.on("room_pause", (data) => {
-                    serverPause = true;
-                    html5VideoElement.pause();
-                });
-    
-                client.on("room_seek", (data) => {
-                    serverSeek = true;
-                    html5VideoElement.currentTime = data.time;
-                });
-                response({ result: "sessionCreated" });
-            } else if (msg.command == "connection") {
-                client.emit("sessionConnect", { id: msg.sessionId });
-            } else if (msg.command == "disconnect") {
-                client.emit("leaveSession", { id: msg.sessionId });
-            } else if (msg.command == "play_test") {
-                html5VideoElement.play();
-            } else if (msg.command == "pause_test") {
-                html5VideoElement.pause();
-            }
+            response(info);
             return true;
-        });
+        } else if (message.command == "createSession") {
+            html5VideoElement = getHtml5VideoElement();
+            serverConnection();
+            addSocketListeners();
+            addVideoListeners();
+            createSession();
+            response({ page: "player", address: document.location.href, type: "creation", status: "completed"});
+        } else if (message.command == "connection") {
+            html5VideoElement = getHtml5VideoElement();
+            serverConnection();
+            addSocketListeners();
+            addVideoListeners();
+            connectSession();
+            response({ page: "player", address: document.location.href, type: "connection", status: "completed"});
+        } else if (message.command == "disconnect") {
+            socket.emit("leaveSession", { id: message.sessionId });
+            removeVideoListeners();
+            socket.disconnect();
+            response({ page: "player", address: document.location.href, type: "disconnection", status: "completed"});
+        } else{
+            response({ page: "undentified", address: document.location.href, type: "none", status: "unknown"});
+        }
+        return true;
     });
+
+    contentScriptsOptions[pageHost]();
 }
 
+function anitubeScript() {
+    console.log("Anitube");
+}
 
+function vikiScript() {
+    console.log("Viki");
+}
+
+function youtubeScript() {
+    console.log("Youtube");
+}
+
+function netflixScript() {
+    console.log("Netflix");
+}
 
 function primevideoScript() {
     $(document).click((event) => {
-        if (
-            document.querySelectorAll(".dv-player-fullscreen").length == 0
-        ) {
+        if (document.querySelectorAll(".dv-player-fullscreen").length == 0) {
             video =
                 "https://www.primevideo.com" +
                 $(event.target).parent().parent().parent().attr("href");
@@ -141,87 +99,138 @@ function primevideoScript() {
 }
 
 function serverConnection() {
-    let socket = io.connect("https://guilhermeasper.com.br:8080");
-    return socket;
+    socket = io.connect("https://guilhermeasper.com.br:443");
 }
 
-function createSession(socket){
-    socket.emit("create", { id: msg.sessionId });
+function createSession() {
+    getUserId().then((userId) => {
+        socket.emit("create", {
+            userId: userId,
+        });
+    });
 }
 
-function joinSession(socket){
+function connectSession() {
+    getUserId().then((userId) => {
+        getSessionId().then((sessionId) => {
+            socket.emit("join", { userId: userId, sessionId: sessionId });
+        });
+    });
+}
+
+function joinSession() {
     socket.emit("join", { id: msg.sessionId });
 }
 
-function leaveSession(socket){
-    socket.emit("leave", { id: msg.sessionId });
-}
-
-function html5VideoPlay(html5Video){
-    serverPlay = true;
-    html5Video.play();
-}
-
-function html5VideoPause(html5Video){
-    serverPause = true;
-    html5Video.pause();
-}
-
-function html5VideoSeek(html5Video, time){
-    serverSeek = true;
-    html5Video.currentTime = time;
+function leaveSession() {
+    getUserId().then((userId) => {
+        getSessionId().then((sessionId) => {
+            socket.emit("leave", { userId: userId, sessionId: sessionId });
+        });
+    });
 }
 
 
-function socketListeners(socket, html5Video) {
+function addSocketListeners() {
     socket.on("room_play", () => {
-        html5VideoPlay(html5Video);
+        serverPlay = true;
+        html5VideoElement.play();
     });
 
     socket.on("room_pause", () => {
-        html5VideoPause(html5Video);
+        serverPause = true;
+    html5VideoElement.pause();
     });
 
     socket.on("room_seek", (data) => {
-        html5VideoSeek(html5Video, data.time)
+        serverSeek = true;
+        html5VideoElement.currentTime = time;
+    });
+
+    socket.on("sessionCreated", (data) => {
+        setSessionId(data.newId);
+    });
+
+    socket.on("joinedSession", (data) => {
+        console.log("Entrou na sessão!");
+    });
+
+    socket.on("reconnect", (attemptNumber) => {
+        console.log(attemptNumber);
+        // console.log(`Reconnected ${attemptNumber} times`);
+        getUserId().then((userId) => {
+            getSessionId().then((sessionId) => {
+                socket.emit("rejoin", { userId: userId, sessionId: sessionId });
+            });
+        });
     });
 }
 
-function socketListeners(html5Video, socket, sessionID) {
-    html5Video.addEventListener("pause", () => {
-        if (!serverPause) {
-            socket.emit("pause", { id: sessionId });
-        }
-        serverPause = false;
-    });
-    html5Video.addEventListener("play", () => {
-        if (!serverPlay) {
-            socket.emit("play", { id: sessionId });
-        }
-        serverPlay = false;
-    });
 
-    html5Video.addEventListener("seeking", () => {
-        if (!serverSeek) {
-            socket.emit("seek", {
-                id: sessionId,
-                time: html5VideoElement.currentTime,
+var html5VideoPauseListerner = function(event){
+    if (!serverPause) {
+        getUserId().then((userId) => {
+            getSessionId().then((sessionId) => {
+                socket.emit("pause", {
+                    userId: userId,
+                    time: html5VideoElement.currentTime,
+                    sessionId: sessionId,
+                });
             });
-            console.log(`Video seeked to ${html5Video.currentTime}`);
-        }
-        serverSeek = false;
-    });
+        });
+    }
+    serverPause = false;
+} 
+var html5VideoPlayListerner = function(event){
+    if (!serverPlay) {
+        getUserId().then((userId) => {
+            getSessionId().then((sessionId) => {
+                socket.emit("play", {
+                    userId: userId,
+                    time: html5VideoElement.currentTime,
+                    sessionId: sessionId,
+                });
+            });
+        });
+    }
+    serverPlay = false;
+}
+var html5VideoSeekListerner = function(event){
+    if (!serverSeek) {
+        getUserId().then((userId) => {
+            getSessionId().then((sessionId) => {
+                socket.emit("seek", {
+                    userId: userId,
+                    time: html5VideoElement.currentTime,
+                    sessionId: sessionId,
+                });
+            });
+        });
+        
+    }
+    serverSeek = false;
+}
+
+function addVideoListeners() {
+    html5VideoElement.addEventListener("pause", html5VideoPauseListerner, false);
+    html5VideoElement.addEventListener("play", html5VideoPlayListerner, false);
+    html5VideoElement.addEventListener("seeking", html5VideoSeekListerner, false);
+}
+
+function removeVideoListeners() {
+    html5VideoElement.removeEventListener("pause", html5VideoPauseListerner, false);
+    html5VideoElement.removeEventListener("play", html5VideoPlayListerner, false);
+    html5VideoElement.removeEventListener("seeking", html5VideoSeekListerner, false);
 }
 
 function getHtml5VideoElement() {
     const videos = document.querySelectorAll("video");
-    var video;
-    videos.forEach((element) => {
-        if (element.src.includes("blob")) {
-            video = element;
+    for (video of videos) {
+        if (video.src.includes("blob")) {
+            return video;
         }
-    });
-    return video;
+    }
+    return undefined;
 }
 
 function getPageHost() {
@@ -234,4 +243,29 @@ function getPageUrl() {
     return pageUrl;
 }
 
-main();
+function getSessionId() {
+    return new Promise((resolve, reject) => {
+        chrome.storage.local.get(["sessionId"], (result) => {
+            resolve(result.sessionId);
+        });
+    });
+}
+
+function getUserId() {
+    return new Promise((resolve, reject) => {
+        chrome.storage.local.get(["userId"], (result) => {
+            console.log("userId value currently is " + result.userId);
+            resolve(result.userId);
+        });
+    });
+}
+
+function setSessionId(newSessionId) {
+    chrome.storage.local.set({ sessionId: newSessionId }, function () {
+        console.log("SID value is set to " + newSessionId);
+    });
+}
+
+function genericSendMessage(msg) {
+    chrome.runtime.sendMessage(msg);
+}

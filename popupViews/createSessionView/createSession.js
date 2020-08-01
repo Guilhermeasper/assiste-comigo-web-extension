@@ -6,11 +6,9 @@ import {
 document.addEventListener("DOMContentLoaded", () => {
     let buttonCreate = document.getElementById("buttonCreate");
     buttonCreate.addEventListener("click", () => {
-        let tempSessionId = Math.random().toString(36).substr(2, 9);
-        setSessionId(tempSessionId);
-        tabSendMessage({ command: "createSession", sessionId: tempSessionId }).then((response) => {
-            if(response.result == "sessionCreated"){
-                window.location.assign("./../inSessionView/inSession.html");
+        tabSendMessage({ command: "createSession"}).then((response) => {
+            if(response.type == "creation" && response.status == "completed"){
+                window.location.assign("./../loadingView/loading.html");
             }else{
                 window.location.assign("./../errorView/error.html");
             }

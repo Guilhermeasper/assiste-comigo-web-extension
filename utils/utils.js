@@ -17,6 +17,27 @@ export function tabSendMessage(message) {
     });
 }
 
+export function getTabUrl() {
+    return new Promise((resolve, reject) => {
+        try {
+            chrome.tabs.query({ currentWindow: true, active: true }, (tabs) => {
+                let activeTab = tabs[0];
+                console.log(activeTab);
+                resolve(activeTab);
+                // try {
+                //     chrome.tabs.sendMessage(activeTab.id, message, (answer) => {
+                //         resolve(answer);
+                //     });
+                // } catch (error) {
+                //     reject(error);
+                // }
+            });
+        } catch (error) {
+            reject(error);
+        }
+    });
+}
+
 export function genericSendMessage(msg) {
     chrome.runtime.sendMessage(msg);
 }

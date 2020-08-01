@@ -1,6 +1,6 @@
 {
     "name": "Assiste Comigo",
-    "version": "1.0.1",
+    "version": "0.2.0",
     "description": "Assista a vídeos com seus amigos",
     "permissions": [
         "tabs",
@@ -21,7 +21,6 @@
             "js": [
                 "./libs/socket.io.js",
                 "./libs/jquery.js",
-                "/utils/utils.js",
                 "./contentScripts/mainContentScript.js"
             ],
             "matches": [
