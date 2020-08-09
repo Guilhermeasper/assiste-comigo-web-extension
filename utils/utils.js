@@ -23,14 +23,7 @@ export function getTabUrl() {
             chrome.tabs.query({ currentWindow: true, active: true }, (tabs) => {
                 let activeTab = tabs[0];
                 console.log(activeTab);
-                resolve(activeTab);
-                // try {
-                //     chrome.tabs.sendMessage(activeTab.id, message, (answer) => {
-                //         resolve(answer);
-                //     });
-                // } catch (error) {
-                //     reject(error);
-                // }
+                resolve(activeTab.url);
             });
         } catch (error) {
             reject(error);
@@ -39,12 +32,17 @@ export function getTabUrl() {
 }
 
 export function genericSendMessage(msg) {
-    chrome.runtime.sendMessage(msg);
+    return new Promise((resolve, reject) => {
+        chrome.runtime.sendMessage(msg, (response) => {
+            //console.log(response);
+            resolve(response);
+        });
+    });
 }
 
 /**
  * Copy the received string to clipboard
- * @param {string} url - 
+ * @param {string} url -
  */
 export function copyToClipboard(url) {
     const textAreaElement = document.createElement("textarea");
@@ -73,15 +71,38 @@ export function getSessionId() {
     });
 }
 
+export function getUserId() {
+    return new Promise((resolve, reject) => {
+        chrome.storage.local.get(["userId"], (result) => {
+            console.log("User id value currently is " + result.userId);
+            resolve(result.userId);
+        });
+    });
+}
+
 export function setSessionId(newSessionId) {
-    chrome.storage.local.set({ sessionId: newSessionId }, function () {
-        console.log("SID value is set to " + newSessionId);
+    return new Promise((resolve, reject) => {
+        chrome.storage.local.set({ sessionId: newSessionId }, function () {
+            console.log("SID value is set to " + newSessionId);
+            resolve(newSessionId);
+        });
+    });
+}
+
+export function setUserId(userId) {
+    return new Promise((resolve, reject) => {
+        chrome.storage.local.set({ userId: userId }, function () {
+            resolve("userId value is set to " + userId);
+        });
     });
 }
 
 export function removeSessionId() {
-    chrome.storage.local.remove(["sessionId"], function () {
-        console.log("sessionId removed");
+    return new Promise((resolve, reject) => {
+        chrome.storage.local.remove(["sessionId"], function () {
+            console.log("Session id removed");
+            resolve("sessionId removed");
+        });
     });
 }
 
@@ -93,4 +114,3 @@ export function getTabId() {
         });
     });
 }
-

@@ -1,6 +1,6 @@
 {
     "name": "Assiste Comigo",
-    "version": "0.2.0",
+    "version": "0.5.2",
     "description": "Assista a vídeos com seus amigos",
     "permissions": [
         "tabs",
@@ -9,6 +9,8 @@
         "https://www.anitube.site/*",
         "https://www.youtube.com/*",
         "https://www.netflix.com/*",
+        "https://www.crunchyroll.com/*",
+        "https://www.vimeo.com/*",
         "declarativeContent",
         "storage"
     ],
@@ -28,6 +30,8 @@
                 "*://*.viki.com/*",
                 "*://*.anitube.site/*",
                 "*://*.youtube.com/*",
+                "*://*.crunchyroll.com/*",
+                "*://*.vimeo.com/*",
                 "*://*.netflix.com/*"
             ],
             "run_at": "document_end"
@@ -40,7 +44,7 @@
         "128": "./icons/icon128.png"
     },
     "background": {
-        "page": "background.html",
+        "page": "./background/background.html",
         "persistent": false
     },
     "content_security_policy": "script-src 'self' https://cdnjs.cloudflare.com/ https://*.cloudflare.com https://www.googleapis.com; object-src 'self';",

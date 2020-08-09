@@ -6,12 +6,14 @@ import {
 document.addEventListener("DOMContentLoaded", () => {
     let buttonCreate = document.getElementById("buttonCreate");
     buttonCreate.addEventListener("click", () => {
-        tabSendMessage({ command: "createSession"}).then((response) => {
+        chrome.runtime.sendMessage({ command: "createSession"}, (response) => {
             if(response.type == "creation" && response.status == "completed"){
+                console.log("Criado");
                 window.location.assign("./../loadingView/loading.html");
             }else{
                 window.location.assign("./../errorView/error.html");
             }
         });
     });
+    
 });

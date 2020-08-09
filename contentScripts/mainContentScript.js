@@ -2,67 +2,144 @@ var serverSeek = false;
 var serverPlay = false;
 var serverPause = false;
 var socket;
-var html5VideoElement;
+var videoElement;
+
 document.addEventListener("DOMContentLoaded", domLoaded());
 
 function domLoaded() {
     console.log("Main content script loaded");
-    
+
     let contentScriptsOptions = {
-        "www.primevideo.com": primevideoScript,
-        "www.anitube.site": anitubeScript,
-        "www.youtube.com": youtubeScript,
-        "www.viki.com": vikiScript,
-        "www.netflix.com": netflixScript,
+        "www.primevideo.com": {
+            main: primevideoScript,
+            getVideo: getPrimeVideo,
+            info: getInfo,
+            play: html5VideoPlay,
+            pause: html5VideoPause,
+            seek: html5VideoSeek,
+            addListeners: addVideoListeners,
+            delListeners: removeVideoListeners,
+        },
+        "www.anitube.site": {
+            main: anitubeScript,
+            getVideo: getAnitubeVideo,
+            info: getInfo,
+            play: html5VideoPlay,
+            pause: html5VideoPause,
+            seek: html5VideoSeek,
+            addListeners: addVideoListeners,
+            delListeners: removeVideoListeners,
+        },
+        "www.youtube.com": {
+            main: youtubeScript,
+            getVideo: getYoutubeVideo,
+            info: getInfo,
+            play: html5VideoPlay,
+            pause: html5VideoPause,
+            seek: html5VideoSeek,
+            addListeners: addVideoListeners,
+            delListeners: removeVideoListeners,
+        },
+        "www.viki.com": {
+            main: vikiScript,
+            getVideo: getVikiVideo,
+            info: getInfo,
+            play: html5VideoPlay,
+            pause: html5VideoPause,
+            seek: html5VideoSeek,
+            addListeners: addVideoListeners,
+            delListeners: removeVideoListeners,
+        },
+        "vimeo.com": {
+            main: vimeoScript,
+            getVideo: getVimeoVideo,
+            info: getInfo,
+            play: html5VideoPlay,
+            pause: html5VideoPause,
+            seek: html5VideoSeek,
+            addListeners: addVideoListeners,
+            delListeners: removeVideoListeners,
+        },
+        "www.crunchyroll.com": {
+            main: crunchyrollScript,
+            getVideo: getCrunchyrollVideo,
+            info: getInfo,
+            play: html5VideoPlay,
+            pause: html5VideoPause,
+            seek: html5VideoSeek,
+            addListeners: addVideoListeners,
+            delListeners: removeVideoListeners,
+        },
+        "www.netflix.com": { main: netflixScript },
     };
     let pageHost = getPageHost();
 
-    var videoUrl;
-
     chrome.runtime.onMessage.addListener((message, sender, response) => {
-        console.log(`Message`);
+        console.log("New message");
         console.log(message);
-
         if (message.command == "info") {
-            var info;
-            html5VideoElement = getHtml5VideoElement();
-            if (!html5VideoElement) {
-                info = { page: "homepage", address: document.location.href, type: "information", status: "completed"};
-            } else {
-                info = { page: "player", address: document.location.href, type: "information", status: "completed"};
-            }
+            let info = contentScriptsOptions[pageHost].info(contentScriptsOptions[pageHost].getVideo);
             response(info);
-            return true;
+        } else if (message.command == "play") {
+            contentScriptsOptions[pageHost].play();
+            response("play");
+        } else if (message.command == "pause") {
+            contentScriptsOptions[pageHost].pause();
+            response("pause");
+        } else if (message.command == "seek") {
+            contentScriptsOptions[pageHost].seek(message.time);
+            response("seek");
         } else if (message.command == "createSession") {
-            html5VideoElement = getHtml5VideoElement();
-            serverConnection();
-            addSocketListeners();
-            addVideoListeners();
-            createSession();
-            response({ page: "player", address: document.location.href, type: "creation", status: "completed"});
+            videoElement = contentScriptsOptions[pageHost].getVideo();
+            contentScriptsOptions[pageHost].addListeners();
+            response({
+                page: "player",
+                address: document.location.href,
+                type: "creation",
+                status: "completed",
+            });
         } else if (message.command == "connection") {
-            html5VideoElement = getHtml5VideoElement();
-            serverConnection();
-            addSocketListeners();
-            addVideoListeners();
-            connectSession();
-            response({ page: "player", address: document.location.href, type: "connection", status: "completed"});
+            videoElement = contentScriptsOptions[pageHost].getVideo();
+            contentScriptsOptions[pageHost].addListeners();
+            response({
+                page: "player",
+                address: document.location.href,
+                type: "connection",
+                status: "completed",
+            });
         } else if (message.command == "disconnect") {
-            socket.emit("leaveSession", { id: message.sessionId });
-            removeVideoListeners();
-            socket.disconnect();
-            response({ page: "player", address: document.location.href, type: "disconnection", status: "completed"});
-        } else{
-            response({ page: "undentified", address: document.location.href, type: "none", status: "unknown"});
+            contentScriptsOptions[pageHost].delListeners();
+            response({
+                page: "player",
+                address: document.location.href,
+                type: "disconnection",
+                status: "completed",
+            });
+        } else {
+            console.log("Undentified message arrived");
+            response({
+                page: "undentified",
+                address: document.location.href,
+                type: "none",
+                status: "unknown",
+            });
         }
         return true;
     });
 
-    contentScriptsOptions[pageHost]();
+    contentScriptsOptions[pageHost].main();
 }
 
 function anitubeScript() {
     console.log("Anitube");
+}
+
+function vimeoScript() {
+    console.log("Vimeo");
+}
+
+function crunchyrollScript() {
+    console.log("Crunchyroll");
 }
 
 function vikiScript() {
@@ -83,6 +160,7 @@ function primevideoScript() {
             video =
                 "https://www.primevideo.com" +
                 $(event.target).parent().parent().parent().attr("href");
+            console.log(video);
         } else if (
             $(event.target)
                 .parent()
@@ -98,129 +176,45 @@ function primevideoScript() {
     });
 }
 
-function serverConnection() {
-    socket = io.connect("https://guilhermeasper.com.br:443");
-}
-
-function createSession() {
-    getUserId().then((userId) => {
-        socket.emit("create", {
-            userId: userId,
-        });
-    });
-}
-
-function connectSession() {
-    getUserId().then((userId) => {
-        getSessionId().then((sessionId) => {
-            socket.emit("join", { userId: userId, sessionId: sessionId });
-        });
-    });
-}
-
-function joinSession() {
-    socket.emit("join", { id: msg.sessionId });
-}
-
-function leaveSession() {
-    getUserId().then((userId) => {
-        getSessionId().then((sessionId) => {
-            socket.emit("leave", { userId: userId, sessionId: sessionId });
-        });
-    });
-}
-
-
-function addSocketListeners() {
-    socket.on("room_play", () => {
-        serverPlay = true;
-        html5VideoElement.play();
-    });
-
-    socket.on("room_pause", () => {
-        serverPause = true;
-    html5VideoElement.pause();
-    });
-
-    socket.on("room_seek", (data) => {
-        serverSeek = true;
-        html5VideoElement.currentTime = time;
-    });
-
-    socket.on("sessionCreated", (data) => {
-        setSessionId(data.newId);
-    });
-
-    socket.on("joinedSession", (data) => {
-        console.log("Entrou na sessão!");
-    });
-
-    socket.on("reconnect", (attemptNumber) => {
-        console.log(attemptNumber);
-        // console.log(`Reconnected ${attemptNumber} times`);
-        getUserId().then((userId) => {
-            getSessionId().then((sessionId) => {
-                socket.emit("rejoin", { userId: userId, sessionId: sessionId });
-            });
-        });
-    });
-}
-
-
-var html5VideoPauseListerner = function(event){
+var html5VideoPauseListerner = function (event) {
     if (!serverPause) {
-        getUserId().then((userId) => {
-            getSessionId().then((sessionId) => {
-                socket.emit("pause", {
-                    userId: userId,
-                    time: html5VideoElement.currentTime,
-                    sessionId: sessionId,
-                });
-            });
+        chrome.runtime.sendMessage({
+            command: "pause",
+            time: videoElement.currentTime,
         });
     }
     serverPause = false;
-} 
-var html5VideoPlayListerner = function(event){
+};
+
+var html5VideoPlayListerner = function (event) {
     if (!serverPlay) {
-        getUserId().then((userId) => {
-            getSessionId().then((sessionId) => {
-                socket.emit("play", {
-                    userId: userId,
-                    time: html5VideoElement.currentTime,
-                    sessionId: sessionId,
-                });
-            });
+        chrome.runtime.sendMessage({
+            command: "play",
+            time: videoElement.currentTime,
         });
     }
     serverPlay = false;
-}
-var html5VideoSeekListerner = function(event){
+};
+var html5VideoSeekListerner = function (event) {
     if (!serverSeek) {
-        getUserId().then((userId) => {
-            getSessionId().then((sessionId) => {
-                socket.emit("seek", {
-                    userId: userId,
-                    time: html5VideoElement.currentTime,
-                    sessionId: sessionId,
-                });
-            });
+        chrome.runtime.sendMessage({
+            command: "seek",
+            time: videoElement.currentTime,
         });
-        
     }
-    serverSeek = false;
-}
+    serverPlay = false;
+};
 
 function addVideoListeners() {
-    html5VideoElement.addEventListener("pause", html5VideoPauseListerner, false);
-    html5VideoElement.addEventListener("play", html5VideoPlayListerner, false);
-    html5VideoElement.addEventListener("seeking", html5VideoSeekListerner, false);
+    videoElement.addEventListener("pause", html5VideoPauseListerner, false);
+    videoElement.addEventListener("play", html5VideoPlayListerner, false);
+    videoElement.addEventListener("seeking", html5VideoSeekListerner, false);
 }
 
 function removeVideoListeners() {
-    html5VideoElement.removeEventListener("pause", html5VideoPauseListerner, false);
-    html5VideoElement.removeEventListener("play", html5VideoPlayListerner, false);
-    html5VideoElement.removeEventListener("seeking", html5VideoSeekListerner, false);
+    videoElement.removeEventListener("pause", html5VideoPauseListerner, false);
+    videoElement.removeEventListener("play", html5VideoPlayListerner, false);
+    videoElement.removeEventListener("seeking", html5VideoSeekListerner, false);
 }
 
 function getHtml5VideoElement() {
@@ -233,9 +227,45 @@ function getHtml5VideoElement() {
     return undefined;
 }
 
+function getYoutubeVideo() {
+    const video = document.querySelector(".video-stream");
+    return video;
+}
+
+//Not working
+function getCrunchyrollVideo() {
+    console.log("Trying to get crunchyroll video");
+    $("#vilos-player").toggle();
+    const video = document.querySelector("#player0");
+    console.log(video);
+    return video;
+}
+
+function getAnitubeVideo() {
+    const video = document.querySelector(".jw-video");
+    return video;
+}
+
+function getVimeoVideo() {
+    const video = document.querySelector("div.vp-video-wrapper > div.vp-video > div > video");
+    return video;
+}
+
+function getVikiVideo() {
+    const video = document.querySelector("#html5_player_id_Shaka_api");
+    return video;
+}
+
+function getPrimeVideo() {
+    const video = document.querySelector(
+        "#dv-web-player > div > div:nth-child(1) > div > div > div.scalingVideoContainer > div.scalingVideoContainerBottom > div > video"
+    );
+    return video;
+}
+
 function getPageHost() {
     let pageHost = document.location.host;
-    return pageHost;
+    return pageHost ?? "unknown";
 }
 
 function getPageUrl() {
@@ -243,29 +273,68 @@ function getPageUrl() {
     return pageUrl;
 }
 
-function getSessionId() {
-    return new Promise((resolve, reject) => {
-        chrome.storage.local.get(["sessionId"], (result) => {
-            resolve(result.sessionId);
-        });
-    });
+
+function getInfo(getVideo) {
+    let info;
+    videoElement = getVideo();
+    if (!videoElement) {
+        info = {
+            page: "homepage",
+            address: document.location.href,
+        };
+    } else {
+        info = {
+            page: "player",
+            address: document.location.href,
+        };
+    }
+    return info;
 }
 
-function getUserId() {
-    return new Promise((resolve, reject) => {
-        chrome.storage.local.get(["userId"], (result) => {
-            console.log("userId value currently is " + result.userId);
-            resolve(result.userId);
-        });
-    });
-}
 
-function setSessionId(newSessionId) {
-    chrome.storage.local.set({ sessionId: newSessionId }, function () {
-        console.log("SID value is set to " + newSessionId);
-    });
+function getCrunchyrollInfo(getVideo) {
+    var info;
+    videoElement = getVideo();
+    console.log("Should get the video");
+    console.log(videoElement);
+    if (!videoElement) {
+        info = {
+            page: "homepage",
+            address: document.location.href,
+            type: "information",
+            status: "completed",
+        };
+    } else {
+        info = {
+            page: "player",
+            address: document.location.href,
+            type: "information",
+            status: "completed",
+        };
+    }
+    return info;
 }
 
 function genericSendMessage(msg) {
-    chrome.runtime.sendMessage(msg);
+    return new Promise((resolve, reject) => {
+        chrome.runtime.sendMessage(msg, () => {
+            console.log(msg);
+            resolve(msg);
+        });
+    });
+}
+
+function html5VideoPlay() {
+    serverPlay = true;
+    videoElement.play();
+}
+
+function html5VideoPause() {
+    serverPause = true;
+    videoElement.pause();
+}
+
+function html5VideoSeek(time) {
+    serverSeek = true;
+    videoElement.currentTime = time;
 }

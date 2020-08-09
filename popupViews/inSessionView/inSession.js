@@ -5,6 +5,7 @@ import {
     getSessionId,
     removeSessionId,
     getTabUrl,
+    genericSendMessage,
 } from "./../../utils/utils.js";
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -15,57 +16,69 @@ document.addEventListener("DOMContentLoaded", () => {
     var connectionCommand;
 
     disconnectButton.addEventListener("click", () => {
-        tabSendMessage({command: "disconnect"}).then((response) => {
+        chrome.runtime.sendMessage({ command: "disconnect" }, (response) => {
             console.log(response);
         });
         removeSessionId();
         window.location.assign("./../createSessionView/createSession.html");
     });
 
-    getSessionId().then((sessionId) => {
-        if (sessionId) {
-            idElement.textContent = sessionId;
+    getSessionId().then((storageSessionId) => {
+        if (storageSessionId) {
+            console.log("Already have a Session id");
 
             tabSendMessage(infoCommand).then((response) => {
-                console.log(response);
-                urlCopyButton.addEventListener(
-                    "click",
-                    copyToClipboard(
-                        response.address + `&assistecomigo=${sessionId}`
-                    )
-                );
+                idElement.textContent = storageSessionId;
+                let url = response.address;
+                if (url.includes("assistecomigo=")) {
+                    urlCopyButton.addEventListener(
+                        "click",
+                        copyToClipboard(url)
+                    );
+                } else {
+                    if (url.includes("?")) {
+                        urlCopyButton.addEventListener(
+                            "click",
+                            copyToClipboard(`${url}&assistecomigo=${storageSessionId}`)
+                        );
+                    } else {
+                        urlCopyButton.addEventListener(
+                            "click",
+                            copyToClipboard(`${url}?assistecomigo=${storageSessionId}`)
+                        );
+                    }
+                }
             });
         } else {
-            getTabUrl().then((response) => {
-                let sessionId;
-                if(response.url.includes("?")){
-                    sessionId = response.url.split("&assistecomigo=")[1];
-                    urlCopyButton.addEventListener(
-                        "click",
-                        copyToClipboard(
-                            response.address + `&assistecomigo=${sessionId}`
-                        )
-                    );
-                }else{
-                    sessionId = response.url.split("?assistecomigo=")[1];
-                    urlCopyButton.addEventListener(
-                        "click",
-                        copyToClipboard(
-                            response.address + `?assistecomigo=${sessionId}`
-                        )
-                    );
-                }
-                setSessionId(sessionId);
-                connectionCommand = {
-                    command: "connection",
-                };
-                idElement.textContent = sessionId;
-
-                tabSendMessage(connectionCommand).then((response) => {
-                    console.log(response);
-                    
-                });
-            });
+            window.location.assign("./../errorView/error.html");
+            // console.log("Doesn't have a Session id");
+            // getTabUrl().then((url) => {
+            //     let sessionId;
+            //     let connectionCommand = {
+            //         command: "connection",
+            //     };
+            //     if (url.includes("assistecomigo=")) {
+            //         if (url.includes("?assistecomigo=")) {
+            //             sessionId = url.split("?assistecomigo=")[1];
+            //         } else {
+            //             sessionId = url.split("&assistecomigo=")[1];
+            //         }
+            //         console.log(`Session id from url is ${sessionId}`);
+            //         idElement.textContent = sessionId;
+            //         setSessionId(sessionId).then(() => {
+            //             urlCopyButton.addEventListener(
+            //                 "click",
+            //                 copyToClipboard(url)
+            //             );
+            //             chrome.runtime.sendMessage(
+            //                 connectionCommand,
+            //                 (response) => {
+            //                     console.log(response);
+            //                 }
+            //             );
+            //         });
+            //     }
+            // });
         }
     });
 });
