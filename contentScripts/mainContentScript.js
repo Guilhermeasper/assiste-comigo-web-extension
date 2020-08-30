@@ -70,7 +70,16 @@ function domLoaded() {
             addListeners: addVideoListeners,
             delListeners: removeVideoListeners,
         },
-        "www.netflix.com": { main: netflixScript },
+        "www.netflix.com": {
+            main: netflixScript,
+            getVideo: getNetflixVideo,
+            info: getInfo,
+            play: html5VideoPlay,
+            pause: html5VideoPause,
+            seek: html5VideoSeek,
+            addListeners: addVideoListeners,
+            delListeners: removeVideoListeners,
+        },
     };
     let pageHost = getPageHost();
 
@@ -78,7 +87,9 @@ function domLoaded() {
         console.log("New message");
         console.log(message);
         if (message.command == "info") {
-            let info = contentScriptsOptions[pageHost].info(contentScriptsOptions[pageHost].getVideo);
+            let info = contentScriptsOptions[pageHost].info(
+                contentScriptsOptions[pageHost].getVideo
+            );
             response(info);
         } else if (message.command == "play") {
             contentScriptsOptions[pageHost].play();
@@ -90,6 +101,7 @@ function domLoaded() {
             contentScriptsOptions[pageHost].seek(message.time);
             response("seek");
         } else if (message.command == "createSession") {
+            console.log("Create session received")
             videoElement = contentScriptsOptions[pageHost].getVideo();
             contentScriptsOptions[pageHost].addListeners();
             response({
@@ -98,6 +110,7 @@ function domLoaded() {
                 type: "creation",
                 status: "completed",
             });
+            return;
         } else if (message.command == "connection") {
             videoElement = contentScriptsOptions[pageHost].getVideo();
             contentScriptsOptions[pageHost].addListeners();
@@ -152,7 +165,9 @@ function youtubeScript() {
 
 function netflixScript() {
     console.log("Netflix");
+    window.addEventListener("message", receiveMessage, false);
 }
+
 
 function primevideoScript() {
     $(document).click((event) => {
@@ -247,13 +262,25 @@ function getAnitubeVideo() {
 }
 
 function getVimeoVideo() {
-    const video = document.querySelector("div.vp-video-wrapper > div.vp-video > div > video");
+    const video = document.querySelector(
+        "div.vp-video-wrapper > div.vp-video > div > video"
+    );
     return video;
 }
 
 function getVikiVideo() {
     const video = document.querySelector("#html5_player_id_Shaka_api");
     return video;
+}
+
+function getNetflixVideo() {
+    const videoPlayer = window.netflix.appContext.state.playerApp.getAPI().videoPlayer;
+
+    // Getting player id
+    const playerSessionId = videoPlayer.getAllPlayerSessionIds()[0];
+
+    const player = videoPlayer.getVideoPlayerBySessionId(playerSessionId);
+    return player;
 }
 
 function getPrimeVideo() {
@@ -273,7 +300,6 @@ function getPageUrl() {
     return pageUrl;
 }
 
-
 function getInfo(getVideo) {
     let info;
     videoElement = getVideo();
@@ -290,7 +316,6 @@ function getInfo(getVideo) {
     }
     return info;
 }
-
 
 function getCrunchyrollInfo(getVideo) {
     var info;

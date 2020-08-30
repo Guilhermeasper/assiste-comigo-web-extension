@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
             console.log(response);
         });
         removeSessionId();
-        window.location.assign("./../createSessionView/createSession.html");
+        window.location.assign("./../homepageView/homepage.html");
     });
 
     getSessionId().then((storageSessionId) => {
@@ -28,7 +28,6 @@ document.addEventListener("DOMContentLoaded", () => {
             console.log("Already have a Session id");
 
             tabSendMessage(infoCommand).then((response) => {
-                idElement.textContent = storageSessionId;
                 let url = response.address;
                 if (url.includes("assistecomigo=")) {
                     urlCopyButton.addEventListener(
@@ -51,34 +50,6 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         } else {
             window.location.assign("./../errorView/error.html");
-            // console.log("Doesn't have a Session id");
-            // getTabUrl().then((url) => {
-            //     let sessionId;
-            //     let connectionCommand = {
-            //         command: "connection",
-            //     };
-            //     if (url.includes("assistecomigo=")) {
-            //         if (url.includes("?assistecomigo=")) {
-            //             sessionId = url.split("?assistecomigo=")[1];
-            //         } else {
-            //             sessionId = url.split("&assistecomigo=")[1];
-            //         }
-            //         console.log(`Session id from url is ${sessionId}`);
-            //         idElement.textContent = sessionId;
-            //         setSessionId(sessionId).then(() => {
-            //             urlCopyButton.addEventListener(
-            //                 "click",
-            //                 copyToClipboard(url)
-            //             );
-            //             chrome.runtime.sendMessage(
-            //                 connectionCommand,
-            //                 (response) => {
-            //                     console.log(response);
-            //                 }
-            //             );
-            //         });
-            //     }
-            // });
         }
     });
 });

@@ -2,6 +2,12 @@ import { tabSendMessage, getSessionId } from "./../../utils/utils.js";
 
 document.addEventListener("DOMContentLoaded", () => {
     let infoCommand = { command: "info" };
+    let hideButton = document.getElementById("player");
+    hideButton.addEventListener("click", () => {
+        var newURL = `chrome-extension://${chrome.runtime.id}/player/index.html`;
+        chrome.tabs.create({ url: newURL });
+        console.log("Nova guia");
+    })
     tabSendMessage(infoCommand)
         .then((response) => {
             if (response.page == "player") {
@@ -29,8 +35,4 @@ document.addEventListener("DOMContentLoaded", () => {
                 window.location.assign("./../errorView/error.html");
             }
         })
-        .catch((error) => {
-            chrome.runtime.sendMessage({ command: "log", error: error });
-            window.location.assign("./../errorView/error.html");
-        });
 });

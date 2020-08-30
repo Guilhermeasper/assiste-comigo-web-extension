@@ -22,7 +22,6 @@ export function getTabUrl() {
         try {
             chrome.tabs.query({ currentWindow: true, active: true }, (tabs) => {
                 let activeTab = tabs[0];
-                console.log(activeTab);
                 resolve(activeTab.url);
             });
         } catch (error) {
@@ -34,7 +33,6 @@ export function getTabUrl() {
 export function genericSendMessage(msg) {
     return new Promise((resolve, reject) => {
         chrome.runtime.sendMessage(msg, (response) => {
-            //console.log(response);
             resolve(response);
         });
     });

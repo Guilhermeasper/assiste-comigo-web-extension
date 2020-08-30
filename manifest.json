@@ -2,8 +2,15 @@
     "name": "Assiste Comigo",
     "version": "0.5.2",
     "description": "Assista a vídeos com seus amigos",
+    "icons": {
+        "16": "./icons/ac16.png",
+        "32": "./icons/ac32.png",
+        "48": "./icons/ac48.png",
+        "128": "./icons/ac128.png"
+    },
     "permissions": [
         "tabs",
+        "*://*/*",
         "https://www.primevideo.com/*",
         "https://www.viki.com/*",
         "https://www.anitube.site/*",
@@ -14,8 +21,8 @@
         "declarativeContent",
         "storage"
     ],
-    "page_action": {
-        "default_icon": "./icons/icon48.png",
+    "browser_action": {
+        "default_icon": "./icons/ac48.png",
         "default_popup": "./popupViews/homepageView/homepage.html"
     },
     "content_scripts": [
@@ -37,15 +44,9 @@
             "run_at": "document_end"
         }
     ],
-    "icons": {
-        "16": "./icons/icon16.png",
-        "32": "./icons/icon32.png",
-        "48": "./icons/icon48.png",
-        "128": "./icons/icon128.png"
-    },
     "background": {
         "page": "./background/background.html",
-        "persistent": false
+        "persistent": true
     },
     "content_security_policy": "script-src 'self' https://cdnjs.cloudflare.com/ https://*.cloudflare.com https://www.googleapis.com; object-src 'self';",
     "manifest_version": 2

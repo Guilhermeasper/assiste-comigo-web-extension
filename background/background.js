@@ -38,23 +38,24 @@ chrome.runtime.onInstalled.addListener(function (details) {
         tmpSocket.disconnect();
     });
     tmpSocket.emit("getId", {});
-    chrome.declarativeContent.onPageChanged.removeRules(undefined, function () {
-        console.log("Rules Removed");
-        chrome.declarativeContent.onPageChanged.addRules([
-            {
-                conditions: [
-                    new chrome.declarativeContent.PageStateMatcher({
-                        pageUrl: {
-                            urlMatches:
-                                "(vimeo|crunchyroll|primevideo|viki|youtube|anitube|netflix).(com|site)",
-                        },
-                    }),
-                ],
-                actions: [new chrome.declarativeContent.ShowPageAction()],
-            },
-        ]);
-        console.log("New rules added");
-    });
+    // chrome.declarativeContent.onPageChanged.removeRules(undefined, function () {
+    //     console.log("Rules Removed");
+    //     chrome.declarativeContent.onPageChanged.addRules([
+    //         {
+    //             conditions: [
+    //                 new chrome.declarativeContent.PageStateMatcher({
+    //                     pageUrl: {
+    //                         urlMatches:
+    //                             "*",
+    //                             //"(vimeo|crunchyroll|primevideo|viki|youtube|anitube|netflix).(com|site)",
+    //                     },
+    //                 }),
+    //             ],
+    //             actions: [new chrome.declarativeContent.ShowPageAction()],
+    //         },
+    //     ]);
+    //     console.log("New rules added");
+    // });
 });
 
 chrome.runtime.onMessage.addListener((message, sender, response) => {
@@ -189,7 +190,7 @@ chrome.runtime.onMessage.addListener((message, sender, response) => {
             console.log("Não está conectado");
         }
     } else if (message.command == "sessionReady") {
-        return;
+        return true;
     } else {
         response({
             page: "undentified",
