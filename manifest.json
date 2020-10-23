@@ -25,6 +25,9 @@
         "default_icon": "./icons/ac48.png",
         "default_popup": "./popupViews/homepageView/homepage.html"
     },
+    "externally_connectable": {
+        "matches": ["https://www.netflix.com/*"]
+    },
     "content_scripts": [
         {
             "js": [
@@ -48,6 +51,7 @@
         "page": "./background/background.html",
         "persistent": true
     },
+    "web_accessible_resources": ["contentScripts/netflixScript.js", "contentScripts/youtube.js"],
     "content_security_policy": "script-src 'self' https://cdnjs.cloudflare.com/ https://*.cloudflare.com https://www.googleapis.com; object-src 'self';",
     "manifest_version": 2
 }

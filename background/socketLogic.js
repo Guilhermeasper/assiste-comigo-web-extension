@@ -1,6 +1,5 @@
 import {
     tabSendMessage,
-    genericSendMessage,
     getSessionId,
     setSessionId,
     getUserId,
@@ -13,13 +12,13 @@ export class Socket {
     }
 
     async connect() {
-        this.socket = await io.connect("https://guilhermeasper.com.br:443", {
+        this.socket = await io.connect("https://assistecomigo.herokuapp.com/", {
             transports: ["websocket"],
         });
     }
 
-    emitCommand(command, message) {
-        this.socket.emit(command, message);
+    emitCommand(type, data) {
+        this.socket.emit(type, data);
     }
 
     disconnect() {
@@ -28,62 +27,32 @@ export class Socket {
 
     addSocketListeners() {
         this.socket.on("room_play", (data) => {
-            tabSendMessage({ command: "play", time: data.time });
-            getUserId().then((userId) => {
-                getSessionId().then((sessionId) => {
-                    this.socket.emit("log", {
-                        userId: userId,
-                        sessionId: sessionId,
-                        message: "Received room play",
-                    });
-                });
-            });
+            tabSendMessage({type: "play"});
         });
 
         this.socket.on("room_pause", (data) => {
-            tabSendMessage({ command: "pause", time: data.time });
-            getUserId().then((userId) => {
-                getSessionId().then((sessionId) => {
-                    this.socket.emit("log", {
-                        userId: userId,
-                        sessionId: sessionId,
-                        message: "Received room pause",
-                    });
-                });
-            });
+            tabSendMessage({type: "pause"});
         });
 
         this.socket.on("room_seek", (data) => {
-            tabSendMessage({ command: "seek", time: data.time });
-            getUserId().then((userId) => {
-                getSessionId().then((sessionId) => {
-                    this.socket.emit("log", {
-                        userId: userId,
-                        sessionId: sessionId,
-                        message: "Received room seek",
-                    });
-                });
-            });
+            tabSendMessage({type: "seek", time: data.time});
         });
 
         this.socket.on("sessionCreated", (data) => {
             setSessionId(data.newId).then(() => {
-                console.log(`Session id is ${data.newId}`);
-                genericSendMessage({ command: "sessionReady" });
+                console.log(`Session id coming from server is ${data.newId}`);
+                chrome.runtime.sendMessage({
+                    type: "startCreate",
+                    sessionId: data.newId
+                });
             });
         });
 
         this.socket.on("joinedSession", (data) => {
-            getUserId().then((userId) => {
-                getSessionId().then((sessionId) => {
-                    this.socket.emit("log", {
-                        userId: userId,
-                        sessionId: sessionId,
-                        message: "Received joined session",
-                    });
-                });
+            chrome.runtime.sendMessage({
+                type: "startConnect",
+                sessionId: data.newId
             });
-            console.log("Entrou na sessão!");
         });
 
         this.socket.on("reconnect", () => {
@@ -91,7 +60,7 @@ export class Socket {
                 getSessionId().then((sessionId) => {
                     this.socket.emit("rejoin", {
                         userId: userId,
-                        sessionId: sessionId,
+                        sessionId: sessionId
                     });
                 });
             });

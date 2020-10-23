@@ -83,60 +83,11 @@ function domLoaded() {
     };
     let pageHost = getPageHost();
 
-    chrome.runtime.onMessage.addListener((message, sender, response) => {
-        console.log("New message");
-        console.log(message);
-        if (message.command == "info") {
-            let info = contentScriptsOptions[pageHost].info(
-                contentScriptsOptions[pageHost].getVideo
-            );
-            response(info);
-        } else if (message.command == "play") {
-            contentScriptsOptions[pageHost].play();
-            response("play");
-        } else if (message.command == "pause") {
-            contentScriptsOptions[pageHost].pause();
-            response("pause");
-        } else if (message.command == "seek") {
-            contentScriptsOptions[pageHost].seek(message.time);
-            response("seek");
-        } else if (message.command == "createSession") {
-            console.log("Create session received")
-            videoElement = contentScriptsOptions[pageHost].getVideo();
-            contentScriptsOptions[pageHost].addListeners();
-            response({
-                page: "player",
-                address: document.location.href,
-                type: "creation",
-                status: "completed",
-            });
-            return;
-        } else if (message.command == "connection") {
-            videoElement = contentScriptsOptions[pageHost].getVideo();
-            contentScriptsOptions[pageHost].addListeners();
-            response({
-                page: "player",
-                address: document.location.href,
-                type: "connection",
-                status: "completed",
-            });
-        } else if (message.command == "disconnect") {
-            contentScriptsOptions[pageHost].delListeners();
-            response({
-                page: "player",
-                address: document.location.href,
-                type: "disconnection",
-                status: "completed",
-            });
-        } else {
-            console.log("Undentified message arrived");
-            response({
-                page: "undentified",
-                address: document.location.href,
-                type: "none",
-                status: "unknown",
-            });
-        }
+    chrome.runtime.onMessage.addListener((request, sender, response) => {
+        const type = request.type;
+        console.log(`Request: ${type}`)
+        document.dispatchEvent(new CustomEvent(type, { detail: request }));
+        response({code: 200});
         return true;
     });
 
@@ -160,12 +111,23 @@ function vikiScript() {
 }
 
 function youtubeScript() {
+    var s = document.createElement('script');
+    s.src = chrome.runtime.getURL('contentScripts/youtube.js');
+    s.onload = function() {
+        this.remove();
+    };
+    (document.head || document.documentElement).appendChild(s);
     console.log("Youtube");
 }
 
 function netflixScript() {
     console.log("Netflix");
-    window.addEventListener("message", receiveMessage, false);
+    var s = document.createElement('script');
+    s.src = chrome.runtime.getURL('contentScripts/netflixScript.js');
+    s.onload = function() {
+        this.remove();
+    };
+    (document.head || document.documentElement).appendChild(s);
 }
 
 
