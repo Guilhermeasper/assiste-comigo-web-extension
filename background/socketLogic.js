@@ -1,3 +1,4 @@
+import { deflate } from "zlib";
 import {
     tabSendMessage,
     getSessionId,
@@ -5,14 +6,14 @@ import {
     getUserId,
 } from "./../utils/utils.js";
 
-export class Socket {
+class Socket {
     socket;
     constructor() {
         this.socket = undefined;
     }
 
     async connect() {
-        this.socket = await io.connect("https://assistecomigo.herokuapp.com/", {
+        this.socket = await io.connect("http://192.168.0.18:80", {
             transports: ["websocket"],
         });
     }
@@ -67,3 +68,5 @@ export class Socket {
         });
     }
 }
+
+export default socket = new Socket();

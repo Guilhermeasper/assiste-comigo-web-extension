@@ -1,18 +1,16 @@
 var assisteComigoId;
-document.addEventListener("info", function (request) {
+document.addEventListener("getInfo", function (request) {
+    console.log(request);
     const video = document.querySelector(".video-stream");
     const data = request.detail;
     const extensionId = data.extensionId;
     assisteComigoId = extensionId;
     let info = { player: false, url: document.location.href, time: undefined };
-    //console.log("Received info request");
     if (video) {
-        const player = videoPlayer.getVideoPlayerBySessionId(
-            playerSessionId[0]
-        );
         info.player = true;
-        info.time = player.getCurrentTime();
+        info.time = video.currentTime;
         const newData = { ...data, ...info };
+        console.log(newData);
         chrome.runtime.sendMessage(extensionId, newData, (response) =>
             console.log(response)
         );
@@ -24,23 +22,12 @@ document.addEventListener("info", function (request) {
     }
 });
 
-window.addEventListener("popstate", function (event) {
-    const video = document.querySelector(".video-stream");
-    const extensionId = data.extensionId;
-    if (video) {
-        const data = { type: "disconnect" };
-        chrome.runtime.sendMessage(extensionId, data, (response) =>
-            console.log(response)
-        );
-    }
-});
-
 document.addEventListener("finishCreate", function (request) {
     const video = document.querySelector(".video-stream");
     const data = request.detail;
     let info = { player: false, url: document.location.href, time: undefined };
     const extensionId = data.extensionId;
-    //console.log("Received create request");
+
     if (video) {
         info.player = true;
         info.time = video.currentTime;

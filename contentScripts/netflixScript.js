@@ -1,5 +1,5 @@
 var assisteComigoId;
-document.addEventListener("info", function (request) {
+document.addEventListener("getInfo", function (request) {
     const videoPlayer = window.netflix.appContext.state.playerApp.getAPI()
         .videoPlayer;
     const playerSessionId = videoPlayer.getAllPlayerSessionIds();
@@ -7,7 +7,7 @@ document.addEventListener("info", function (request) {
     const extensionId = data.extensionId;
     assisteComigoId = extensionId;
     let info = { player: false, url: document.location.href, time: undefined };
-    //console.log("Received info request");
+
     if (playerSessionId.length > 0) {
         const player = videoPlayer.getVideoPlayerBySessionId(
             playerSessionId[0]
@@ -89,7 +89,7 @@ document.addEventListener("finishConnect", function (request) {
     let info = { player: false, url: document.location.href, time: undefined };
     const videoPlayer = window.netflix.appContext.state.playerApp.getAPI()
         .videoPlayer;
-        const extensionId = data.extensionId;
+    const extensionId = data.extensionId;
     const playerSessionId = videoPlayer.getAllPlayerSessionIds();
     console.log("Received connect request");
     if (video) {

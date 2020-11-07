@@ -32,13 +32,6 @@ function domLoaded() {
         },
         "www.youtube.com": {
             main: youtubeScript,
-            getVideo: getYoutubeVideo,
-            info: getInfo,
-            play: html5VideoPlay,
-            pause: html5VideoPause,
-            seek: html5VideoSeek,
-            addListeners: addVideoListeners,
-            delListeners: removeVideoListeners,
         },
         "www.viki.com": {
             main: vikiScript,
@@ -72,30 +65,19 @@ function domLoaded() {
         },
         "www.netflix.com": {
             main: netflixScript,
-            getVideo: getNetflixVideo,
-            info: getInfo,
-            play: html5VideoPlay,
-            pause: html5VideoPause,
-            seek: html5VideoSeek,
-            addListeners: addVideoListeners,
-            delListeners: removeVideoListeners,
         },
     };
     let pageHost = getPageHost();
 
     chrome.runtime.onMessage.addListener((request, sender, response) => {
         const type = request.type;
-        console.log(`Request: ${type}`)
+        console.log(`Request: ${type}`);
         document.dispatchEvent(new CustomEvent(type, { detail: request }));
-        response({code: 200});
+        response({ code: 200 });
         return true;
     });
 
     contentScriptsOptions[pageHost].main();
-}
-
-function anitubeScript() {
-    console.log("Anitube");
 }
 
 function vimeoScript() {
@@ -111,9 +93,9 @@ function vikiScript() {
 }
 
 function youtubeScript() {
-    var s = document.createElement('script');
-    s.src = chrome.runtime.getURL('contentScripts/youtube.js');
-    s.onload = function() {
+    var s = document.createElement("script");
+    s.src = chrome.runtime.getURL("contentScripts/youtube.js");
+    s.onload = function () {
         this.remove();
     };
     (document.head || document.documentElement).appendChild(s);
@@ -122,14 +104,23 @@ function youtubeScript() {
 
 function netflixScript() {
     console.log("Netflix");
-    var s = document.createElement('script');
-    s.src = chrome.runtime.getURL('contentScripts/netflixScript.js');
-    s.onload = function() {
+    var s = document.createElement("script");
+    s.src = chrome.runtime.getURL("contentScripts/netflixScript.js");
+    s.onload = function () {
         this.remove();
     };
     (document.head || document.documentElement).appendChild(s);
 }
 
+function anitubeScript() {
+    console.log("Anitube");
+    var s = document.createElement("script");
+    s.src = chrome.runtime.getURL("contentScripts/anitubeScript.js");
+    s.onload = function () {
+        this.remove();
+    };
+    (document.head || document.documentElement).appendChild(s);
+}
 
 function primevideoScript() {
     $(document).click((event) => {
@@ -233,16 +224,6 @@ function getVimeoVideo() {
 function getVikiVideo() {
     const video = document.querySelector("#html5_player_id_Shaka_api");
     return video;
-}
-
-function getNetflixVideo() {
-    const videoPlayer = window.netflix.appContext.state.playerApp.getAPI().videoPlayer;
-
-    // Getting player id
-    const playerSessionId = videoPlayer.getAllPlayerSessionIds()[0];
-
-    const player = videoPlayer.getVideoPlayerBySessionId(playerSessionId);
-    return player;
 }
 
 function getPrimeVideo() {

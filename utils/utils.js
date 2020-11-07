@@ -1,10 +1,8 @@
 export function tabSendMessage(message) {
-    console.log(message);
     return new Promise((resolve, reject) => {
         try {
             chrome.tabs.query({ currentWindow: true, active: true }, (tabs) => {
                 let activeTab = tabs[0];
-                console.log(activeTab);
                 try {
                     const newdata = { tabId: activeTab.id };
                     const newMessage = { ...message, ...newdata };
