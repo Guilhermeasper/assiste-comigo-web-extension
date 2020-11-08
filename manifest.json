@@ -21,7 +21,8 @@
         "declarativeContent",
         "storage"
     ],
-    "browser_action": {
+    "page_action": {
+        "default_title": "Assiste Comigo",
         "default_icon": "./icons/ac48.png",
         "default_popup": "./popupViews/homepageView/homepage.html"
     },

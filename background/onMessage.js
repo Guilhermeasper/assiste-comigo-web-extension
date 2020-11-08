@@ -5,7 +5,7 @@ import {
     getSessionUrl,
 } from "./../utils/utils.js";
 
-import socket from "./socketLogic.js";
+import socket from "../utils/socket.js";
 
 chrome.runtime.onMessage.addListener(onMessage);
 
@@ -85,12 +85,12 @@ function onMessage(request, sender, response) {
     console.log(request, sender, response);
     const type = request.type;
     const typeOptions = {
-        getInfo: getInfo.bind(request, response),
-        startCreate: startCreate.bind(response),
-        finishCreate: finishCreate.bind(request, response),
-        startConnect: startConnect.bind(request, response),
-        finishConnect: finishConnect.bind(request, response),
-        disconnect: disconnect.bind(request, response),
+        getInfo: getInfo.bind(this, request, response),
+        startCreate: startCreate.bind(this, response),
+        finishCreate: finishCreate.bind(this, request, response),
+        startConnect: startConnect.bind(this, request, response),
+        finishConnect: finishConnect.bind(this, request, response),
+        disconnect: disconnect.bind(this, request, response),
     };
     typeOptions[type]();
     return true;

@@ -1,12 +1,14 @@
-import { tabSendMessage, setSessionId } from "./../../utils/utils.js";
 const buttonCreate = document.getElementById("buttonCreate");
-document.addEventListener("DOMContentLoaded", DOMContentLoaded)
 
-function DOMContentLoaded(){
-    buttonCreate.addEventListener("click", onButtonCreateClick);
-    chrome.runtime.onMessage.addListener(onMessage);
-}
+chrome.runtime.onMessage.addListener(onMessage);
+buttonCreate.addEventListener("click", onButtonCreateClick);
 
+/**
+ * Listener from messages coming from the background
+ * @param {Object} request - Object cotaining request information
+ * @param {Object} sender - Object cotaining sender information
+ * @param {Object} response - Callback to respond message received
+ */
 function onMessage(request, sender, response){
     if (request.type == "startCreate") {
         chrome.runtime.sendMessage({type: "finishCreate"});
@@ -31,6 +33,9 @@ function onMessage(request, sender, response){
     }
 }
 
+/**
+ * Function fired when create button is clicked
+ */
 function onButtonCreateClick(){
     chrome.runtime.sendMessage({ type: "startCreate" });
 }

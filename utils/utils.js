@@ -1,3 +1,7 @@
+/**
+ * Send a message to the content script of the current tab
+ * @param {Object} message Object containing the message to be sent
+ */
 export function tabSendMessage(message) {
     return new Promise((resolve, reject) => {
         try {

@@ -6,15 +6,15 @@ import {
 } from "./../../utils/popupNavigate.js";
 
 document.addEventListener("DOMContentLoaded", DOMContentLoaded);
+chrome.runtime.onMessage.addListener(onMessage);
 
 /**
- * 
+ * Listener from messages coming from the background
  * @param {Object} request - Object cotaining request information
  * @param {Object} sender - Object cotaining sender information
  * @param {Object} response - Callback to respond message received
  */
-
-function onMessage(request, sender, response) {
+function onMessage(request, sender, response){
     const player = request.player;
     const userId = request.userId;
     const sessionId = request.sessionId;
@@ -32,12 +32,21 @@ function onMessage(request, sender, response) {
     }
 }
 
+/**
+ * Callback from the send message function
+ * @param {Object} result Answer from the send message
+ */
 function sendMessageClosure(result) {
     console.log(result);
+    if(!result){
+        goToErrorPage();
+    }
 }
 
+/**
+ * Function fired when the dom is completely loaded
+ */
 function DOMContentLoaded() {
     let infoPacket = { type: "getInfo" };
-    chrome.runtime.onMessage.addListener(onMessage);
     chrome.runtime.sendMessage(infoPacket, sendMessageClosure);
 }
