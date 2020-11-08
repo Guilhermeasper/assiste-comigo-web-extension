@@ -40,14 +40,6 @@ export function getTabUrl() {
     });
 }
 
-// export function genericSendMessage(msg) {
-//     return new Promise((resolve, reject) => {
-//         chrome.runtime.sendMessage(msg, (response) => {
-//             resolve(response);
-//         });
-//     });
-// }
-
 /**
  * Copy the received string to clipboard
  * @param {string} url -

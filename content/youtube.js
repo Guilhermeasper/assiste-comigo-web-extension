@@ -1,7 +1,8 @@
 var assisteComigoId;
+const selector = ".video-stream";
 document.addEventListener("getInfo", function (request) {
     console.log(request);
-    const video = document.querySelector(".video-stream");
+    const video = document.querySelector(selector);
     const data = request.detail;
     const extensionId = data.extensionId;
     assisteComigoId = extensionId;
@@ -23,7 +24,7 @@ document.addEventListener("getInfo", function (request) {
 });
 
 document.addEventListener("finishCreate", function (request) {
-    const video = document.querySelector(".video-stream");
+    const video = document.querySelector(selector);
     const data = request.detail;
     let info = { player: false, url: document.location.href, time: undefined };
     const extensionId = data.extensionId;
@@ -60,7 +61,7 @@ document.addEventListener("startConnect", function (request) {
 });
 
 document.addEventListener("finishConnect", function (request) {
-    const video = document.querySelector(".video-stream");
+    const video = document.querySelector(selector);
     const data = request.detail;
     let info = { player: false, url: document.location.href, time: undefined };
     console.log("Received connect request");
@@ -85,7 +86,7 @@ document.addEventListener("finishConnect", function (request) {
 });
 
 document.addEventListener("disconnect", function (request) {
-    const video = document.querySelector(".video-stream");
+    const video = document.querySelector(selector);
     const data = request.detail;
     let info = { player: false, url: document.location.href };
     const extensionId = data.extensionId;
@@ -110,7 +111,7 @@ document.addEventListener("disconnect", function (request) {
 });
 
 document.addEventListener("play", function (request) {
-    const video = document.querySelector(".video-stream");
+    const video = document.querySelector(selector);
     console.log("Received info request");
     if (video) {
         video.play();
@@ -120,7 +121,7 @@ document.addEventListener("play", function (request) {
 });
 
 document.addEventListener("pause", function (request) {
-    const video = document.querySelector(".video-stream");
+    const video = document.querySelector(selector);
     console.log("Received info request");
     if (video) {
         video.pause();
@@ -130,7 +131,7 @@ document.addEventListener("pause", function (request) {
 });
 
 document.addEventListener("seek", function (request) {
-    const video = document.querySelector(".video-stream");
+    const video = document.querySelector(selector);
     const data = request.detail;
     console.log("Received info request");
     if (video) {
@@ -141,7 +142,7 @@ document.addEventListener("seek", function (request) {
 });
 
 const playListener = function () {
-    const video = document.querySelector(".video-stream");
+    const video = document.querySelector(selector);
     chrome.runtime.sendMessage(
         assisteComigoId,
         { type: "play", time: video.currentTime },
@@ -150,7 +151,7 @@ const playListener = function () {
 };
 
 const pauseListener = function () {
-    const video = document.querySelector(".video-stream");
+    const video = document.querySelector(selector);
     chrome.runtime.sendMessage(
         assisteComigoId,
         { type: "pause", time: video.currentTime },
@@ -159,7 +160,7 @@ const pauseListener = function () {
 };
 
 const seekListener = function () {
-    const video = document.querySelector(".video-stream");
+    const video = document.querySelector(selector);
     chrome.runtime.sendMessage(
         assisteComigoId,
         { type: "seek", time: video.currentTime },

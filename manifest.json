@@ -1,7 +1,7 @@
 {
     "name": "Assiste Comigo",
-    "version": "0.5.2",
-    "description": "Assista a vídeos com seus amigos",
+    "version": "1.0.0",
+    "description": "Assista a filmes, séries e animes com quem você gosta",
     "icons": {
         "16": "./icons/ac16.png",
         "32": "./icons/ac32.png",
@@ -10,7 +10,7 @@
     },
     "permissions": [
         "tabs",
-        "*://*/*",
+        "activeTab",
         "https://www.primevideo.com/*",
         "https://www.viki.com/*",
         "https://www.anitube.site/*",
@@ -28,9 +28,13 @@
     },
     "externally_connectable": {
         "matches": [
-            "https://www.netflix.com/*",
+            "https://www.primevideo.com/*",
+            "https://www.viki.com/*",
+            "https://www.anitube.site/*",
             "https://www.youtube.com/*",
-            "https://www.anitube.site/*"
+            "https://www.netflix.com/*",
+            "https://www.crunchyroll.com/*",
+            "https://www.vimeo.com/*"
         ]
     },
     "content_scripts": [
@@ -38,7 +42,7 @@
             "js": [
                 "./libs/socket.io.js",
                 "./libs/jquery.js",
-                "./contentScripts/mainContentScript.js"
+                "./content/content.js"
             ],
             "matches": [
                 "*://*.primevideo.com/*",
@@ -57,9 +61,18 @@
         "persistent": true
     },
     "web_accessible_resources": [
-        "contentScripts/youtube.js",
-        "contentScripts/anitubeScript.js",
-        "contentScripts/netflixScript.js"
+        "content/youtube.js",
+        "content/anitube.js",
+        "content/netflix.js",
+        "content/appletv.js",
+        "content/crunchyroll.js",
+        "content/disney.js",
+        "content/globoplay.js",
+        "content/hulu.js",
+        "content/primevideo.js",
+        "content/telecine.js",
+        "content/viki.js",
+        "content/vimeo.js"
     ],
     "content_security_policy": "script-src 'self' https://cdnjs.cloudflare.com/ https://*.cloudflare.com https://www.googleapis.com; object-src 'self';",
     "manifest_version": 2
