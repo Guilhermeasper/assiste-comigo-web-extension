@@ -1,55 +1,50 @@
-import {
-    tabSendMessage,
-    copyToClipboard,
-    setSessionId,
-    getSessionId,
-    removeSessionId,
-    getTabUrl,
-    genericSendMessage,
-} from "./../../utils/utils.js";
+import { copyToClipboard, clearInfo } from "./../../utils/utils.js";
+import { goToErrorPage, goToHomepagePage } from "./../../utils/popupNavigate.js";
 
-document.addEventListener("DOMContentLoaded", () => {
-    var idElement = document.getElementById("id");
-    var urlCopyButton = document.getElementById("urlCopyButton");
-    var disconnectButton = document.getElementById("disconnectButton");
-    var infoCommand = { command: "info" };
-    var connectionCommand;
+const urlCopyButton = document.getElementById("urlCopyButton");
+const disconnectButton = document.getElementById("disconnectButton");
 
-    disconnectButton.addEventListener("click", () => {
-        chrome.runtime.sendMessage({ command: "disconnect" }, (response) => {
-            console.log(response);
-        });
-        removeSessionId();
-        window.location.assign("./../homepageView/homepage.html");
-    });
+document.addEventListener("DOMContentLoaded", DOMContentLoaded);
+chrome.runtime.onMessage.addListener(onMessage);
+disconnectButton.addEventListener("click", onDisconnectButtonClick);
 
-    getSessionId().then((storageSessionId) => {
-        if (storageSessionId) {
-            console.log("Already have a Session id");
+/**
+ * Function fired when the dom is completely loaded
+ */
+function DOMContentLoaded(){
+    chrome.runtime.sendMessage({ type: "getInfo" }, sendMessageClosure);
+}
 
-            tabSendMessage(infoCommand).then((response) => {
-                let url = response.address;
-                if (url.includes("assistecomigo=")) {
-                    urlCopyButton.addEventListener(
-                        "click",
-                        copyToClipboard(url)
-                    );
-                } else {
-                    if (url.includes("?")) {
-                        urlCopyButton.addEventListener(
-                            "click",
-                            copyToClipboard(`${url}&assistecomigo=${storageSessionId}`)
-                        );
-                    } else {
-                        urlCopyButton.addEventListener(
-                            "click",
-                            copyToClipboard(`${url}?assistecomigo=${storageSessionId}`)
-                        );
-                    }
-                }
-            });
-        } else {
-            window.location.assign("./../errorView/error.html");
-        }
-    });
-});
+/**
+ * Function fired when disconnect button is clicked
+ */
+function onDisconnectButtonClick() {
+    chrome.runtime.sendMessage({ type: "disconnect" }, sendMessageClosure);
+    goToHomepagePage();
+}
+
+/**
+ * Listener from messages coming from the background
+ * @param {Object} request - Object cotaining request information
+ * @param {Object} sender - Object cotaining sender information
+ * @param {Object} response - Callback to respond message received
+ */
+function onMessage(request, sender, response) {
+    const player = request.player;
+    const userId = request.userId;
+    const sessionId = request.sessionId;
+    const sessionUrl = request.sessionUrl;
+    if (userId && player && sessionId) {
+        urlCopyButton.addEventListener("click", copyToClipboard(sessionUrl));
+    } else {
+        goToErrorPage();
+    }
+}
+
+/**
+ * Callback from the send message function
+ * @param {Object} result Answer from the send message
+ */
+function sendMessageClosure(response) {
+    console.log(response);
+}

@@ -8,16 +8,20 @@
         />
         <script src="./../../libs/jquery.js"></script>
         <link rel="stylesheet" href="./../styles.css" />
-        <link rel="stylesheet" href="./createSession.css" />
-        <script type="module" src="./createSession.js"></script>
+        <link rel="stylesheet" href="connect.css" />
+        <script type="module" src="./connect.js"></script>
     </head>
+
     <body>
         <div id="content">
             <div class="innerContent">
                 <img id="title" alt="Assiste comigo" src="./../../icons/assiste-comigo-title.svg">
             </div>
             <div class="innerContent">
-                <button class="button" id="buttonCreate">Nova Sessão</button>
+                <div id="info" class="text">
+                    Conectando...
+                </div>
+                <div id="loading-bar"></div>
             </div>
         </div>
     </body>

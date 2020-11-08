@@ -1,38 +1,52 @@
-import { tabSendMessage, getSessionId } from "./../../utils/utils.js";
+import {
+    goToConnectPage,
+    goToCreateSessionPage,
+    goToErrorPage,
+    goToInSessionPage
+} from "./../../utils/popupNavigate.js";
 
-document.addEventListener("DOMContentLoaded", () => {
-    let infoCommand = { command: "info" };
-    let hideButton = document.getElementById("player");
-    hideButton.addEventListener("click", () => {
-        var newURL = `chrome-extension://${chrome.runtime.id}/player/index.html`;
-        chrome.tabs.create({ url: newURL });
-        console.log("Nova guia");
-    })
-    tabSendMessage(infoCommand)
-        .then((response) => {
-            if (response.page == "player") {
-                // window.location.assign("./../loadingView/loading.html");
-                getSessionId().then((result) => {
-                    if (!result) {
-                        if (response.address.includes("assistecomigo")) {
-                            window.location.assign(
-                                "./../loadingView/loading.html"
-                            );
-                        } else {
-                            window.location.assign(
-                                "./../createSessionView/createSession.html"
-                            );
-                        }
-                    } else {
-                        window.location.assign(
-                            "./../inSessionView/inSession.html"
-                        );
-                    }
-                });
-            } else if (response.page == "homepage") {
-                console.log("Already on homepage");
-            } else {
-                window.location.assign("./../errorView/error.html");
-            }
-        })
-});
+document.addEventListener("DOMContentLoaded", DOMContentLoaded);
+chrome.runtime.onMessage.addListener(onMessage);
+
+/**
+ * Listener from messages coming from the background
+ * @param {Object} request - Object cotaining request information
+ * @param {Object} sender - Object cotaining sender information
+ * @param {Object} response - Callback to respond message received
+ */
+function onMessage(request, sender, response){
+    const player = request.player;
+    const userId = request.userId;
+    const sessionId = request.sessionId;
+    const url = request.url;
+    if (!userId) {
+        goToErrorPage();
+    } else {
+        if (player && sessionId) {
+            goToInSessionPage();
+        } else if (!sessionId && url.includes("assistecomigo=")) {
+            goToConnectPage();
+        } else if (player && !sessionId) {
+            goToCreateSessionPage();
+        }
+    }
+}
+
+/**
+ * Callback from the send message function
+ * @param {Object} result Answer from the send message
+ */
+function sendMessageClosure(result) {
+    console.log(result);
+    if(!result){
+        goToErrorPage();
+    }
+}
+
+/**
+ * Function fired when the dom is completely loaded
+ */
+function DOMContentLoaded() {
+    let infoPacket = { type: "getInfo" };
+    chrome.runtime.sendMessage(infoPacket, sendMessageClosure);
+}
