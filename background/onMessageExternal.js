@@ -23,6 +23,7 @@ function onMessageExternal(request, sender, response) {
     const typeOptions = {
         getInfo: getInfoExternal.bind(this, request, response),
         startConnect: startConnectExternal.bind(
+            this,
             request,
             response,
             url,
