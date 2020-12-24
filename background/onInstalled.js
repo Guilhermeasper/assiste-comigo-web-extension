@@ -8,7 +8,7 @@ chrome.runtime.onInstalled.addListener(onInstalled);
  */
 function onInstalled(details) {
     clearInfo();
-    let tmpSocket = io.connect("http://192.168.0.18:80", {
+    let tmpSocket = io.connect("http://assistecomigotest.herokuapp.com", {
         transports: ["websocket"],
     });
     tmpSocket.on("newId", (data) => {

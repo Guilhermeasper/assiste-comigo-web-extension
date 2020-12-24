@@ -42,7 +42,7 @@ class Socket {
     }
 
     async connect() {
-        this.socket = await io.connect("http://192.168.0.18:80", {
+        this.socket = await io.connect("http://assistecomigotest.herokuapp.com", {
             transports: ["websocket"],
         });
     }

@@ -1,7 +1,16 @@
 var assisteComigoId;
 const selector = ".video-stream";
-document.addEventListener("getInfo", function (request) {
-    console.log(request);
+
+document.addEventListener("getInfo", getInfo);
+document.addEventListener("finishCreate", finishCreate);
+document.addEventListener("startConnect", startConnect);
+document.addEventListener("finishConnect", finishConnect);
+document.addEventListener("disconnect", disconnect);
+document.addEventListener("play", play);
+document.addEventListener("pause", pause);
+document.addEventListener("seek", seek);
+
+function getInfo(request) {
     const video = document.querySelector(selector);
     const data = request.detail;
     const extensionId = data.extensionId;
@@ -21,10 +30,11 @@ document.addEventListener("getInfo", function (request) {
             console.log(response)
         );
     }
-});
+}
 
-document.addEventListener("finishCreate", function (request) {
+function finishCreate(request) {
     const video = document.querySelector(selector);
+    const videoAds = document.querySelector(".video-ads");
     const data = request.detail;
     let info = { player: false, url: document.location.href, time: undefined };
     const extensionId = data.extensionId;
@@ -36,6 +46,7 @@ document.addEventListener("finishCreate", function (request) {
         video.addEventListener("play", playListener);
         video.addEventListener("pause", pauseListener);
         video.addEventListener("seeking", seekListener);
+        new ResizeObserver(videoAdsResize).observe(videoAds);
         chrome.runtime.sendMessage(extensionId, newData, (response) =>
             console.log(response)
         );
@@ -47,9 +58,9 @@ document.addEventListener("finishCreate", function (request) {
             console.log(response)
         );
     }
-});
+}
 
-document.addEventListener("startConnect", function (request) {
+function startConnect(request) {
     const data = request.detail;
     let info = { url: document.location.href };
     const newData = { ...data, ...info };
@@ -57,11 +68,11 @@ document.addEventListener("startConnect", function (request) {
     chrome.runtime.sendMessage(extensionId, newData, (response) =>
         console.log(response)
     );
-    console.log("Received connect request");
-});
+}
 
-document.addEventListener("finishConnect", function (request) {
+function finishConnect(request) {
     const video = document.querySelector(selector);
+    const videoAds = document.querySelector(".video-ads");
     const data = request.detail;
     let info = { player: false, url: document.location.href, time: undefined };
     console.log("Received connect request");
@@ -72,6 +83,7 @@ document.addEventListener("finishConnect", function (request) {
         video.addEventListener("play", playListener);
         video.addEventListener("pause", pauseListener);
         video.addEventListener("seeking", seekListener);
+        new ResizeObserver(videoAdsResize).observe(videoAds);
         chrome.runtime.sendMessage(extensionId, newData, (response) =>
             console.log(response)
         );
@@ -83,9 +95,9 @@ document.addEventListener("finishConnect", function (request) {
             console.log(response)
         );
     }
-});
+}
 
-document.addEventListener("disconnect", function (request) {
+function disconnect(request) {
     const video = document.querySelector(selector);
     const data = request.detail;
     let info = { player: false, url: document.location.href };
@@ -108,9 +120,9 @@ document.addEventListener("disconnect", function (request) {
             console.log(response)
         );
     }
-});
+}
 
-document.addEventListener("play", function (request) {
+function play(request) {
     const video = document.querySelector(selector);
     console.log("Received info request");
     if (video) {
@@ -118,9 +130,9 @@ document.addEventListener("play", function (request) {
     } else {
         console.log("Erro no play");
     }
-});
+}
 
-document.addEventListener("pause", function (request) {
+function pause(request) {
     const video = document.querySelector(selector);
     console.log("Received info request");
     if (video) {
@@ -128,9 +140,9 @@ document.addEventListener("pause", function (request) {
     } else {
         console.log("Erro no pause");
     }
-});
+}
 
-document.addEventListener("seek", function (request) {
+function seek(request) {
     const video = document.querySelector(selector);
     const data = request.detail;
     console.log("Received info request");
@@ -139,31 +151,52 @@ document.addEventListener("seek", function (request) {
     } else {
         console.log("Erro no seek");
     }
-});
+}
 
-const playListener = function () {
+function playListener() {
     const video = document.querySelector(selector);
     chrome.runtime.sendMessage(
         assisteComigoId,
         { type: "play", time: video.currentTime },
         (response) => console.log(response)
     );
-};
+}
 
-const pauseListener = function () {
+function pauseListener() {
     const video = document.querySelector(selector);
     chrome.runtime.sendMessage(
         assisteComigoId,
         { type: "pause", time: video.currentTime },
         (response) => console.log(response)
     );
-};
+}
 
-const seekListener = function () {
+function seekListener() {
     const video = document.querySelector(selector);
     chrome.runtime.sendMessage(
         assisteComigoId,
         { type: "seek", time: video.currentTime },
         (response) => console.log(response)
     );
-};
+}
+
+function videoAdsResize(){
+    const video = document.querySelector(selector);
+    const videoAds = document.querySelector(".video-ads");
+    console.log(videoAdsRect);
+    if(videoAdsRect.width + videoAdsRect.height > 0){
+        console.log("Pausing for ad");
+        chrome.runtime.sendMessage(
+            assisteComigoId,
+            { type: "pause", time: video.currentTime },
+            (response) => console.log(response)
+        );
+    }else{
+        console.log("Playing after ad");
+        chrome.runtime.sendMessage(
+            assisteComigoId,
+            { type: "play", time: video.currentTime },
+            (response) => console.log(response)
+        );
+    }
+}

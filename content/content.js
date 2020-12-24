@@ -137,6 +137,3 @@ function getPageUrl() {
     let pageUrl = document.location.href;
     return pageUrl;
 }
-
-
-
