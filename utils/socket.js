@@ -37,12 +37,14 @@ function joinedSession(data) {
 
 class Socket {
     socket;
+    _address;
     constructor() {
         this.socket = undefined;
+        this._address = "http://assistecomigo.herokuapp.com";
     }
 
     async connect() {
-        this.socket = await io.connect("http://assistecomigotest.herokuapp.com", {
+        this.socket = await io.connect(this._address, {
             transports: ["websocket"],
         });
     }

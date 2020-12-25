@@ -1,6 +1,8 @@
 importScripts("./utils/utils.js");
 importScripts('./libs/socket.io.js');
 
+const serverAddress = "http://assistecomigo.herokuapp.com";
+
 chrome.runtime.onInstalled.addListener(onInstalled);
 
 /**
@@ -9,7 +11,7 @@ chrome.runtime.onInstalled.addListener(onInstalled);
  */
 function onInstalled(details) {
     clearInfo();
-    let tmpSocket = io.connect("http://assistecomigotest.herokuapp.com", {
+    let tmpSocket = io.connect(serverAddress, {
         transports: ["websocket"],
     });
     tmpSocket.on("newId", (data) => {
