@@ -1,66 +1,60 @@
 {
-    "name": "Assiste Comigo",
-    "version": "1.0.0",
-    "description": "Assista a filmes, séries e animes com quem você gosta",
-    "icons": {
-        "16": "./icons/ac16.png",
-        "32": "./icons/ac32.png",
-        "48": "./icons/ac48.png",
-        "128": "./icons/ac128.png"
-    },
-    "permissions": [
-        "tabs",
-        "activeTab",
-        "https://www.primevideo.com/*",
-        "https://www.viki.com/*",
-        "https://www.anitube.site/*",
-        "https://www.youtube.com/*",
-        "https://www.netflix.com/*",
-        "https://www.crunchyroll.com/*",
-        "https://www.vimeo.com/*",
-        "declarativeContent",
-        "storage"
-    ],
-    "page_action": {
-        "default_title": "Assiste Comigo",
-        "default_icon": "./icons/ac48.png",
-        "default_popup": "./popupViews/homepageView/homepage.html"
-    },
-    "externally_connectable": {
-        "matches": [
-            "https://www.primevideo.com/*",
-            "https://www.viki.com/*",
-            "https://www.anitube.site/*",
-            "https://www.youtube.com/*",
-            "https://www.netflix.com/*",
-            "https://www.crunchyroll.com/*",
-            "https://www.vimeo.com/*"
-        ]
-    },
-    "content_scripts": [
-        {
-            "js": [
-                "./libs/socket.io.js",
-                "./libs/jquery.js",
-                "./content/content.js"
-            ],
-            "matches": [
-                "*://*.primevideo.com/*",
-                "*://*.viki.com/*",
-                "*://*.anitube.site/*",
-                "*://*.youtube.com/*",
-                "*://*.crunchyroll.com/*",
-                "*://*.vimeo.com/*",
-                "*://*.netflix.com/*"
-            ],
-            "run_at": "document_end"
-        }
-    ],
-    "background": {
-        "page": "./background/background.html",
-        "persistent": true
-    },
-    "web_accessible_resources": [
+  "name": "Assiste Comigo",
+  "version": "1.0.0",
+  "description": "Assista a filmes, séries e animes com quem você gosta",
+  "icons": {
+    "16": "./icons/ac16.png",
+    "32": "./icons/ac32.png",
+    "48": "./icons/ac48.png",
+    "128": "./icons/ac128.png"
+  },
+  "permissions": ["tabs", "activeTab", "declarativeContent", "storage"],
+  "host_permissions": [
+    "https://www.primevideo.com/*",
+    "https://www.viki.com/*",
+    "https://www.anitube.site/*",
+    "https://www.youtube.com/*",
+    "https://www.netflix.com/*",
+    "https://www.crunchyroll.com/*",
+    "https://www.vimeo.com/*"
+  ],
+  "action": {
+    "default_title": "Assiste Comigo",
+    "default_icon": "./icons/ac48.png",
+    "default_popup": "./popupViews/homepageView/homepage.html"
+  },
+  "externally_connectable": {
+    "matches": [
+      "https://www.primevideo.com/*",
+      "https://www.viki.com/*",
+      "https://www.anitube.site/*",
+      "https://www.youtube.com/*",
+      "https://www.netflix.com/*",
+      "https://www.crunchyroll.com/*",
+      "https://www.vimeo.com/*"
+    ]
+  },
+  "content_scripts": [
+    {
+      "js": ["./libs/socket.io.js", "./libs/jquery.js", "./content/content.js"],
+      "matches": [
+        "*://*.primevideo.com/*",
+        "*://*.viki.com/*",
+        "*://*.anitube.site/*",
+        "*://*.youtube.com/*",
+        "*://*.crunchyroll.com/*",
+        "*://*.vimeo.com/*",
+        "*://*.netflix.com/*"
+      ],
+      "run_at": "document_end"
+    }
+  ],
+  "background": {
+    "service_worker": "./background/background.js"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
         "content/youtube.js",
         "content/anitube.js",
         "content/netflix.js",
@@ -73,7 +67,17 @@
         "content/telecine.js",
         "content/viki.js",
         "content/vimeo.js"
-    ],
-    "content_security_policy": "script-src 'self' https://cdnjs.cloudflare.com/ https://*.cloudflare.com https://www.googleapis.com; object-src 'self';",
-    "manifest_version": 2
+      ],
+      "matches" : [
+        "https://www.primevideo.com/*",
+        "https://www.viki.com/*",
+        "https://www.anitube.site/*",
+        "https://www.youtube.com/*",
+        "https://www.netflix.com/*",
+        "https://www.crunchyroll.com/*",
+        "https://www.vimeo.com/*"
+      ]
+    }
+  ],
+  "manifest_version": 3
 }
