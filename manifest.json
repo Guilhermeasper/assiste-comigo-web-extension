@@ -50,7 +50,7 @@
     }
   ],
   "background": {
-    "service_worker": "./background/background.js"
+    "service_worker": "./serviceWorker.js"
   },
   "web_accessible_resources": [
     {

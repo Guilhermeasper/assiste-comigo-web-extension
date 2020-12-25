@@ -1,4 +1,5 @@
-import { setUserId, clearInfo } from "./../utils/utils.js";
+importScripts("./utils/utils.js");
+importScripts('./libs/socket.io.js');
 
 chrome.runtime.onInstalled.addListener(onInstalled);
 

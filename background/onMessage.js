@@ -1,11 +1,4 @@
-import {
-    tabSendMessage,
-    getSessionId,
-    getUserId,
-    getSessionUrl,
-} from "./../utils/utils.js";
-
-import socket from "../utils/socket.js";
+importScripts("./utils/utils.js");
 
 chrome.runtime.onMessage.addListener(onMessage);
 

@@ -1,12 +1,4 @@
-import {
-    getSessionId,
-    getUserId,
-    clearInfo,
-    setSessionId,
-    setSessionUrl,
-} from "./../utils/utils.js";
-
-import socket from "../utils/socket.js";
+importScripts("./utils/utils.js");
 
 chrome.runtime.onMessageExternal.addListener(onMessageExternal);
 
