@@ -1,12 +1,3 @@
-import {
-    tabSendMessage,
-    getSessionId,
-    setSessionId,
-    getUserId,
-} from "./utils.js";
-
-var socket;
-
 function roomPlay(data) {
     tabSendMessage({ type: "play" });
 }
@@ -78,5 +69,3 @@ class Socket {
         });
     }
 }
-
-export default socket = new Socket();
