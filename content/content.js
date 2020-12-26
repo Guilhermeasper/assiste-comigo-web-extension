@@ -62,16 +62,13 @@ function vikiScript() {
 }
 
 function youtubeScript() {
-    // var s = document.createElement("script");
-    // s.src = chrome.runtime.getURL("content/youtube.js");
-    // s.onload = function () {
-    //     this.remove();
-    // };
-    // (document.head || document.documentElement).appendChild(s);
-    // console.log("Youtube");
-    chrome.scripting.executeScript({
-        file: 'content/youtube.js'
-      });
+    var s = document.createElement("script");
+    s.src = chrome.runtime.getURL("content/youtube.js");
+    s.onload = function () {
+        this.remove();
+    };
+    (document.head || document.documentElement).appendChild(s);
+    console.log("Youtube");
 }
 
 function netflixScript() {
