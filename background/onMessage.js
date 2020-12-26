@@ -1,8 +1,12 @@
-importScripts("./utils/utils.js");
+importScripts("./utils/workerUtils.js");
+importScripts("./utils/socket.js");
+
+var socket = new Socket();
 
 chrome.runtime.onMessage.addListener(onMessage);
 
 async function getInfo(request, response) {
+    console.log("Get to the getInfo function");
     let userId = await getUserId();
     let sessionId = await getSessionId();
     let sessionUrl = await getSessionUrl();

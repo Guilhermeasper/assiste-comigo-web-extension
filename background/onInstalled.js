@@ -1,4 +1,4 @@
-importScripts("./utils/utils.js");
+importScripts("./utils/workerUtils.js");
 importScripts('./libs/socket.io.js');
 
 const serverAddress = "http://assistecomigo.herokuapp.com";

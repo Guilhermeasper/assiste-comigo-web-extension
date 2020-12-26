@@ -1,4 +1,4 @@
-importScripts("./utils/utils.js");
+importScripts("./utils/workerUtils.js");
 
 chrome.runtime.onMessageExternal.addListener(onMessageExternal);
 
