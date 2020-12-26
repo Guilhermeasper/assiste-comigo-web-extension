@@ -15,6 +15,7 @@ chrome.runtime.onMessage.addListener(onMessage);
  * @param {Object} response - Callback to respond message received
  */
 function onMessage(request, sender, response){
+    console.log(request);
     const player = request.player;
     const userId = request.userId;
     const sessionId = request.sessionId;
@@ -37,7 +38,7 @@ function onMessage(request, sender, response){
  * @param {Object} result Answer from the send message
  */
 function sendMessageClosure(result) {
-    console.log(result);
+
     if(!result){
         goToErrorPage();
     }
