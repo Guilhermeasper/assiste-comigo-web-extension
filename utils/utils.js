@@ -2,7 +2,7 @@
  * Send a message to the content script of the current tab
  * @param {Object} message Object containing the message to be sent
  */
-function tabSendMessage(message) {
+export function tabSendMessage(message) {
     return new Promise((resolve, reject) => {
         try {
             chrome.tabs.query({ currentWindow: true, active: true }, (tabs) => {
@@ -27,7 +27,7 @@ function tabSendMessage(message) {
     });
 }
 
-function getTabUrl() {
+export function getTabUrl() {
     return new Promise((resolve, reject) => {
         try {
             chrome.tabs.query({ currentWindow: true, active: true }, (tabs) => {
@@ -44,7 +44,7 @@ function getTabUrl() {
  * Copy the received string to clipboard
  * @param {string} url -
  */
-function copyToClipboard(url) {
+export function copyToClipboard(url) {
     const textAreaElement = document.createElement("textarea");
     textAreaElement.value = url;
     textAreaElement.style.position = "absolute";
@@ -55,7 +55,7 @@ function copyToClipboard(url) {
     document.body.removeChild(textAreaElement);
 }
 
-function getSessionId() {
+export function getSessionId() {
     return new Promise((resolve, reject) => {
         try {
             chrome.storage.local.get(["sessionId"], (result) => {
@@ -68,7 +68,7 @@ function getSessionId() {
     });
 }
 
-function getUserId() {
+export function getUserId() {
     return new Promise((resolve, reject) => {
         try {
             chrome.storage.local.get(["userId"], (result) => {
@@ -81,7 +81,7 @@ function getUserId() {
     });
 }
 
-function getSessionUrl() {
+export function getSessionUrl() {
     return new Promise((resolve, reject) => {
         try {
             chrome.storage.local.get(["sessionUrl"], (result) => {
@@ -94,7 +94,7 @@ function getSessionUrl() {
     });
 }
 
-function setSessionId(newSessionId) {
+export function setSessionId(newSessionId) {
     return new Promise((resolve, reject) => {
         try {
             chrome.storage.local.set({ sessionId: newSessionId }, function () {
@@ -107,7 +107,7 @@ function setSessionId(newSessionId) {
     });
 }
 
-function setSessionUrl(sessionUrl) {
+export function setSessionUrl(sessionUrl) {
     return new Promise((resolve, reject) => {
         try {
             console.log(`Setting new session url to ${sessionUrl}`);
@@ -120,7 +120,7 @@ function setSessionUrl(sessionUrl) {
     });
 }
 
-function setUserId(userId) {
+export function setUserId(userId) {
     return new Promise((resolve, reject) => {
         try {
             chrome.storage.local.set({ userId: userId }, function () {
@@ -132,7 +132,7 @@ function setUserId(userId) {
     });
 }
 
-function clearInfo() {
+export function clearInfo() {
     return new Promise((resolve, reject) => {
         try {
             chrome.storage.local.remove(
@@ -148,7 +148,7 @@ function clearInfo() {
     });
 }
 
-function getTabId() {
+export function getTabId() {
     return new Promise((resolve, reject) => {
         try {
             chrome.tabs.query({ currentWindow: true, active: true }, (tabs) => {
