@@ -1,202 +1,239 @@
-var assisteComigoId;
-const selector = ".video-stream";
+class Youtube {
+    #assisteComigoId;
+    #selector;
+    #serverPause;
+    #serverPlay;
+    #serverSeek;
 
-document.addEventListener("getInfo", getInfo);
-document.addEventListener("finishCreate", finishCreate);
-document.addEventListener("startConnect", startConnect);
-document.addEventListener("finishConnect", finishConnect);
-document.addEventListener("disconnect", disconnect);
-document.addEventListener("play", play);
-document.addEventListener("pause", pause);
-document.addEventListener("seek", seek);
+    constructor() {
+        this.#selector = ".video-stream";
+        this.#serverPause = false;
+        this.#serverPlay = false;
+        this.#serverSeek = false;
+        document.addEventListener("getInfo", this.#getInfo);
+        document.addEventListener("finishCreate", this.#finishCreate);
+        document.addEventListener("startConnect", this.#startConnect);
+        document.addEventListener("finishConnect", this.#finishConnect);
+        document.addEventListener("disconnect", this.#disconnect);
+        document.addEventListener("play", this.#play);
+        document.addEventListener("pause", this.#pause);
+        document.addEventListener("seek", this.#seek);
+    }
 
-function getInfo(request) {
-    const video = document.querySelector(selector);
-    const data = request.detail;
-    const extensionId = data.extensionId;
-    assisteComigoId = extensionId;
-    let info = { player: false, url: document.location.href, time: undefined };
-    if (video) {
-        info.player = true;
-        info.time = video.currentTime;
+    #getInfo = (request) => {
+        const video = document.querySelector(this.#selector);
+        const contentRequestData = request.detail;
+        const extensionId = contentRequestData.extensionId;
+        this.#assisteComigoId = extensionId;
+        let info = {
+            player: false,
+            url: document.location.href,
+            time: undefined,
+        };
+        if (video) {
+            info.player = true;
+            info.time = video.currentTime;
+            const newData = { ...contentRequestData, ...info };
+            console.log(newData);
+            chrome.runtime.sendMessage(extensionId, newData, (response) =>
+                console.log(response)
+            );
+        } else {
+            const newData = { ...contentRequestData, ...info };
+            chrome.runtime.sendMessage(extensionId, newData, (response) =>
+                console.log(response)
+            );
+        }
+    };
+
+    #finishCreate = (request) => {
+        const video = document.querySelector(this.#selector);
+        const videoAds = document.querySelector(".video-ads");
+        const data = request.detail;
+        let info = {
+            player: false,
+            url: document.location.href,
+            time: undefined,
+        };
+        const extensionId = data.extensionId;
+
+        if (video) {
+            info.player = true;
+            info.time = video.currentTime;
+            const newData = { ...data, ...info };
+            video.addEventListener("play", this.#playListener);
+            video.addEventListener("pause", this.#pauseListener);
+            video.addEventListener("seeking", this.#seekListener);
+            // new ResizeObserver(videoAdsResize).observe(videoAds);
+            chrome.runtime.sendMessage(extensionId, newData, (response) =>
+                console.log(response)
+            );
+        } else {
+            info.player = false;
+            const newData = { ...data, ...info };
+            console.log(newData);
+            chrome.runtime.sendMessage(extensionId, newData, (response) =>
+                console.log(response)
+            );
+        }
+    };
+
+    #startConnect = (request) => {
+        const data = request.detail;
+        let info = { url: document.location.href };
         const newData = { ...data, ...info };
-        console.log(newData);
+        const extensionId = data.extensionId;
         chrome.runtime.sendMessage(extensionId, newData, (response) =>
             console.log(response)
         );
-    } else {
-        const newData = { ...data, ...info };
-        chrome.runtime.sendMessage(extensionId, newData, (response) =>
-            console.log(response)
-        );
-    }
+    };
+
+    #finishConnect = (request) => {
+        const video = document.querySelector(this.#selector);
+        const videoAds = document.querySelector(".video-ads");
+        const data = request.detail;
+        let info = {
+            player: false,
+            url: document.location.href,
+            time: undefined,
+        };
+        console.log("Received connect request");
+        if (video) {
+            info.player = true;
+            info.time = video.currentTime;
+            const newData = { ...data, ...info };
+            video.addEventListener("play", this.#playListener);
+            video.addEventListener("pause", this.#pauseListener);
+            video.addEventListener("seeking", this.#seekListener);
+            //new ResizeObserver(videoAdsResize).observe(videoAds);
+            chrome.runtime.sendMessage(extensionId, newData, (response) =>
+                console.log(response)
+            );
+        } else {
+            info.player = false;
+            const newData = { ...data, ...info };
+            console.log(newData);
+            chrome.runtime.sendMessage(extensionId, newData, (response) =>
+                console.log(response)
+            );
+        }
+    };
+
+    #disconnect = (request) => {
+        const video = document.querySelector(this.#selector);
+        const data = request.detail;
+        let info = { player: false, url: document.location.href };
+        const extensionId = data.extensionId;
+        console.log("Received disconnect request");
+        if (video) {
+            info.player = true;
+            const newData = { ...data, ...info };
+            video.removeEventListener("play", this.#playListener);
+            video.removeEventListener("pause", this.#pauseListener);
+            video.removeEventListener("seeked", this.#seekListener);
+            chrome.runtime.sendMessage(extensionId, newData, (response) =>
+                console.log(response)
+            );
+        } else {
+            info.player = false;
+            const newData = { ...data, ...info };
+            console.log(newData);
+            chrome.runtime.sendMessage(extensionId, newData, (response) =>
+                console.log(response)
+            );
+        }
+    };
+
+    #play = (request) => {
+        const video = document.querySelector(this.#selector);
+        console.log("Received info request");
+        if (video) {
+            this.#serverPlay = true;
+            video.play();
+        } else {
+            console.log("Erro no play");
+        }
+    };
+
+    #pause = (request) => {
+        const video = document.querySelector(this.#selector);
+        console.log("Received info request");
+        if (video) {
+            this.#serverPause = true;
+            video.pause();
+        } else {
+            console.log("Erro no pause");
+        }
+    };
+
+    #seek = (request) => {
+        const video = document.querySelector(this.#selector);
+        const data = request.detail;
+        console.log("Received info request");
+        if (video) {
+            this.#serverSeek = true;
+            video.currentTime = data.time;
+        } else {
+            console.log("Erro no seek");
+        }
+    };
+
+    #playListener = () => {
+        const video = document.querySelector(this.#selector);
+        if (!this.#serverPlay) {
+            chrome.runtime.sendMessage(
+                this.#assisteComigoId,
+                { type: "play", time: video.currentTime },
+                (response) => console.log(response)
+            );
+            this.#serverPlay = false;
+        }
+    };
+
+    #pauseListener = () => {
+        const video = document.querySelector(this.#selector);
+        if (!this.#serverPause) {
+            chrome.runtime.sendMessage(
+                this.#assisteComigoId,
+                { type: "pause", time: video.currentTime },
+                (response) => console.log(response)
+            );
+            this.#serverPause = false;
+        }
+    };
+
+    #seekListener = () => {
+        const video = document.querySelector(this.#selector);
+        if (!this.#serverSeek) {
+            chrome.runtime.sendMessage(
+                this.#assisteComigoId,
+                { type: "seek", time: video.currentTime },
+                (response) => console.log(response)
+            );
+            this.#serverSeek = false;
+        }
+    };
+
+    #videoAdsResize = () => {
+        const video = document.querySelector(this.#selector);
+        const videoAds = document.querySelector(".video-ads");
+        console.log(videoAdsRect);
+        if (videoAdsRect.width + videoAdsRect.height > 0) {
+            console.log("Pausing for ad");
+            chrome.runtime.sendMessage(
+                this.#assisteComigoId,
+                { type: "pause", time: video.currentTime },
+                (response) => console.log(response)
+            );
+        } else {
+            console.log("Playing after ad");
+            chrome.runtime.sendMessage(
+                this.#assisteComigoId,
+                { type: "play", time: video.currentTime },
+                (response) => console.log(response)
+            );
+        }
+    };
 }
 
-function finishCreate(request) {
-    const video = document.querySelector(selector);
-    const videoAds = document.querySelector(".video-ads");
-    const data = request.detail;
-    let info = { player: false, url: document.location.href, time: undefined };
-    const extensionId = data.extensionId;
-
-    if (video) {
-        info.player = true;
-        info.time = video.currentTime;
-        const newData = { ...data, ...info };
-        video.addEventListener("play", playListener);
-        video.addEventListener("pause", pauseListener);
-        video.addEventListener("seeking", seekListener);
-        new ResizeObserver(videoAdsResize).observe(videoAds);
-        chrome.runtime.sendMessage(extensionId, newData, (response) =>
-            console.log(response)
-        );
-    } else {
-        info.player = false;
-        const newData = { ...data, ...info };
-        console.log(newData);
-        chrome.runtime.sendMessage(extensionId, newData, (response) =>
-            console.log(response)
-        );
-    }
-}
-
-function startConnect(request) {
-    const data = request.detail;
-    let info = { url: document.location.href };
-    const newData = { ...data, ...info };
-    const extensionId = data.extensionId;
-    chrome.runtime.sendMessage(extensionId, newData, (response) =>
-        console.log(response)
-    );
-}
-
-function finishConnect(request) {
-    const video = document.querySelector(selector);
-    const videoAds = document.querySelector(".video-ads");
-    const data = request.detail;
-    let info = { player: false, url: document.location.href, time: undefined };
-    console.log("Received connect request");
-    if (video) {
-        info.player = true;
-        info.time = video.currentTime;
-        const newData = { ...data, ...info };
-        video.addEventListener("play", playListener);
-        video.addEventListener("pause", pauseListener);
-        video.addEventListener("seeking", seekListener);
-        new ResizeObserver(videoAdsResize).observe(videoAds);
-        chrome.runtime.sendMessage(extensionId, newData, (response) =>
-            console.log(response)
-        );
-    } else {
-        info.player = false;
-        const newData = { ...data, ...info };
-        console.log(newData);
-        chrome.runtime.sendMessage(extensionId, newData, (response) =>
-            console.log(response)
-        );
-    }
-}
-
-function disconnect(request) {
-    const video = document.querySelector(selector);
-    const data = request.detail;
-    let info = { player: false, url: document.location.href };
-    const extensionId = data.extensionId;
-    console.log("Received disconnect request");
-    if (video) {
-        info.player = true;
-        const newData = { ...data, ...info };
-        video.removeEventListener("play", playListener);
-        video.removeEventListener("pause", pauseListener);
-        video.removeEventListener("seeked", seekListener);
-        chrome.runtime.sendMessage(extensionId, newData, (response) =>
-            console.log(response)
-        );
-    } else {
-        info.player = false;
-        const newData = { ...data, ...info };
-        console.log(newData);
-        chrome.runtime.sendMessage(extensionId, newData, (response) =>
-            console.log(response)
-        );
-    }
-}
-
-function play(request) {
-    const video = document.querySelector(selector);
-    console.log("Received info request");
-    if (video) {
-        video.play();
-    } else {
-        console.log("Erro no play");
-    }
-}
-
-function pause(request) {
-    const video = document.querySelector(selector);
-    console.log("Received info request");
-    if (video) {
-        video.pause();
-    } else {
-        console.log("Erro no pause");
-    }
-}
-
-function seek(request) {
-    const video = document.querySelector(selector);
-    const data = request.detail;
-    console.log("Received info request");
-    if (video) {
-        video.currentTime = data.time;
-    } else {
-        console.log("Erro no seek");
-    }
-}
-
-function playListener() {
-    const video = document.querySelector(selector);
-    chrome.runtime.sendMessage(
-        assisteComigoId,
-        { type: "play", time: video.currentTime },
-        (response) => console.log(response)
-    );
-}
-
-function pauseListener() {
-    const video = document.querySelector(selector);
-    chrome.runtime.sendMessage(
-        assisteComigoId,
-        { type: "pause", time: video.currentTime },
-        (response) => console.log(response)
-    );
-}
-
-function seekListener() {
-    const video = document.querySelector(selector);
-    chrome.runtime.sendMessage(
-        assisteComigoId,
-        { type: "seek", time: video.currentTime },
-        (response) => console.log(response)
-    );
-}
-
-function videoAdsResize(){
-    const video = document.querySelector(selector);
-    const videoAds = document.querySelector(".video-ads");
-    console.log(videoAdsRect);
-    if(videoAdsRect.width + videoAdsRect.height > 0){
-        console.log("Pausing for ad");
-        chrome.runtime.sendMessage(
-            assisteComigoId,
-            { type: "pause", time: video.currentTime },
-            (response) => console.log(response)
-        );
-    }else{
-        console.log("Playing after ad");
-        chrome.runtime.sendMessage(
-            assisteComigoId,
-            { type: "play", time: video.currentTime },
-            (response) => console.log(response)
-        );
-    }
-}
+const youtube = new Youtube();
