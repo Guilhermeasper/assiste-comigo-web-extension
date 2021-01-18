@@ -10,6 +10,8 @@ chrome.runtime.onMessage.addListener(onMessage);
  */
 function onMessage(request, sender, response) {
     const type = request.type;
+    console.log("Connect view");
+    console.log(request);
     if (type == "startConnect") {
         chrome.runtime.sendMessage({ type: "finishConnect" });
         return;
