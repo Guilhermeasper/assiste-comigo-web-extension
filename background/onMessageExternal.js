@@ -24,10 +24,10 @@ function onMessageExternal(request, sender, response) {
             urlParams
         ),
         finishCreate: finishCreateExternal.bind(this, request, response, url),
-        finishConnect: finishConnectExternal.bind(this. request, response),
-        play: playExternal.bind(this, request, response),
-        pause: pauseExternal.bind(this, request, response),
-        seek: seekExternal.bind(this, request, response),
+        finishConnect: finishConnectExternal.bind(this, request, response),
+        listenerPlay: playExternal.bind(this, request, response),
+        listenerPause: pauseExternal.bind(this, request, response),
+        listenerSeek: seekExternal.bind(this, request, response),
         disconnect: disconnectExternal.bind(this, request, response),
     };
     typeOptions[request.type]();
@@ -56,13 +56,6 @@ async function startConnectExternal(request, response, url, urlParams){
         const sessionId = urlParams.get("assistecomigo");
         await setSessionId(sessionId);
         let userId = await getUserId();
-        await socket.connect();
-        socket.addSocketListeners();
-        let packet = {
-            userId: userId,
-            sessionId: sessionId,
-        };
-        socket.emitCommand("join", packet);
         let sessionUrl = await parseUrl(url, sessionId);
         await setSessionUrl(sessionUrl);
         response({ code: 200});
@@ -78,8 +71,8 @@ async function startConnectExternal(request, response, url, urlParams){
  * @param {String} url 
  */
 async function finishConnectExternal(request, response) {
-    const newRequest = { ...request};
-    chrome.runtime.sendMessage(newRequest);
+    chrome.runtime.sendMessage(request);
+    response({ code: 200 });
 }
 /**
  * Passes the create packte from the page to the popup
@@ -88,7 +81,9 @@ async function finishConnectExternal(request, response) {
  * @param {String} url 
  */
 async function finishCreateExternal(request, response, url) {
+    console.log(request);
     let sessionUrl = url;
+    let userId = await getUserId();
     const sessionId = request.sessionId;
     if (url.includes("?")) {
         sessionUrl = `${url}&assistecomigo=${sessionId}`;
@@ -98,6 +93,7 @@ async function finishCreateExternal(request, response, url) {
     await setSessionUrl(sessionUrl);
     const newdata = {
         sessionUrl: sessionUrl,
+        userId: userId,
     };
     const newRequest = { ...request, ...newdata };
     chrome.runtime.sendMessage(newRequest);
@@ -110,14 +106,7 @@ async function finishCreateExternal(request, response, url) {
  * @param {Function} response - Function to response to the request
  */
 async function playExternal(request, response) {
-    let userId = await getUserId();
-    let sessionId = await getSessionId();
-    let packet = {
-        userId: userId,
-        sessionId: sessionId,
-        time: request.time,
-    };
-    socket.emitCommand("play", packet);
+    tabSendMessage(request);
     response({ code: 200 });
 }
 
@@ -127,14 +116,7 @@ async function playExternal(request, response) {
  * @param {Function} response - Function to response to the request
  */
 async function pauseExternal(request, response) {
-    let userId = await getUserId();
-    let sessionId = await getSessionId();
-    let packet = {
-        userId: userId,
-        sessionId: sessionId,
-        time: request.time,
-    };
-    socket.emitCommand("pause", packet);
+    tabSendMessage(request);
     response({ code: 200 });
 }
 
@@ -144,14 +126,7 @@ async function pauseExternal(request, response) {
  * @param {Function} response - Function to response to the request
  */
 async function seekExternal(request, response) {
-    let userId = await getUserId();
-    let sessionId = await getSessionId();
-    let packet = {
-        userId: userId,
-        sessionId: sessionId,
-        time: request.time,
-    };
-    socket.emitCommand("seek", packet);
+    tabSendMessage(request);
     response({ code: 200 });
 }
 
@@ -162,10 +137,6 @@ async function seekExternal(request, response) {
  */
 function disconnectExternal(request, response) {
     clearInfo();
-    if (socket.socket) {
-        socket.emitCommand("disconnect", {});
-        socket.disconnect();
-    }
     response({ code: 200 });
 }
 

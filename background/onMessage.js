@@ -1,7 +1,4 @@
 importScripts("./utils/workerUtils.js");
-importScripts("./utils/socket.js");
-
-var socket = new Socket();
 
 chrome.runtime.onMessage.addListener(onMessage);
 
@@ -34,16 +31,15 @@ async function getInfo(request, response) {
 
 async function startCreate(response) {
     let userId = await getUserId();
-    await socket.connect();
-    socket.addSocketListeners();
     let packet = {
         userId: userId,
     };
-    socket.emitCommand("create", packet);
     response({ code: 200 });
 }
 
 async function finishCreate(request, response) {
+    console.log("Finish create");
+    console.log(request);
     let userId = await getUserId();
     let sessionId = await getSessionId();
     const newdata = {
