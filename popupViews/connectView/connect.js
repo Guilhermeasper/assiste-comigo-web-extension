@@ -12,10 +12,6 @@ function onMessage(request, sender, response) {
     const type = request.type;
     console.log("Connect view");
     console.log(request);
-    if (type == "startConnect") {
-        chrome.runtime.sendMessage({ type: "finishConnect" });
-        return;
-    }
     if (type == "finishConnect") {
         window.location.assign("./../inSessionView/inSession.html");
     }

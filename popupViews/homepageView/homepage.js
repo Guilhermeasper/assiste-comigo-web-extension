@@ -38,7 +38,6 @@ function onMessage(request, sender, response){
  * @param {Object} result Answer from the send message
  */
 function sendMessageClosure(result) {
-
     if(!result){
         goToErrorPage();
     }

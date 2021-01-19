@@ -12,10 +12,6 @@ import {tabSendMessage} from './../../utils/utils.js';
  * @param {Object} response - Callback to respond message received
  */
 function onMessage(request, sender, response){
-    if (request.type == "startCreate") {
-        chrome.runtime.sendMessage({type: "finishCreate"});
-        return;
-    }
     const player = request.player;
     const userId = request.userId;
     const sessionId = request.sessionId;
@@ -40,7 +36,7 @@ function onMessage(request, sender, response){
  */
 function onButtonCreateClick(){
     // chrome.runtime.sendMessage({ type: "startCreate" });
-    tabSendMessage({message: "test"}).then((response) => {
+    tabSendMessage({type: "create"}).then((response) => {
         console.log(response);
     });
 }

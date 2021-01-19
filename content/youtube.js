@@ -13,7 +13,6 @@ class Youtube {
         document.addEventListener("init", this.#init);
         document.addEventListener("getInfo", this.#getInfo);
         document.addEventListener("finishCreate", this.#finishCreate);
-        document.addEventListener("startConnect", this.#startConnect);
         document.addEventListener("finishConnect", this.#finishConnect);
         document.addEventListener("disconnect", this.#disconnect);
         document.addEventListener("play", this.#play);
@@ -88,15 +87,6 @@ class Youtube {
                 (response) => console.log(response)
             );
         }
-    };
-
-    #startConnect = (request) => {
-        const data = request.detail;
-        let info = { url: document.location.href };
-        const newData = { ...data, ...info };
-        chrome.runtime.sendMessage(this.#assisteComigoId, newData, (response) =>
-            console.log(response)
-        );
     };
 
     #finishConnect = (request) => {
@@ -201,11 +191,12 @@ class Youtube {
         if (!this.#serverPlay) {
             chrome.runtime.sendMessage(
                 this.#assisteComigoId,
-                { type: "play", time: video.currentTime },
+                { type: "listenerPlay", time: video.currentTime },
                 (response) => console.log(response)
             );
-            this.#serverPlay = false;
+            
         }
+        this.#serverPlay = false;
     };
 
     #pauseListener = () => {
@@ -213,11 +204,12 @@ class Youtube {
         if (!this.#serverPause) {
             chrome.runtime.sendMessage(
                 this.#assisteComigoId,
-                { type: "pause", time: video.currentTime },
+                { type: "listenerPause", time: video.currentTime },
                 (response) => console.log(response)
             );
-            this.#serverPause = false;
+            
         }
+        this.#serverPause = false;
     };
 
     #seekListener = () => {
@@ -225,17 +217,17 @@ class Youtube {
         if (!this.#serverSeek) {
             chrome.runtime.sendMessage(
                 this.#assisteComigoId,
-                { type: "seek", time: video.currentTime },
+                { type: "listenerSeek", time: video.currentTime },
                 (response) => console.log(response)
             );
-            this.#serverSeek = false;
+            
         }
+        this.#serverSeek = false;
     };
 
     #videoAdsResize = () => {
         const video = document.querySelector(this.#selector);
-        const videoAds = document.querySelector(".video-ads");
-        console.log(videoAdsRect);
+        const videoAds = document.querySelector(".video-ads").rect;
         if (videoAdsRect.width + videoAdsRect.height > 0) {
             console.log("Pausing for ad");
             chrome.runtime.sendMessage(
@@ -255,10 +247,10 @@ class Youtube {
 
     #createAdsObserver = () => {
         const videoAds = document.querySelector(".video-ads");
-        if (videoAds) {
-            const videoAdsObserver = new ResizeObserver(this.#videoAdsResize);
-            videoAdsObserver.observe(videoAds);
-        }
+        // if (videoAds) {
+        //     const videoAdsObserver = new ResizeObserver(this.#videoAdsResize);
+        //     videoAdsObserver.observe(videoAds);
+        // }
     };
 }
 
