@@ -1,7 +1,7 @@
 importScripts("./utils/workerUtils.js");
 importScripts('./libs/socket.io.js');
 
-const serverAddress = "http://assistecomigo.herokuapp.com";
+const serverAddress = "https://assistecomigo.herokuapp.com";
 
 chrome.runtime.onInstalled.addListener(onInstalled);
 
