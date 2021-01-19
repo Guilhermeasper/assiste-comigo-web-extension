@@ -1,14 +1,14 @@
 var serverSeek = false;
 var serverPlay = false;
 var serverPause = false;
-var socket;
 var videoElement;
+var globalResponse;
+const socket = new Socket();
 
 document.addEventListener("DOMContentLoaded", domLoaded());
 
 function domLoaded() {
     console.log("Main content script loaded");
-
     let contentScriptsOptions = {
         "www.primevideo.com": primevideoScript,
         "www.anitube.site": anitubeScript,
@@ -16,17 +16,72 @@ function domLoaded() {
         "www.viki.com": vikiScript,
         "vimeo.com": vimeoScript,
         "www.crunchyroll.com": crunchyrollScript,
-        "www.netflix.com": netflixScript
+        "www.netflix.com": netflixScript,
     };
-    
+
     let pageHost = getPageHost();
 
-    chrome.runtime.onMessage.addListener( async (request, sender, response) => {
+    chrome.runtime.onMessage.addListener((request, sender, response) => {
         const type = request.type;
-        if(type == "startCreate"){
-            const socket = new Socket();
-            await socket.connect();
-            socket.emitCommand("create", packet);
+        console.log(request);
+        if (type == "create") {
+            (async () => {
+                let userId = await getUserId();
+                let packet = {
+                    userId: userId,
+                };
+                await socket.connect();
+                socket.addSocketListeners();
+                socket.emitCommand("create", packet);
+            })();
+        } else if (type == "listenerPlay") {
+            (async () => {
+                let userId = await getUserId();
+                let sessionId = await getSessionId();
+                let packet = {
+                    userId: userId,
+                    sessionId: sessionId,
+                    time: request.time,
+                };
+                socket.emitCommand("play", packet);
+            })();
+        }else if (type == "listenerPause") {
+            (async () => {
+                let userId = await getUserId();
+                let sessionId = await getSessionId();
+                let packet = {
+                    userId: userId,
+                    sessionId: sessionId,
+                    time: request.time,
+                };
+                socket.emitCommand("pause", packet);
+            })();
+        }else if (type == "listenerSeek") {
+            (async () => {
+                let userId = await getUserId();
+                let sessionId = await getSessionId();
+                let packet = {
+                    userId: userId,
+                    sessionId: sessionId,
+                    time: request.time,
+                };
+                socket.emitCommand("seek", packet);
+            })();
+        }else if(type == "startConnect"){
+            (async () => {
+                let userId = await getUserId();
+                let url = document.location.href;
+                const urlParams = new URLSearchParams(url);
+                const sessionId = urlParams.get("assistecomigo");
+                await setSessionId(sessionId);
+                let packet = {
+                    userId: userId,
+                    sessionId: sessionId,
+                };
+                await socket.connect();
+                socket.addSocketListeners();
+                socket.emitCommand("join", packet);
+            })();
         }
         console.log(`Request: ${type}`);
         document.dispatchEvent(new CustomEvent(type, { detail: request }));
@@ -37,12 +92,12 @@ function domLoaded() {
     contentScriptsOptions[pageHost]();
 }
 
-function injectScript(url){
+function injectScript(url) {
     var s = document.createElement("script");
     s.src = chrome.runtime.getURL(url);
     s.onload = function () {
         this.remove();
-        chrome.runtime.sendMessage({type: "init"});
+        chrome.runtime.sendMessage({ type: "init" });
     };
     (document.head || document.documentElement).appendChild(s);
 }
@@ -118,76 +173,4 @@ function getPageHost() {
 function getPageUrl() {
     let pageUrl = document.location.href;
     return pageUrl;
-}
-
-class Socket {
-    socket;
-    _address;
-    constructor() {
-        this.socket = undefined;
-        this._address = "https://assistecomigo.herokuapp.com";
-    }
-
-    async connect() {
-        this.socket = await io.connect(this._address, {
-            transports: ["websocket"],
-        });
-    }
-
-    emitCommand(type, data) {
-        this.socket.emit(type, data);
-    }
-
-    disconnect() {
-        this.socket.disconnect();
-    }
-
-    addSocketListeners() {
-        this.socket.on("room_play", this.roomPlay);
-
-        this.socket.on("room_pause", this.roomPause);
-
-        this.socket.on("room_seek", this.roomSeek);
-
-        this.socket.on("sessionCreated", this.sessionCreated);
-
-        this.socket.on("joinedSession", this.joinedSession);
-
-        this.socket.on("reconnect", async () => {
-            let userId = await getUserId();
-            let sessionId = await getSessionId();
-            this.socket.emit("rejoin", {
-                userId: userId,
-                sessionId: sessionId,
-            });
-        });
-    }
-
-    roomPlay(data) {
-        tabSendMessage({ type: "play" });
-    }
-    
-    roomPause(data) {
-        tabSendMessage({ type: "pause" });
-    }
-    
-    roomSeek(data) {
-        tabSendMessage({ type: "seek", time: data.time });
-    }
-    
-    async sessionCreated(data) {
-        await setSessionId(data.newId);
-        console.log(`Session id coming from server is ${data.newId}`);
-        chrome.runtime.sendMessage({
-            type: "startCreate",
-            sessionId: data.newId,
-        });
-    }
-    
-    joinedSession(data) {
-        chrome.runtime.sendMessage({
-            type: "startConnect",
-            sessionId: data.newId,
-        });
-    }
 }
