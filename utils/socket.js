@@ -31,7 +31,7 @@ class Socket {
     _address;
     constructor() {
         this.socket = undefined;
-        this._address = "http://assistecomigo.herokuapp.com";
+        this._address = "https://assistecomigo.herokuapp.com";
     }
 
     async connect() {
