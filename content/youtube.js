@@ -10,6 +10,7 @@ class Youtube {
         this.#serverPause = false;
         this.#serverPlay = false;
         this.#serverSeek = false;
+        document.addEventListener("init", this.#init);
         document.addEventListener("getInfo", this.#getInfo);
         document.addEventListener("finishCreate", this.#finishCreate);
         document.addEventListener("startConnect", this.#startConnect);
@@ -20,11 +21,17 @@ class Youtube {
         document.addEventListener("seek", this.#seek);
     }
 
+    #init = (request) => {
+        console.log("Initializing youtube module");
+        const contentRequestData = request.detail;
+        const extensionId = contentRequestData.extensionId;
+        console.log(`Extension ID:${extensionId}`);
+        this.#assisteComigoId = extensionId;
+    };
+
     #getInfo = (request) => {
         const video = document.querySelector(this.#selector);
         const contentRequestData = request.detail;
-        const extensionId = contentRequestData.extensionId;
-        this.#assisteComigoId = extensionId;
         let info = {
             player: false,
             url: document.location.href,
@@ -34,28 +41,29 @@ class Youtube {
             info.player = true;
             info.time = video.currentTime;
             const newData = { ...contentRequestData, ...info };
-            console.log(newData);
-            chrome.runtime.sendMessage(extensionId, newData, (response) =>
-                console.log(response)
+            chrome.runtime.sendMessage(
+                this.#assisteComigoId,
+                newData,
+                (response) => console.log(response)
             );
         } else {
             const newData = { ...contentRequestData, ...info };
-            chrome.runtime.sendMessage(extensionId, newData, (response) =>
-                console.log(response)
+            chrome.runtime.sendMessage(
+                this.#assisteComigoId,
+                newData,
+                (response) => console.log(response)
             );
         }
     };
 
     #finishCreate = (request) => {
         const video = document.querySelector(this.#selector);
-        const videoAds = document.querySelector(".video-ads");
         const data = request.detail;
         let info = {
             player: false,
             url: document.location.href,
             time: undefined,
         };
-        const extensionId = data.extensionId;
 
         if (video) {
             info.player = true;
@@ -64,16 +72,20 @@ class Youtube {
             video.addEventListener("play", this.#playListener);
             video.addEventListener("pause", this.#pauseListener);
             video.addEventListener("seeking", this.#seekListener);
-            // new ResizeObserver(videoAdsResize).observe(videoAds);
-            chrome.runtime.sendMessage(extensionId, newData, (response) =>
-                console.log(response)
+            this.#createAdsObserver();
+            chrome.runtime.sendMessage(
+                this.#assisteComigoId,
+                newData,
+                (response) => console.log(response)
             );
         } else {
             info.player = false;
             const newData = { ...data, ...info };
             console.log(newData);
-            chrome.runtime.sendMessage(extensionId, newData, (response) =>
-                console.log(response)
+            chrome.runtime.sendMessage(
+                this.#assisteComigoId,
+                newData,
+                (response) => console.log(response)
             );
         }
     };
@@ -82,15 +94,13 @@ class Youtube {
         const data = request.detail;
         let info = { url: document.location.href };
         const newData = { ...data, ...info };
-        const extensionId = data.extensionId;
-        chrome.runtime.sendMessage(extensionId, newData, (response) =>
+        chrome.runtime.sendMessage(this.#assisteComigoId, newData, (response) =>
             console.log(response)
         );
     };
 
     #finishConnect = (request) => {
         const video = document.querySelector(this.#selector);
-        const videoAds = document.querySelector(".video-ads");
         const data = request.detail;
         let info = {
             player: false,
@@ -105,16 +115,20 @@ class Youtube {
             video.addEventListener("play", this.#playListener);
             video.addEventListener("pause", this.#pauseListener);
             video.addEventListener("seeking", this.#seekListener);
-            //new ResizeObserver(videoAdsResize).observe(videoAds);
-            chrome.runtime.sendMessage(extensionId, newData, (response) =>
-                console.log(response)
+            this.#createAdsObserver();
+            chrome.runtime.sendMessage(
+                this.#assisteComigoId,
+                newData,
+                (response) => console.log(response)
             );
         } else {
             info.player = false;
             const newData = { ...data, ...info };
             console.log(newData);
-            chrome.runtime.sendMessage(extensionId, newData, (response) =>
-                console.log(response)
+            chrome.runtime.sendMessage(
+                this.#assisteComigoId,
+                newData,
+                (response) => console.log(response)
             );
         }
     };
@@ -131,15 +145,19 @@ class Youtube {
             video.removeEventListener("play", this.#playListener);
             video.removeEventListener("pause", this.#pauseListener);
             video.removeEventListener("seeked", this.#seekListener);
-            chrome.runtime.sendMessage(extensionId, newData, (response) =>
-                console.log(response)
+            chrome.runtime.sendMessage(
+                this.#assisteComigoId,
+                newData,
+                (response) => console.log(response)
             );
         } else {
             info.player = false;
             const newData = { ...data, ...info };
             console.log(newData);
-            chrome.runtime.sendMessage(extensionId, newData, (response) =>
-                console.log(response)
+            chrome.runtime.sendMessage(
+                this.#assisteComigoId,
+                newData,
+                (response) => console.log(response)
             );
         }
     };
@@ -232,6 +250,14 @@ class Youtube {
                 { type: "play", time: video.currentTime },
                 (response) => console.log(response)
             );
+        }
+    };
+
+    #createAdsObserver = () => {
+        const videoAds = document.querySelector(".video-ads");
+        if (videoAds) {
+            const videoAdsObserver = new ResizeObserver(this.#videoAdsResize);
+            videoAdsObserver.observe(videoAds);
         }
     };
 }

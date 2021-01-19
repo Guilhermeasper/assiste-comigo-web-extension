@@ -3,6 +3,8 @@ const buttonCreate = document.getElementById("buttonCreate");
 chrome.runtime.onMessage.addListener(onMessage);
 buttonCreate.addEventListener("click", onButtonCreateClick);
 
+import {tabSendMessage} from './../../utils/utils.js';
+
 /**
  * Listener from messages coming from the background
  * @param {Object} request - Object cotaining request information
@@ -37,7 +39,10 @@ function onMessage(request, sender, response){
  * Function fired when create button is clicked
  */
 function onButtonCreateClick(){
-    chrome.runtime.sendMessage({ type: "startCreate" });
+    // chrome.runtime.sendMessage({ type: "startCreate" });
+    tabSendMessage({message: "test"}).then((response) => {
+        console.log(response);
+    });
 }
 
 
