@@ -10,6 +10,8 @@ chrome.runtime.onMessageExternal.addListener(onMessageExternal);
  */
 function onMessageExternal(request, sender, response) {
     // if (sender.url == blocklistedWebsite) return; // don't allow this web page access
+    console.log("onMessageExternal new request.");
+    console.log(request);
     const url = request.url;
     const urlParams = new URLSearchParams(url);
     const typeOptions = {
@@ -22,6 +24,7 @@ function onMessageExternal(request, sender, response) {
             urlParams
         ),
         finishCreate: finishCreateExternal.bind(this, request, response, url),
+        finishConnect: finishConnectExternal.bind(this. request, response),
         play: playExternal.bind(this, request, response),
         pause: pauseExternal.bind(this, request, response),
         seek: seekExternal.bind(this, request, response),
@@ -68,6 +71,16 @@ async function startConnectExternal(request, response, url, urlParams){
     }
 }
 
+/**
+ * Passes the create packte from the page to the popup
+ * @param {Object} request 
+ * @param {Object} response 
+ * @param {String} url 
+ */
+async function finishConnectExternal(request, response) {
+    const newRequest = { ...request};
+    chrome.runtime.sendMessage(newRequest);
+}
 /**
  * Passes the create packte from the page to the popup
  * @param {Object} request 
