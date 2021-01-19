@@ -18,10 +18,16 @@ function domLoaded() {
         "www.crunchyroll.com": crunchyrollScript,
         "www.netflix.com": netflixScript
     };
+    
     let pageHost = getPageHost();
 
-    chrome.runtime.onMessage.addListener((request, sender, response) => {
+    chrome.runtime.onMessage.addListener( async (request, sender, response) => {
         const type = request.type;
+        if(type == "startCreate"){
+            const socket = new Socket();
+            await socket.connect();
+            socket.emitCommand("create", packet);
+        }
         console.log(`Request: ${type}`);
         document.dispatchEvent(new CustomEvent(type, { detail: request }));
         response({ code: 200 });
@@ -31,73 +37,49 @@ function domLoaded() {
     contentScriptsOptions[pageHost]();
 }
 
-function vimeoScript() {
+function injectScript(url){
     var s = document.createElement("script");
-    s.src = chrome.runtime.getURL("content/vimeo.js");
+    s.src = chrome.runtime.getURL(url);
     s.onload = function () {
         this.remove();
+        chrome.runtime.sendMessage({type: "init"});
     };
     (document.head || document.documentElement).appendChild(s);
+}
+
+function vimeoScript() {
+    injectScript("content/vimeo.js");
     console.log("Vimeo");
 }
 
 function crunchyrollScript() {
-    var s = document.createElement("script");
-    s.src = chrome.runtime.getURL("content/crunchyroll.js");
-    s.onload = function () {
-        this.remove();
-    };
-    (document.head || document.documentElement).appendChild(s);
+    injectScript("content/crunchyroll.js");
     console.log("Crunchyroll");
 }
 
 function vikiScript() {
-    var s = document.createElement("script");
-    s.src = chrome.runtime.getURL("content/viki.js");
-    s.onload = function () {
-        this.remove();
-    };
-    (document.head || document.documentElement).appendChild(s);
+    injectScript("content/viki.js");
     console.log("Viki");
 }
 
 function youtubeScript() {
-    var s = document.createElement("script");
-    s.src = chrome.runtime.getURL("content/youtube.js");
-    s.onload = function () {
-        this.remove();
-    };
-    (document.head || document.documentElement).appendChild(s);
+    injectScript("content/youtube.js");
     console.log("Youtube");
 }
 
 function netflixScript() {
+    injectScript("content/youtube.js");
     console.log("Netflix");
-    var s = document.createElement("script");
-    s.src = chrome.runtime.getURL("content/netflix.js");
-    s.onload = function () {
-        this.remove();
-    };
-    (document.head || document.documentElement).appendChild(s);
 }
 
 function anitubeScript() {
+    injectScript("content/anitube.js");
     console.log("Anitube");
-    var s = document.createElement("script");
-    s.src = chrome.runtime.getURL("content/anitube.js");
-    s.onload = function () {
-        this.remove();
-    };
-    (document.head || document.documentElement).appendChild(s);
 }
 
 function primevideoScript() {
-    var s = document.createElement("script");
-    s.src = chrome.runtime.getURL("content/primevideo.js");
-    s.onload = function () {
-        this.remove();
-    };
-    (document.head || document.documentElement).appendChild(s);
+    injectScript("content/primevideo.js");
+    console.log("Primevideo");
     // $(document).click((event) => {
     //     if (document.querySelectorAll(".dv-player-fullscreen").length == 0) {
     //         video =
@@ -136,4 +118,76 @@ function getPageHost() {
 function getPageUrl() {
     let pageUrl = document.location.href;
     return pageUrl;
+}
+
+class Socket {
+    socket;
+    _address;
+    constructor() {
+        this.socket = undefined;
+        this._address = "https://assistecomigo.herokuapp.com";
+    }
+
+    async connect() {
+        this.socket = await io.connect(this._address, {
+            transports: ["websocket"],
+        });
+    }
+
+    emitCommand(type, data) {
+        this.socket.emit(type, data);
+    }
+
+    disconnect() {
+        this.socket.disconnect();
+    }
+
+    addSocketListeners() {
+        this.socket.on("room_play", this.roomPlay);
+
+        this.socket.on("room_pause", this.roomPause);
+
+        this.socket.on("room_seek", this.roomSeek);
+
+        this.socket.on("sessionCreated", this.sessionCreated);
+
+        this.socket.on("joinedSession", this.joinedSession);
+
+        this.socket.on("reconnect", async () => {
+            let userId = await getUserId();
+            let sessionId = await getSessionId();
+            this.socket.emit("rejoin", {
+                userId: userId,
+                sessionId: sessionId,
+            });
+        });
+    }
+
+    roomPlay(data) {
+        tabSendMessage({ type: "play" });
+    }
+    
+    roomPause(data) {
+        tabSendMessage({ type: "pause" });
+    }
+    
+    roomSeek(data) {
+        tabSendMessage({ type: "seek", time: data.time });
+    }
+    
+    async sessionCreated(data) {
+        await setSessionId(data.newId);
+        console.log(`Session id coming from server is ${data.newId}`);
+        chrome.runtime.sendMessage({
+            type: "startCreate",
+            sessionId: data.newId,
+        });
+    }
+    
+    joinedSession(data) {
+        chrome.runtime.sendMessage({
+            type: "startConnect",
+            sessionId: data.newId,
+        });
+    }
 }
