@@ -5,6 +5,17 @@ var socket = new Socket();
 
 chrome.runtime.onMessage.addListener(onMessage);
 
+async function init(request, response) {
+    console.log("Initializing content module");
+    const newdata = {
+        extensionId: chrome.runtime.id,
+    };
+    const newRequest = { ...request, ...newdata };
+    console.log(newRequest);
+    let result = await tabSendMessage(newRequest);
+    response(result);
+}
+
 async function getInfo(request, response) {
     console.log("Get to the getInfo function");
     let userId = await getUserId();
@@ -82,6 +93,7 @@ function onMessage(request, sender, response) {
     console.log(request, sender, response);
     const type = request.type;
     const typeOptions = {
+        init: init.bind(this, request, response),
         getInfo: getInfo.bind(this, request, response),
         startCreate: startCreate.bind(this, response),
         finishCreate: finishCreate.bind(this, request, response),
