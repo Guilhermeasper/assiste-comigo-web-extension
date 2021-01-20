@@ -70,7 +70,7 @@ function domLoaded() {
         }else if(type == "startConnect"){
             (async () => {
                 let userId = await getUserId();
-                let url = document.location.href;
+                let url = document.location.href.split('?')[1];
                 const urlParams = new URLSearchParams(url);
                 const sessionId = urlParams.get("assistecomigo");
                 await setSessionId(sessionId);
