@@ -1,5 +1,3 @@
-importScripts("./utils/workerUtils.js");
-
 chrome.runtime.onMessageExternal.addListener(onMessageExternal);
 
 /**
@@ -24,7 +22,7 @@ function onMessageExternal(request, sender, response) {
             urlParams
         ),
         finishCreate: finishCreateExternal.bind(this, request, response, url),
-        finishConnect: finishConnectExternal.bind(this, request, response),
+        finishConnect: finishConnectExternal.bind(this, request, response, url, urlParams),
         listenerPlay: playExternal.bind(this, request, response),
         listenerPause: pauseExternal.bind(this, request, response),
         listenerSeek: seekExternal.bind(this, request, response),
@@ -70,8 +68,18 @@ async function startConnectExternal(request, response, url, urlParams){
  * @param {Object} response 
  * @param {String} url 
  */
-async function finishConnectExternal(request, response) {
-    chrome.runtime.sendMessage(request);
+async function finishConnectExternal(request, response, url, urlParams) {
+    let userId = await getUserId();
+    const sessionId = await getSessionId();
+    await setSessionUrl(url);
+    const newdata = {
+        sessionUrl: url,
+        sessionId: sessionId,
+        userId: userId,
+    };
+    const newRequest = { ...request, ...newdata };
+    console.log(newRequest);
+    chrome.runtime.sendMessage(newRequest);
     response({ code: 200 });
 }
 /**
@@ -82,17 +90,13 @@ async function finishConnectExternal(request, response) {
  */
 async function finishCreateExternal(request, response, url) {
     console.log(request);
-    let sessionUrl = url;
     let userId = await getUserId();
     const sessionId = request.sessionId;
-    if (url.includes("?")) {
-        sessionUrl = `${url}&assistecomigo=${sessionId}`;
-    } else {
-        sessionUrl = `${url}?assistecomigo=${sessionId}`;
-    }
-    await setSessionUrl(sessionUrl);
+    const sessionUrl = new URL(url);
+    sessionUrl.searchParams.append("assistecomigo", sessionId);
+    await setSessionUrl(sessionUrl.href);
     const newdata = {
-        sessionUrl: sessionUrl,
+        sessionUrl: sessionUrl.href,
         userId: userId,
     };
     const newRequest = { ...request, ...newdata };
