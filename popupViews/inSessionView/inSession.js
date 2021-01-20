@@ -1,4 +1,4 @@
-import { copyToClipboard, clearInfo } from "./../../utils/utils.js";
+import { copyToClipboard, getSessionId, getUserId, getSessionUrl } from "./../../utils/utils.js";
 import { goToErrorPage, goToHomepagePage } from "./../../utils/popupNavigate.js";
 
 const urlCopyButton = document.getElementById("urlCopyButton");
@@ -29,11 +29,12 @@ function onDisconnectButtonClick() {
  * @param {Object} sender - Object cotaining sender information
  * @param {Object} response - Callback to respond message received
  */
-function onMessage(request, sender, response) {
+async function onMessage(request, sender, response) {
     const player = request.player;
-    const userId = request.userId;
-    const sessionId = request.sessionId;
-    const sessionUrl = request.sessionUrl;
+    const userId = await getUserId();
+    const sessionId = await getSessionId();
+    const sessionUrl = await getSessionUrl();
+    console.log(player, userId, sessionId);
     if (userId && player && sessionId) {
         urlCopyButton.addEventListener("click", copyToClipboard(sessionUrl));
     } else {

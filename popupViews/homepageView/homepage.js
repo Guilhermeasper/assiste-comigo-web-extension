@@ -5,6 +5,8 @@ import {
     goToInSessionPage
 } from "./../../utils/popupNavigate.js";
 
+import {getUserId, getSessionId} from "./../../utils/utils.js"
+
 document.addEventListener("DOMContentLoaded", DOMContentLoaded);
 chrome.runtime.onMessage.addListener(onMessage);
 
@@ -14,12 +16,13 @@ chrome.runtime.onMessage.addListener(onMessage);
  * @param {Object} sender - Object cotaining sender information
  * @param {Object} response - Callback to respond message received
  */
-function onMessage(request, sender, response){
+async function onMessage(request, sender, response){
     console.log(request);
     const player = request.player;
-    const userId = request.userId;
-    const sessionId = request.sessionId;
     const url = request.url;
+    const userId = await getUserId();
+    const sessionId = await getSessionId();
+    
     if (!userId) {
         goToErrorPage();
     } else {
