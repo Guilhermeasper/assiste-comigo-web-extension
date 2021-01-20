@@ -1,5 +1,3 @@
-importScripts("./utils/workerUtils.js");
-
 chrome.runtime.onMessage.addListener(onMessage);
 
 async function init(request, response) {
@@ -27,14 +25,6 @@ async function getInfo(request, response) {
     const newRequest = { ...request, ...newdata };
     let result = await tabSendMessage(newRequest);
     response(result);
-}
-
-async function startCreate(response) {
-    let userId = await getUserId();
-    let packet = {
-        userId: userId,
-    };
-    response({ code: 200 });
 }
 
 async function finishCreate(request, response) {
@@ -91,7 +81,6 @@ function onMessage(request, sender, response) {
     const typeOptions = {
         init: init.bind(this, request, response),
         getInfo: getInfo.bind(this, request, response),
-        startCreate: startCreate.bind(this, response),
         finishCreate: finishCreate.bind(this, request, response),
         startConnect: startConnect.bind(this, request, response),
         finishConnect: finishConnect.bind(this, request, response),
