@@ -36,7 +36,7 @@
   },
   "content_scripts": [
     {
-      "js": ["./libs/socket.io.js", "./libs/jquery.js", "./utils/workerUtils.js", "./utils/socket.js", "./content/content.js"],
+      "js": ["./libs/socket.io.js", "./utils/workerUtils.js", "./utils/socket.js", "./content/content.js"],
       "matches": [
         "*://*.primevideo.com/*",
         "*://*.viki.com/*",
