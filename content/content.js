@@ -123,7 +123,7 @@ function youtubeScript() {
 }
 
 function netflixScript() {
-    injectScript("content/youtube.js");
+    injectScript("content/netflix.js");
     console.log("Netflix");
 }
 
