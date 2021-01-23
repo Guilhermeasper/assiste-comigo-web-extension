@@ -36,7 +36,7 @@ function onMessage(request, sender, response){
  */
 function onButtonCreateClick(){
     // chrome.runtime.sendMessage({ type: "startCreate" });
-    tabSendMessage({type: "create"}).then((response) => {
+    tabSendMessage({type: "startCreate"}).then((response) => {
         console.log(response);
     });
 }
