@@ -31,16 +31,6 @@ document.addEventListener("getInfo", function (request) {
     }
 });
 
-// window.addEventListener("popstate", function (event) {
-//     const player = getNetflixPlayer();
-//     if (player) {
-//         const data = { type: "disconnect" };
-//         chrome.runtime.sendMessage(assisteComigoId, data, (response) =>
-//             console.log(response)
-//         );
-//     }
-// });
-
 document.addEventListener("finishCreate", function (request) {
     console.log(request.detail);
     let video = document.querySelector("video");
