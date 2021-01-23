@@ -5,6 +5,9 @@ class AssisteComigoNeflix {
     #serverSeek;
 
     constructor() {
+        this.#serverPause = false;
+        this.#serverPlay = false;
+        this.#serverSeek = false;
         document.addEventListener("init", this.#init);
         document.addEventListener("getInfo", this.#getInfo);
         document.addEventListener("finishCreate", this.#StartSession);
@@ -99,7 +102,7 @@ class AssisteComigoNeflix {
     }
 
     #playListener = () => {
-        const player = getNetflixPlayer();
+        const player = this.#getNetflixPlayer();
         if (!this.#serverPlay) {
             chrome.runtime.sendMessage(
                 this.#assisteComigoId,
@@ -111,7 +114,7 @@ class AssisteComigoNeflix {
     };
 
     #pauseListener = () => {
-        const player = getNetflixPlayer();
+        const player = this.#getNetflixPlayer();
         if (!this.#serverPause) {
             chrome.runtime.sendMessage(
                 this.#assisteComigoId,
@@ -123,7 +126,7 @@ class AssisteComigoNeflix {
     };
 
     #seekListener = () => {
-        const player = getNetflixPlayer();
+        const player = this.#getNetflixPlayer();
         if (!this.#serverSeek) {
             chrome.runtime.sendMessage(
                 this.#assisteComigoId,
