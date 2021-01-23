@@ -1,9 +1,3 @@
-var serverSeek = false;
-var serverPlay = false;
-var serverPause = false;
-var videoElement;
-var globalResponse;
-
 const socket = new Socket();
 
 const contentScriptsOptions = {
@@ -144,25 +138,6 @@ function anitubeScript() {
 function primevideoScript() {
     injectScript("content/primevideo.js");
     console.log("Primevideo");
-    // $(document).click((event) => {
-    //     if (document.querySelectorAll(".dv-player-fullscreen").length == 0) {
-    //         video =
-    //             "https://www.primevideo.com" +
-    //             $(event.target).parent().parent().parent().attr("href");
-    //         console.log(video);
-    //     } else if (
-    //         $(event.target)
-    //             .parent()
-    //             .parent()
-    //             .attr("class")
-    //             .toString()
-    //             .includes("closeButtonWrapper")
-    //     ) {
-    //         chrome.storage.local.remove(["sessionId"], function () {
-    //             console.log("SID removed");
-    //         });
-    //     }
-    // });
 }
 
 //Not working
