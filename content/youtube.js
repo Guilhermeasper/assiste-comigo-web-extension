@@ -1,4 +1,4 @@
-class Youtube {
+class AssisteComigoYoutube {
     #assisteComigoId;
     #selector;
     #serverPause;
@@ -254,4 +254,4 @@ class Youtube {
     };
 }
 
-const youtube = new Youtube();
+const youtube = new AssisteComigoYoutube();
