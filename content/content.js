@@ -10,28 +10,34 @@ const contentScriptsOptions = {
     "www.netflix.com": netflixScript,
 };
 
-const onMessageCommands = {
-    startCreate: startCreate.bind(this, request, response),
-    startConnect: startConnect.bind(this, request, response),
-    listenerPlay: listenerPlay.bind(this, request, response),
-    listenerPause: listenerPause.bind(this, request, response),
-    listenerSeek: listenerSeek.bind(this, request, response),
-    disconnect: disconnect.bind(this, request, response),
-};
-
 document.addEventListener("DOMContentLoaded", domLoaded());
 
 function domLoaded() {
 
     console.log("Main content script loaded");
     const pageHost = getPageHost();
-    chrome.runtime.onMessage.addListener(onMessage(request, sender, response));
+    chrome.runtime.onMessage.addListener(onMessage);
     contentScriptsOptions[pageHost]();
 }
 
 function onMessage(request, sender, response) {
+    console.log(`New Message Arrived:`);
+    console.log(request);
     const type = request.type;
-    onMessageCommands[type]();
+    
+    const onMessageCommands = {
+        startCreate: startCreate.bind(this, request, response),
+        startConnect: startConnect.bind(this, request, response),
+        listenerPlay: listenerPlay.bind(this, request, response),
+        listenerPause: listenerPause.bind(this, request, response),
+        listenerSeek: listenerSeek.bind(this, request, response),
+        disconnect: disconnect.bind(this, request, response),
+    };
+    try {
+        onMessageCommands[type]();
+    } catch (error) {
+        console.log(error)
+    }
     document.dispatchEvent(new CustomEvent(type, { detail: request }));
     response({ code: 200 });
     return true;
@@ -60,7 +66,7 @@ async function startConnect() {
     socket.emitCommand("join", packet);
 }
 
-async function listenerPlay() {
+async function listenerPlay(request, response) {
     let userId = await getUserId();
     let sessionId = await getSessionId();
     let packet = {
@@ -70,7 +76,7 @@ async function listenerPlay() {
     };
     socket.emitCommand("play", packet);
 }
-async function listenerPause() {
+async function listenerPause(request, response) {
     let userId = await getUserId();
     let sessionId = await getSessionId();
     let packet = {
@@ -80,7 +86,7 @@ async function listenerPause() {
     };
     socket.emitCommand("pause", packet);
 }
-async function listenerSeek() {
+async function listenerSeek(request, response) {
     let userId = await getUserId();
     let sessionId = await getSessionId();
     let packet = {
@@ -138,15 +144,6 @@ function anitubeScript() {
 function primevideoScript() {
     injectScript("content/primevideo.js");
     console.log("Primevideo");
-}
-
-//Not working
-function getCrunchyrollVideo() {
-    console.log("Trying to get crunchyroll video");
-    $("#vilos-player").toggle();
-    const video = document.querySelector("#player0");
-    console.log(video);
-    return video;
 }
 
 function getPageHost() {
