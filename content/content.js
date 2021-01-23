@@ -3,93 +3,102 @@ var serverPlay = false;
 var serverPause = false;
 var videoElement;
 var globalResponse;
+
 const socket = new Socket();
+
+const contentScriptsOptions = {
+    "www.primevideo.com": primevideoScript,
+    "www.anitube.site": anitubeScript,
+    "www.youtube.com": youtubeScript,
+    "www.viki.com": vikiScript,
+    "vimeo.com": vimeoScript,
+    "www.crunchyroll.com": crunchyrollScript,
+    "www.netflix.com": netflixScript,
+};
+
+const onMessageCommands = {
+    startCreate: startCreate.bind(this, request, response),
+    startConnect: startConnect.bind(this, request, response),
+    listenerPlay: listenerPlay.bind(this, request, response),
+    listenerPause: listenerPause.bind(this, request, response),
+    listenerSeek: listenerSeek.bind(this, request, response),
+    disconnect: disconnect.bind(this, request, response),
+};
 
 document.addEventListener("DOMContentLoaded", domLoaded());
 
 function domLoaded() {
+
     console.log("Main content script loaded");
-    let contentScriptsOptions = {
-        "www.primevideo.com": primevideoScript,
-        "www.anitube.site": anitubeScript,
-        "www.youtube.com": youtubeScript,
-        "www.viki.com": vikiScript,
-        "vimeo.com": vimeoScript,
-        "www.crunchyroll.com": crunchyrollScript,
-        "www.netflix.com": netflixScript,
-    };
-
-    let pageHost = getPageHost();
-
-    chrome.runtime.onMessage.addListener((request, sender, response) => {
-        const type = request.type;
-        console.log(request);
-        if (type == "create") {
-            (async () => {
-                let userId = await getUserId();
-                let packet = {
-                    userId: userId,
-                };
-                await socket.connect();
-                socket.addSocketListeners();
-                socket.emitCommand("create", packet);
-            })();
-        } else if (type == "listenerPlay") {
-            (async () => {
-                let userId = await getUserId();
-                let sessionId = await getSessionId();
-                let packet = {
-                    userId: userId,
-                    sessionId: sessionId,
-                    time: request.time,
-                };
-                socket.emitCommand("play", packet);
-            })();
-        }else if (type == "listenerPause") {
-            (async () => {
-                let userId = await getUserId();
-                let sessionId = await getSessionId();
-                let packet = {
-                    userId: userId,
-                    sessionId: sessionId,
-                    time: request.time,
-                };
-                socket.emitCommand("pause", packet);
-            })();
-        }else if (type == "listenerSeek") {
-            (async () => {
-                let userId = await getUserId();
-                let sessionId = await getSessionId();
-                let packet = {
-                    userId: userId,
-                    sessionId: sessionId,
-                    time: request.time,
-                };
-                socket.emitCommand("seek", packet);
-            })();
-        }else if(type == "startConnect"){
-            (async () => {
-                let userId = await getUserId();
-                let url = document.location.href.split('?')[1];
-                const urlParams = new URLSearchParams(url);
-                const sessionId = urlParams.get("assistecomigo");
-                await setSessionId(sessionId);
-                let packet = {
-                    userId: userId,
-                    sessionId: sessionId,
-                };
-                await socket.connect();
-                socket.addSocketListeners();
-                socket.emitCommand("join", packet);
-            })();
-        }
-        console.log(`Request: ${type}`);
-        document.dispatchEvent(new CustomEvent(type, { detail: request }));
-        response({ code: 200 });
-        return true;
-    });
-
+    const pageHost = getPageHost();
+    chrome.runtime.onMessage.addListener(onMessage(request, sender, response));
     contentScriptsOptions[pageHost]();
+}
+
+function onMessage(request, sender, response) {
+    const type = request.type;
+    onMessageCommands[type]();
+    document.dispatchEvent(new CustomEvent(type, { detail: request }));
+    response({ code: 200 });
+    return true;
+}
+
+async function startCreate() {
+    let userId = await getUserId();
+    let packet = {
+        userId: userId,
+    };
+    await socket.connect();
+    socket.addSocketListeners();
+    socket.emitCommand("create", packet);
+}
+
+async function startConnect() {
+    let userId = await getUserId();
+    const sessionId = getSessionIdFromURL();
+    await setSessionId(sessionId);
+    let packet = {
+        userId: userId,
+        sessionId: sessionId,
+    };
+    await socket.connect();
+    socket.addSocketListeners();
+    socket.emitCommand("join", packet);
+}
+
+async function listenerPlay() {
+    let userId = await getUserId();
+    let sessionId = await getSessionId();
+    let packet = {
+        userId: userId,
+        sessionId: sessionId,
+        time: request.time,
+    };
+    socket.emitCommand("play", packet);
+}
+async function listenerPause() {
+    let userId = await getUserId();
+    let sessionId = await getSessionId();
+    let packet = {
+        userId: userId,
+        sessionId: sessionId,
+        time: request.time,
+    };
+    socket.emitCommand("pause", packet);
+}
+async function listenerSeek() {
+    let userId = await getUserId();
+    let sessionId = await getSessionId();
+    let packet = {
+        userId: userId,
+        sessionId: sessionId,
+        time: request.time,
+    };
+    socket.emitCommand("seek", packet);
+}
+
+async function disconnect(){
+    await socket.disconnect();
 }
 
 function injectScript(url) {
@@ -173,4 +182,11 @@ function getPageHost() {
 function getPageUrl() {
     let pageUrl = document.location.href;
     return pageUrl;
+}
+
+function getSessionIdFromURL(){
+    let url = document.location.href.split("?")[1];
+    const urlParams = new URLSearchParams(url);
+    const sessionId = urlParams.get("assistecomigo");
+    return sessionId;
 }
