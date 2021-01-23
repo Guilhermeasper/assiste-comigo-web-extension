@@ -1,197 +1,193 @@
-var assisteComigoId;
-var serverSeek = false;
-var serverPlay = false;
-var serverPause = false;
+class AssisteComigoNeflix {
+    #assisteComigoId;
+    #serverPause;
+    #serverPlay;
+    #serverSeek;
 
-document.addEventListener("init", function (request) {
-    console.log("Initializing youtube module");
-    const contentRequestData = request.detail;
-    const extensionId = contentRequestData.extensionId;
-    console.log(`Extension ID:${extensionId}`);
-    assisteComigoId = extensionId;
-});
-
-document.addEventListener("getInfo", function (request) {
-    const data = request.detail;
-    let info = { player: false, url: document.location.href, time: undefined };
-    const player = getNetflixPlayer();
-    console.log(player);
-    if (player) {
-        info.player = true;
-        info.time = player.getCurrentTime();
-        const newData = { ...data, ...info };
-        chrome.runtime.sendMessage(assisteComigoId, newData, (response) =>
-            console.log(response)
-        );
-    } else {
-        const newData = { ...data, ...info };
-        chrome.runtime.sendMessage(assisteComigoId, newData, (response) =>
-            console.log(response)
-        );
+    constructor() {
+        document.addEventListener("init", this.#init);
+        document.addEventListener("getInfo", this.#getInfo);
+        document.addEventListener("finishCreate", this.#StartSession);
+        document.addEventListener("startConnect", this.#startConnect);
+        document.addEventListener("finishConnect", this.#StartSession);
+        document.addEventListener("disconnect", this.#completeEndSession);
+        document.addEventListener("play", this.#playbackCommands);
+        document.addEventListener("pause", this.#playbackCommands);
+        document.addEventListener("seek", this.#playbackCommands);
     }
-});
 
-document.addEventListener("finishCreate", function (request) {
-    console.log(request.detail);
-    let video = document.querySelector("video");
-    const data = request.detail;
-    let info = { player: false, url: document.location.href, time: undefined };
-    const player = getNetflixPlayer();
-    //console.log("Received create request");
-    if (video) {
-        info.player = true;
-        info.time = player.getCurrentTime();
-        const newData = { ...data, ...info };
-        video.addEventListener("play", playListener);
-        video.addEventListener("pause", pauseListener);
-        video.addEventListener("seeking", seekListener);
-        chrome.runtime.sendMessage(assisteComigoId, newData, (response) =>
-            console.log(response)
+    #init = (request) => {
+        const contentRequestData = request.detail;
+        const extensionId = contentRequestData.extensionId;
+        this.#assisteComigoId = extensionId;
+    };
+
+    #prepareInformation = (requestData) => {
+        const player = this.#getNetflixPlayer();
+        const playerExists = this.#checkIfPlayerExists(player);
+        const playerCurrentTime = this.#getPlayerCurrentTime(player);
+        const responseDataPacket = this.#generateInformartionPacket(
+            requestData,
+            playerExists,
+            playerCurrentTime
         );
-    } else {
-        info.player = false;
-        const newData = { ...data, ...info };
-        console.log(newData);
-        chrome.runtime.sendMessage(assisteComigoId, newData, (response) =>
-            console.log(response)
-        );
-    }
-});
+        return responseDataPacket;
+    };
 
-document.addEventListener("startConnect", function (request) {
-    const data = request.detail;
-    let info = { url: document.location.href };
-    const newData = { ...data, ...info };
-    chrome.runtime.sendMessage(assisteComigoId, newData, (response) =>
-        console.log(response)
-    );
-    console.log("Received connect request");
-});
-
-document.addEventListener("finishConnect", function (request) {
-    let video = document.querySelector("video");
-    const data = request.detail;
-    let info = { player: false, url: document.location.href, time: undefined };
-    const player = getNetflixPlayer();
-    console.log("Received connect request");
-    if (video) {
-        info.player = true;
-        info.time = player.getCurrentTime();
-        const newData = { ...data, ...info };
-        video.addEventListener("play", playListener);
-        video.addEventListener("pause", pauseListener);
-        video.addEventListener("seeking", seekListener);
-        chrome.runtime.sendMessage(assisteComigoId, newData, (response) =>
-            console.log(response)
-        );
-    } else {
-        info.player = false;
-        const newData = { ...data, ...info };
-        console.log(newData);
-        chrome.runtime.sendMessage(assisteComigoId, newData, (response) =>
-            console.log(response)
-        );
-    }
-});
-
-document.addEventListener("disconnect", function (request) {
-    let video = document.querySelector("video");
-    const data = request.detail;
-    let info = { player: false, url: document.location.href };
-    console.log("Received disconnect request");
-    if (video) {
-        info.player = true;
-        const newData = { ...data, ...info };
-        video.removeEventListener("play", playListener);
-        video.removeEventListener("pause", pauseListener);
-        video.removeEventListener("seeked", seekListener);
-        chrome.runtime.sendMessage(assisteComigoId, newData, (response) =>
-            console.log(response)
-        );
-    } else {
-        info.player = false;
-        const newData = { ...data, ...info };
-        console.log(newData);
-        chrome.runtime.sendMessage(assisteComigoId, newData, (response) =>
-            console.log(response)
-        );
-    }
-});
-
-document.addEventListener("play", function (request) {
-    const player = getNetflixPlayer();
-    console.log("Received info request");
-    if (player) {
-        serverPlay = true;
-        player.play();
-    } else {
-        console.log("Erro no play");
-    }
-});
-
-document.addEventListener("pause", function (request) {
-    const player = getNetflixPlayer();
-    console.log("Received info request");
-    if (player) {
-        serverPause = true;
-        player.pause();
-    } else {
-        console.log("Erro no pause");
-    }
-});
-
-document.addEventListener("seek", function (request) {
-    const player = getNetflixPlayer();
-    const data = request.detail;
-    console.log("Received info request");
-    if (player) {
-        serverSeek = true;
-        player.seek(data.time);
-    } else {
-        console.log("Erro no seek");
-    }
-});
-
-const playListener = function () {
-    const player = getNetflixPlayer();
-    if (!serverPlay) {
+    #getInfo = (request) => {
+        const requestData = request.detail;
+        const responseDataPacket = this.#prepareInformation(requestData);
         chrome.runtime.sendMessage(
-            assisteComigoId,
-            { type: "listenerPlay", time: player.getCurrentTime() },
-            (response) => console.log(response)
+            this.#assisteComigoId,
+            responseDataPacket,
+            this.#sendMessageCallback
         );
-    }
-    serverPlay = false;
-};
+    };
 
-const pauseListener = function () {
-    const player = getNetflixPlayer();
-    if (!serverPlay) {
+    #StartSession = (request) => {
+        const requestData = request.detail;
+        const video = this.#getHtmlVideo();
+        const responseDataPacket = this.#prepareInformation(requestData);
+        if (video) this.#addEventListerners(video);
         chrome.runtime.sendMessage(
-            assisteComigoId,
-            { type: "listenerPause", time: player.getCurrentTime() },
-            (response) => console.log(response)
+            this.#assisteComigoId,
+            responseDataPacket,
+            this.#sendMessageCallback
         );
-    }
-    serverPause = false;
-};
+    };
 
-const seekListener = function () {
-    const player = getNetflixPlayer();
-    if (!serverSeek) {
+    #completeEndSession = (request) => {
+        const requestData = request.detail;
+        const video = this.#getHtmlVideo();
+        const responseDataPacket = this.#prepareInformation(requestData);
+        if (video) this.#removeEventListeners(video);
         chrome.runtime.sendMessage(
-            assisteComigoId,
-            { type: "listenerSeek", time: player.getCurrentTime() },
-            (response) => console.log(response)
+            this.#assisteComigoId,
+            responseDataPacket,
+            this.#sendMessageCallback
         );
-    }
-    serverSeek = false;
-};
+    };
 
-function getNetflixPlayer() {
-    const videoPlayer = window.netflix.appContext.state.playerApp.getAPI()
-        .videoPlayer;
-    const playerSessionId = videoPlayer.getAllPlayerSessionIds();
-    const player = videoPlayer.getVideoPlayerBySessionId(playerSessionId[0]);
-    return player;
+    #startConnect = (request) => {
+        const requestData = request.detail;
+        let info = { url: document.location.href };
+        const newData = { ...requestData, ...info };
+        chrome.runtime.sendMessage(this.#assisteComigoId, newData, this.#sendMessageCallback);
+    }
+
+    #playbackCommands = (request) => {
+        const requestData = request.detail;
+        const requestType = requestData.type;
+        const player = getNetflixPlayer();
+        switch (requestType) {
+            case "play":
+                this.#serverPlay = true;
+                player.play()
+                break;
+            case "pause":
+                this.#serverPause = true;
+                player.pause();
+                break;
+            case "seek":
+                this.#serverSeek = true;
+                player.seek(requestData.time);
+                break;
+            default:
+                console.log(`Can't find ${requestType} command`);
+                break;
+        }
+    }
+
+    #playListener = () => {
+        const player = getNetflixPlayer();
+        if (!this.#serverPlay) {
+            chrome.runtime.sendMessage(
+                this.#assisteComigoId,
+                { type: "listenerPlay", time: player.getCurrentTime() },
+                this.#sendMessageCallback
+            );
+        }
+        this.#serverPlay = false;
+    };
+
+    #pauseListener = () => {
+        const player = getNetflixPlayer();
+        if (!this.#serverPause) {
+            chrome.runtime.sendMessage(
+                this.#assisteComigoId,
+                { type: "listenerPause", time: player.getCurrentTime() },
+                this.#sendMessageCallback
+            );
+        }
+        this.#serverPause = false;
+    };
+
+    #seekListener = () => {
+        const player = getNetflixPlayer();
+        if (!this.#serverSeek) {
+            chrome.runtime.sendMessage(
+                this.#assisteComigoId,
+                { type: "listenerSeek", time: player.getCurrentTime() },
+                this.#sendMessageCallback
+            );
+        }
+        this.#serverSeek = false;
+    };
+
+    #getNetflixPlayer = () => {
+        const videoPlayer = window.netflix.appContext.state.playerApp.getAPI()
+            .videoPlayer;
+        const playerSessionId = videoPlayer.getAllPlayerSessionIds();
+        const player = videoPlayer.getVideoPlayerBySessionId(
+            playerSessionId[0]
+        );
+        return player;
+    };
+
+    #removeEventListeners = (video) => {
+        video.removeEventListener("play", this.#playListener);
+        video.removeEventListener("pause", this.#pauseListener);
+        video.removeEventListener("seeked", this.#seekListener);
+    }
+
+    #addEventListerners = (video) => {
+        video.addEventListener("play", this.#playListener);
+        video.addEventListener("pause", this.#pauseListener);
+        video.addEventListener("seeking", this.#seekListener);
+    };
+
+    #sendMessageCallback = (response) => {
+        console.log(response);
+    };
+
+    #generateInformartionPacket = (requestData, playerExists, currentTime) => {
+        let addtionalInfo = {
+            player: playerExists,
+            url: document.location.href,
+            time: currentTime,
+        };
+        const responseData = { ...requestData, ...addtionalInfo };
+        return responseData;
+    };
+
+    #checkIfPlayerExists = (player) => {
+        if (player) {
+            return true;
+        }
+        return false;
+    };
+
+    #getPlayerCurrentTime = (player) => {
+        if (player) {
+            return player.getCurrentTime();
+        }
+        return;
+    };
+
+    #getHtmlVideo = () => {
+        const htmlVideo = document.querySelector("video");
+        return htmlVideo;
+    };
 }
+
+const assisteComigoNetflix = new AssisteComigoNeflix();
