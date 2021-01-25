@@ -42,7 +42,7 @@ async function onMessage(request, sender, response){
  */
 function sendMessageClosure(result) {
     if(!result){
-        goToErrorPage();
+        console.log("Erro"); //goToErrorPage();
     }
 }
 
@@ -51,5 +51,13 @@ function sendMessageClosure(result) {
  */
 function DOMContentLoaded() {
     let infoPacket = { type: "getInfo" };
+    const externalSession = document.getElementById("internalPlayerLink");
+    externalSession.addEventListener("click", onButtonExternalSessionClick)
     chrome.runtime.sendMessage(infoPacket, sendMessageClosure);
+}
+
+function onButtonExternalSessionClick(){
+    var newURL = `chrome-extension://${chrome.runtime.id}/internalPlayer/mainPage/index.html`;	
+    chrome.tabs.create({ url: newURL });	document.addEventListener("DOMContentLoaded", DOMContentLoaded);
+    console.log("Nova guia");
 }
