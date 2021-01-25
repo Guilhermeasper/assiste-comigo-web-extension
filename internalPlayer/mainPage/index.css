@@ -1,0 +1,100 @@
+* {
+    padding: 0;
+    margin: 0;
+    border: 0;
+    box-sizing: border-box;
+}
+
+html {
+    height: 100vh;
+}
+
+body {
+    position: relative;
+    background: white;
+    height: 200px;
+    width: 60%;
+    margin: 0 auto;
+    padding: 20px;
+    resize: both;
+    overflow: auto;
+}
+
+.text,
+button {
+    font-family: "Manrope", sans-serif;
+    font-size: 15px;
+}
+
+#title {
+    height: 50px;
+    margin-top: 0.2em;
+}
+
+body {
+    width: 500px;
+    height: 300px;
+    margin: -150px 0 0 -200px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    padding: 20px;
+}
+
+.innerContent {
+    margin-top: 10px;
+    margin-left: 20px;
+}
+
+button {
+    background-color: red;
+    height: 65px;
+    width: 160px;
+    border-radius: 1rem;
+    font-size: 18px;
+    font-weight: 600;
+    color: white;
+    margin-left: 5px;
+}
+
+#info {
+    color: gray;
+}
+
+#urlCopyButton {
+    margin-left: 10px;
+    font-size: 10px;
+    height: 15px;
+    width: 70px;
+    opacity: 50%;
+}
+
+.flex {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+#loading-bar {
+    animation: loading 2s ease alternate-reverse infinite;
+    background: linear-gradient(
+        to right,
+        rgba(170, 170, 170, 0.6),
+        40%,
+        rgba(240, 240, 240, 1),
+        60%,
+        rgba(170, 170, 170, 0.6)
+    );
+    background-size: 200% 100%;
+    height: 20px;
+    width: 210px;
+}
+
+@keyframes loading {
+    0% {
+        background-position-x: 0%;
+    }
+    100% {
+        background-position-x: 100%;
+    }
+}
