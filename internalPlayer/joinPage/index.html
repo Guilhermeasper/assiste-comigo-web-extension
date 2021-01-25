@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link
+            href="https://fonts.googleapis.com/css?family=Montserrat:600&display=swap&subset=latin-ext"
+            rel="stylesheet"
+        />
+        <link href="./../../libs/video-js.css" rel="stylesheet" />
+        <link href="./index.css" rel="stylesheet" />
+        <script src="./../../libs/videojs-ie8.min.js"></script>
+        <script src="./../../libs/socket.io.js"></script>
+        <script type="module" src="./index.js"></script>
+        <title>Assiste Comigo - Juntar a sessão</title>
+    </head>
+    <body>
+        <div id="content">
+            <div class="innerContent">
+                <img id="title" alt="Assiste comigo" src="./../../icons/assiste-comigo-title.svg">
+            </div>
+            <div class="filePicker" id="videoPicker">
+                <label for="text">ID da sessão: </label>
+                <input class="text" type="text" id="sessionId" />
+            </div>
+            <div class="filePicker" id="videoPicker">
+                <label for="file">Escolha um vídeo para assistir</label><br>
+                <input type="file" id="videoFile" name="video" accept="video/mp4" />
+            </div>
+            <div class="filePicker" id="subPicker">
+                <label for="file">Escolha uma legenda</label><br>
+                <input type="file" id="subFile" name="video" accept=".vtt" />
+            </div>
+            <div class="innerContent">
+                <button class="button" id="buttonCreate">Entrar na Sessão</button>
+            </div>
+        </div>
+    </body>
+</html>
