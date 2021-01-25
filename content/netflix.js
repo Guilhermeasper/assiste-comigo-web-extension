@@ -10,9 +10,9 @@ class AssisteComigoNeflix {
         this.#serverSeek = false;
         document.addEventListener("init", this.#init);
         document.addEventListener("getInfo", this.#getInfo);
-        document.addEventListener("finishCreate", this.#StartSession);
+        document.addEventListener("finishCreate", this.#startSession);
         document.addEventListener("startConnect", this.#startConnect);
-        document.addEventListener("finishConnect", this.#StartSession);
+        document.addEventListener("finishConnect", this.#startSession);
         document.addEventListener("disconnect", this.#completeEndSession);
         document.addEventListener("play", this.#playbackCommands);
         document.addEventListener("pause", this.#playbackCommands);
@@ -47,7 +47,7 @@ class AssisteComigoNeflix {
         );
     };
 
-    #StartSession = (request) => {
+    #startSession = (request) => {
         const requestData = request.detail;
         const video = this.#getHtmlVideo();
         const responseDataPacket = this.#prepareInformation(requestData);
@@ -182,7 +182,7 @@ class AssisteComigoNeflix {
 
     #getPlayerCurrentTime = (player) => {
         if (player) {
-            return player.getCurrentTime();
+            return !!player && player.getCurrentTime();
         }
         return;
     };
