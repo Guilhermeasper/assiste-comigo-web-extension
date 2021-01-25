@@ -2,10 +2,10 @@ import {
     goToConnectPage,
     goToCreateSessionPage,
     goToErrorPage,
-    goToInSessionPage
+    goToInSessionPage,
 } from "./../../utils/popupNavigate.js";
 
-import {getUserId, getSessionId} from "./../../utils/utils.js"
+import { getUserId, getSessionId } from "./../../utils/utils.js";
 
 document.addEventListener("DOMContentLoaded", DOMContentLoaded);
 chrome.runtime.onMessage.addListener(onMessage);
@@ -16,13 +16,13 @@ chrome.runtime.onMessage.addListener(onMessage);
  * @param {Object} sender - Object cotaining sender information
  * @param {Object} response - Callback to respond message received
  */
-async function onMessage(request, sender, response){
+async function onMessage(request, sender, response) {
     console.log(request);
     const player = request.player;
     const url = request.url;
     const userId = await getUserId();
     const sessionId = await getSessionId();
-    
+
     if (!userId) {
         goToErrorPage();
     } else {
@@ -41,7 +41,7 @@ async function onMessage(request, sender, response){
  * @param {Object} result Answer from the send message
  */
 function sendMessageClosure(result) {
-    if(!result){
+    if (!result) {
         console.log("Erro"); //goToErrorPage();
     }
 }
@@ -52,12 +52,16 @@ function sendMessageClosure(result) {
 function DOMContentLoaded() {
     let infoPacket = { type: "getInfo" };
     const externalSession = document.getElementById("internalPlayerLink");
-    externalSession.addEventListener("click", onButtonExternalSessionClick)
+    externalSession.addEventListener("click", onButtonExternalSessionClick);
     chrome.runtime.sendMessage(infoPacket, sendMessageClosure);
+    document.querySelectorAll("[data-locale]").forEach((elem) => {
+        elem.innerText = chrome.i18n.getMessage(elem.dataset.locale);
+    });
 }
 
-function onButtonExternalSessionClick(){
-    var newURL = `chrome-extension://${chrome.runtime.id}/internalPlayer/mainPage/index.html`;	
-    chrome.tabs.create({ url: newURL });	document.addEventListener("DOMContentLoaded", DOMContentLoaded);
+function onButtonExternalSessionClick() {
+    var newURL = `chrome-extension://${chrome.runtime.id}/internalPlayer/mainPage/index.html`;
+    chrome.tabs.create({ url: newURL });
+    document.addEventListener("DOMContentLoaded", DOMContentLoaded);
     console.log("Nova guia");
 }

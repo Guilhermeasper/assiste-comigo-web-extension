@@ -1,0 +1,27 @@
+{
+    "appTitle": {
+        "message": "Assiste Comigo"
+    },
+    "appDesc": {
+        "message": "Assista a filmes, séries e animes com quem você gosta.",
+        "description":"The description of the application."
+    },
+    "homepageMessage": {
+        "message": "Abra um vídeo para criar uma sessão ou"
+    },
+    "homepageMessageLink": {
+        "message": "escolha um vídeo do seu PC"
+    },
+    "newSessionButton": {
+        "message": "Nova sessão"
+    },
+    "urlCopyButton": {
+        "message": "Copiar URL"
+    },
+    "connectedToSession": {
+        "message": "Conectado à sessão"
+    },
+    "disconnectButton": {
+        "message": "Desconectar"
+    }
+  }

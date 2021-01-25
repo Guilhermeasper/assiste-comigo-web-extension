@@ -3,6 +3,8 @@ const buttonCreate = document.getElementById("buttonCreate");
 chrome.runtime.onMessage.addListener(onMessage);
 buttonCreate.addEventListener("click", onButtonCreateClick);
 
+document.addEventListener("DOMContentLoaded", DOMContentLoaded);
+
 import {tabSendMessage} from './../../utils/utils.js';
 
 /**
@@ -41,4 +43,8 @@ function onButtonCreateClick(){
     });
 }
 
-
+function DOMContentLoaded(){
+    document.querySelectorAll("[data-locale]").forEach((elem) => {
+        elem.innerText = chrome.i18n.getMessage(elem.dataset.locale);
+    });
+}

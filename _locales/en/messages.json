@@ -1,0 +1,27 @@
+{
+    "appTitle": {
+        "message": "Assiste Comigo"
+    },
+    "appDesc": {
+        "message": "Watch movies, series and anime with the ones you like.",
+        "description":"The description of the application."
+    },
+    "homepageMessage": {
+        "message": "Open a video to create a session or"
+    },
+    "homepageMessageLink": {
+        "message": "choose a video from your PC"
+    },
+    "newSessionButton": {
+        "message": "New session"
+    },
+    "urlCopyButton": {
+        "message": "Copy URL"
+    },
+    "connectedToSession": {
+        "message": "Connected to the session"
+    },
+    "disconnectButton": {
+        "message": "Disconnect"
+    }
+  }
