@@ -3,6 +3,7 @@ import { goToErrorPage, goToHomepagePage } from "./../../utils/popupNavigate.js"
 
 const urlCopyButton = document.getElementById("urlCopyButton");
 const disconnectButton = document.getElementById("disconnectButton");
+const emojisHTMLElement = document.getElementById("emojis");
 
 document.addEventListener("DOMContentLoaded", DOMContentLoaded);
 chrome.runtime.onMessage.addListener(onMessage);
@@ -46,6 +47,7 @@ async function onMessage(request, sender, response) {
     const sessionUrl = await getSessionUrl();
     console.log(player, userId, sessionId);
     if (userId && player && sessionId) {
+        emojisHTMLElement.innerText = convertUUIDToEmoji(sessionId);
         urlCopyButton.addEventListener("click", copyToClipboard(sessionUrl));
     } else {
         goToErrorPage();
@@ -58,4 +60,14 @@ async function onMessage(request, sender, response) {
  */
 function sendMessageClosure(response) {
     console.log(response);
+}
+
+function convertUUIDToEmoji(uuid){
+    let emojiOutput = ""
+    const uuidArray = uuid.split("-");
+    for (const section of uuidArray) {
+        const index = parseInt(section.substring(0,2), 16);
+        emojiOutput += emojis[index];
+    }
+    return emojiOutput;
 }
