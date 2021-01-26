@@ -13,9 +13,16 @@ disconnectButton.addEventListener("click", onDisconnectButtonClick);
  */
 function DOMContentLoaded(){
     chrome.runtime.sendMessage({ type: "getInfo" }, sendMessageClosure);
+    const informationIcon = document.getElementById("informationIcon");
+    informationIcon.addEventListener("click", informationIconCallback);
     document.querySelectorAll("[data-locale]").forEach((elem) => {
         elem.innerText = chrome.i18n.getMessage(elem.dataset.locale);
     });
+}
+
+function informationIconCallback(){
+    var newURL = `chrome-extension://${chrome.runtime.id}/about/index.html`;
+    chrome.tabs.create({ url: newURL });
 }
 
 /**

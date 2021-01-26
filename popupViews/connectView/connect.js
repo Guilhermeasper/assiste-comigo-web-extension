@@ -21,7 +21,14 @@ function onMessage(request, sender, response) {
  * Function fired when the dom is completely loaded
  */
 function DOMContentLoaded() {
+    const informationIcon = document.getElementById("informationIcon");
+    informationIcon.addEventListener("click", informationIconCallback);
     chrome.runtime.sendMessage({
         type: "startConnect",
     });
+}
+
+function informationIconCallback(){
+    var newURL = `chrome-extension://${chrome.runtime.id}/about/index.html`;
+    chrome.tabs.create({ url: newURL });
 }
