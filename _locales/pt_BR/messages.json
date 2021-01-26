@@ -7,10 +7,10 @@
         "description":"The description of the application."
     },
     "homepageMessage": {
-        "message": "Abra um vídeo para criar uma sessão ou"
+        "message": "Abra um vídeo para criar uma sessão"
     },
     "homepageMessageLink": {
-        "message": "escolha um vídeo do seu PC"
+        "message": ""
     },
     "newSessionButton": {
         "message": "Nova sessão"
