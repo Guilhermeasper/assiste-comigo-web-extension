@@ -17,7 +17,8 @@
     "https://www.youtube.com/*",
     "https://www.netflix.com/*",
     "https://www.crunchyroll.com/*",
-    "https://www.vimeo.com/*"
+    "https://www.vimeo.com/*",
+    "https://tv.apple.com/*"
   ],
   "action": {
     "default_title": "__MSG_appTitle__",
@@ -32,7 +33,8 @@
       "https://www.youtube.com/*",
       "https://www.netflix.com/*",
       "https://www.crunchyroll.com/*",
-      "https://www.vimeo.com/*"
+      "https://www.vimeo.com/*",
+      "https://tv.apple.com/*"
     ]
   },
   "content_scripts": [
@@ -45,7 +47,8 @@
         "*://*.youtube.com/*",
         "*://*.crunchyroll.com/*",
         "*://*.vimeo.com/*",
-        "*://*.netflix.com/*"
+        "*://*.netflix.com/*",
+        "*://tv.apple.com/*"
       ],
       "run_at": "document_end"
     }
@@ -76,7 +79,8 @@
         "https://www.youtube.com/*",
         "https://www.netflix.com/*",
         "https://www.crunchyroll.com/*",
-        "https://www.vimeo.com/*"
+        "https://www.vimeo.com/*",
+        "https://tv.apple.com/*"
       ]
     }
   ],

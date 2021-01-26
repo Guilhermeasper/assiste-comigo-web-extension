@@ -8,6 +8,7 @@ const contentScriptsOptions = {
     "vimeo.com": vimeoScript,
     "www.crunchyroll.com": crunchyrollScript,
     "www.netflix.com": netflixScript,
+    "tv.apple.com": appleTVScript
 };
 
 document.addEventListener("DOMContentLoaded", domLoaded());
@@ -144,6 +145,11 @@ function anitubeScript() {
 function primevideoScript() {
     injectScript("content/primevideo.js");
     console.log("Primevideo");
+}
+
+function appleTVScript() {
+    injectScript("content/appletv.js");
+    console.log("AppleTV");
 }
 
 function getPageHost() {
