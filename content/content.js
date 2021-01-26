@@ -8,7 +8,8 @@ const contentScriptsOptions = {
     "vimeo.com": vimeoScript,
     "www.crunchyroll.com": crunchyrollScript,
     "www.netflix.com": netflixScript,
-    "tv.apple.com": appleTVScript
+    "tv.apple.com": appleTVScript,
+    "goyabu.com": goyabuScript
 };
 
 document.addEventListener("DOMContentLoaded", domLoaded());
@@ -150,6 +151,11 @@ function primevideoScript() {
 function appleTVScript() {
     injectScript("content/appletv.js");
     console.log("AppleTV");
+}
+
+function goyabuScript() {
+    injectScript("content/goyabu.js");
+    console.log("Goyabu");
 }
 
 function getPageHost() {

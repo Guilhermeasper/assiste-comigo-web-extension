@@ -18,7 +18,8 @@
     "https://www.netflix.com/*",
     "https://www.crunchyroll.com/*",
     "https://www.vimeo.com/*",
-    "https://tv.apple.com/*"
+    "https://tv.apple.com/*",
+    "https://goyabu.com/*"
   ],
   "action": {
     "default_title": "__MSG_appTitle__",
@@ -34,7 +35,8 @@
       "https://www.netflix.com/*",
       "https://www.crunchyroll.com/*",
       "https://www.vimeo.com/*",
-      "https://tv.apple.com/*"
+      "https://tv.apple.com/*",
+      "https://goyabu.com/*"
     ]
   },
   "content_scripts": [
@@ -48,7 +50,8 @@
         "*://*.crunchyroll.com/*",
         "*://*.vimeo.com/*",
         "*://*.netflix.com/*",
-        "*://tv.apple.com/*"
+        "*://tv.apple.com/*",
+        "*://goyabu.com/*"
       ],
       "run_at": "document_end"
     }
@@ -70,7 +73,8 @@
         "content/primevideo.js",
         "content/telecine.js",
         "content/viki.js",
-        "content/vimeo.js"
+        "content/vimeo.js",
+        "content/goyabu.js"
       ],
       "matches" : [
         "https://www.primevideo.com/*",
@@ -80,7 +84,8 @@
         "https://www.netflix.com/*",
         "https://www.crunchyroll.com/*",
         "https://www.vimeo.com/*",
-        "https://tv.apple.com/*"
+        "https://tv.apple.com/*",
+        "https://goyabu.com/*"
       ]
     }
   ],
