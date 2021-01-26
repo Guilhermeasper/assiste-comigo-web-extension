@@ -1,4 +1,6 @@
-import { setUserId, clearInfo } from "./../utils/utils.js";
+importScripts('./libs/socket.io.js');
+
+const serverAddress = "https://assistecomigo.herokuapp.com";
 
 chrome.runtime.onInstalled.addListener(onInstalled);
 
@@ -8,31 +10,15 @@ chrome.runtime.onInstalled.addListener(onInstalled);
  */
 function onInstalled(details) {
     clearInfo();
-    let tmpSocket = io.connect("http://192.168.0.18:80", {
+    let temporarySocket = io.connect(serverAddress, {
         transports: ["websocket"],
     });
-    tmpSocket.on("newId", (data) => {
+    temporarySocket.on("newId", (data) => {
         console.log(`The user created by server is ${data.newId}`);
         setUserId(data.newId);
-        tmpSocket.disconnect();
+        temporarySocket.disconnect();
+        var newURL = `chrome-extension://${chrome.runtime.id}/about/index.html`;
+        chrome.tabs.create({ url: newURL });
     });
-    tmpSocket.emit("getId", {});
-
-    chrome.declarativeContent.onPageChanged.removeRules(undefined, function () {
-        console.log("Rules Removed");
-        chrome.declarativeContent.onPageChanged.addRules([
-            {
-                conditions: [
-                    new chrome.declarativeContent.PageStateMatcher({
-                        pageUrl: {
-                            urlMatches:
-                                "(vimeo|crunchyroll|primevideo|viki|youtube|anitube|netflix).(com|site)",
-                        },
-                    }),
-                ],
-                actions: [new chrome.declarativeContent.ShowPageAction()],
-            },
-        ]);
-        console.log("New rules added");
-    });
+    temporarySocket.emit("getId", {});
 }

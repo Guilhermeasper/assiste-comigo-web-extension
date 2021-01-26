@@ -1,13 +1,3 @@
-import {
-    getSessionId,
-    getUserId,
-    clearInfo,
-    setSessionId,
-    setSessionUrl,
-} from "./../utils/utils.js";
-
-import socket from "../utils/socket.js";
-
 chrome.runtime.onMessageExternal.addListener(onMessageExternal);
 
 /**
@@ -18,20 +8,24 @@ chrome.runtime.onMessageExternal.addListener(onMessageExternal);
  */
 function onMessageExternal(request, sender, response) {
     // if (sender.url == blocklistedWebsite) return; // don't allow this web page access
+    console.log("onMessageExternal new request.");
+    console.log(request);
     const url = request.url;
     const urlParams = new URLSearchParams(url);
     const typeOptions = {
         getInfo: getInfoExternal.bind(this, request, response),
         startConnect: startConnectExternal.bind(
+            this,
             request,
             response,
             url,
             urlParams
         ),
         finishCreate: finishCreateExternal.bind(this, request, response, url),
-        play: playExternal.bind(this, request, response),
-        pause: pauseExternal.bind(this, request, response),
-        seek: seekExternal.bind(this, request, response),
+        finishConnect: finishConnectExternal.bind(this, request, response, url, urlParams),
+        listenerPlay: playExternal.bind(this, request, response),
+        listenerPause: pauseExternal.bind(this, request, response),
+        listenerSeek: seekExternal.bind(this, request, response),
         disconnect: disconnectExternal.bind(this, request, response),
     };
     typeOptions[request.type]();
@@ -60,13 +54,6 @@ async function startConnectExternal(request, response, url, urlParams){
         const sessionId = urlParams.get("assistecomigo");
         await setSessionId(sessionId);
         let userId = await getUserId();
-        await socket.connect();
-        socket.addSocketListeners();
-        let packet = {
-            userId: userId,
-            sessionId: sessionId,
-        };
-        socket.emitCommand("join", packet);
         let sessionUrl = await parseUrl(url, sessionId);
         await setSessionUrl(sessionUrl);
         response({ code: 200});
@@ -81,17 +68,36 @@ async function startConnectExternal(request, response, url, urlParams){
  * @param {Object} response 
  * @param {String} url 
  */
-async function finishCreateExternal(request, response, url) {
-    let sessionUrl = url;
-    const sessionId = request.sessionId;
-    if (url.includes("?")) {
-        sessionUrl = `${url}&assistecomigo=${sessionId}`;
-    } else {
-        sessionUrl = `${url}?assistecomigo=${sessionId}`;
-    }
-    await setSessionUrl(sessionUrl);
+async function finishConnectExternal(request, response, url, urlParams) {
+    let userId = await getUserId();
+    const sessionId = await getSessionId();
+    await setSessionUrl(url);
     const newdata = {
-        sessionUrl: sessionUrl,
+        sessionUrl: url,
+        sessionId: sessionId,
+        userId: userId,
+    };
+    const newRequest = { ...request, ...newdata };
+    console.log(newRequest);
+    chrome.runtime.sendMessage(newRequest);
+    response({ code: 200 });
+}
+/**
+ * Passes the create packte from the page to the popup
+ * @param {Object} request 
+ * @param {Object} response 
+ * @param {String} url 
+ */
+async function finishCreateExternal(request, response, url) {
+    console.log(request);
+    let userId = await getUserId();
+    const sessionId = request.sessionId;
+    const sessionUrl = new URL(url);
+    sessionUrl.searchParams.append("assistecomigo", sessionId);
+    await setSessionUrl(sessionUrl.href);
+    const newdata = {
+        sessionUrl: sessionUrl.href,
+        userId: userId,
     };
     const newRequest = { ...request, ...newdata };
     chrome.runtime.sendMessage(newRequest);
@@ -104,14 +110,7 @@ async function finishCreateExternal(request, response, url) {
  * @param {Function} response - Function to response to the request
  */
 async function playExternal(request, response) {
-    let userId = await getUserId();
-    let sessionId = await getSessionId();
-    let packet = {
-        userId: userId,
-        sessionId: sessionId,
-        time: request.time,
-    };
-    socket.emitCommand("play", packet);
+    tabSendMessage(request);
     response({ code: 200 });
 }
 
@@ -121,14 +120,7 @@ async function playExternal(request, response) {
  * @param {Function} response - Function to response to the request
  */
 async function pauseExternal(request, response) {
-    let userId = await getUserId();
-    let sessionId = await getSessionId();
-    let packet = {
-        userId: userId,
-        sessionId: sessionId,
-        time: request.time,
-    };
-    socket.emitCommand("pause", packet);
+    tabSendMessage(request);
     response({ code: 200 });
 }
 
@@ -138,14 +130,7 @@ async function pauseExternal(request, response) {
  * @param {Function} response - Function to response to the request
  */
 async function seekExternal(request, response) {
-    let userId = await getUserId();
-    let sessionId = await getSessionId();
-    let packet = {
-        userId: userId,
-        sessionId: sessionId,
-        time: request.time,
-    };
-    socket.emitCommand("seek", packet);
+    tabSendMessage(request);
     response({ code: 200 });
 }
 
@@ -156,10 +141,6 @@ async function seekExternal(request, response) {
  */
 function disconnectExternal(request, response) {
     clearInfo();
-    if (socket.socket) {
-        socket.emitCommand("disconnect", {});
-        socket.disconnect();
-    }
     response({ code: 200 });
 }
 

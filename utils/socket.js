@@ -1,53 +1,21 @@
-import {
-    tabSendMessage,
-    getSessionId,
-    setSessionId,
-    getUserId,
-} from "./utils.js";
-
-var socket;
-
-function roomPlay(data) {
-    tabSendMessage({ type: "play" });
-}
-
-function roomPause(data) {
-    tabSendMessage({ type: "pause" });
-}
-
-function roomSeek(data) {
-    tabSendMessage({ type: "seek", time: data.time });
-}
-
-async function sessionCreated(data) {
-    await setSessionId(data.newId);
-    console.log(`Session id coming from server is ${data.newId}`);
-    chrome.runtime.sendMessage({
-        type: "startCreate",
-        sessionId: data.newId,
-    });
-}
-
-function joinedSession(data) {
-    chrome.runtime.sendMessage({
-        type: "startConnect",
-        sessionId: data.newId,
-    });
-}
-
 class Socket {
     socket;
+    _address;
+    response;
     constructor() {
-        this.socket = undefined;
+        this._address = "https://assistecomigo.herokuapp.com";
     }
 
     async connect() {
-        this.socket = await io.connect("http://192.168.0.18:80", {
+        console.log("Connecting to server");
+        this.socket = await io.connect(this._address, {
             transports: ["websocket"],
         });
+        console.log("Connected to the server");
     }
 
     emitCommand(type, data) {
+        console.log("Sending information to server");
         this.socket.emit(type, data);
     }
 
@@ -56,15 +24,15 @@ class Socket {
     }
 
     addSocketListeners() {
-        this.socket.on("room_play", roomPlay);
+        this.socket.on("room_play", this.roomPlay);
 
-        this.socket.on("room_pause", roomPause);
+        this.socket.on("room_pause", this.roomPause);
 
-        this.socket.on("room_seek", roomSeek);
+        this.socket.on("room_seek", this.roomSeek);
 
-        this.socket.on("sessionCreated", sessionCreated);
+        this.socket.on("sessionCreated", this.sessionCreated);
 
-        this.socket.on("joinedSession", joinedSession);
+        this.socket.on("joinedSession", this.joinedSession);
 
         this.socket.on("reconnect", async () => {
             let userId = await getUserId();
@@ -75,6 +43,58 @@ class Socket {
             });
         });
     }
-}
 
-export default socket = new Socket();
+    roomPlay(data) {
+        document.dispatchEvent(
+            new CustomEvent("play", {
+                detail: {
+                    type: "play",
+                },
+            })
+        );
+    }
+
+    roomPause(data) {
+        document.dispatchEvent(
+            new CustomEvent("pause", {
+                detail: {
+                    type: "pause",
+                },
+            })
+        );
+    }
+
+    roomSeek(data) {
+        document.dispatchEvent(
+            new CustomEvent("seek", {
+                detail: {
+                    type: "seek",
+                    time: data.time,
+                },
+            })
+        );
+    }
+
+    async sessionCreated(data) {
+        await setSessionId(data.newId);
+        console.log(`Session id coming from server is ${data.newId}`);
+        document.dispatchEvent(
+            new CustomEvent("finishCreate", {
+                detail: {
+                    type: "finishCreate",
+                    sessionId: data.newId,
+                },
+            })
+        );
+    }
+
+    joinedSession(data) {
+        document.dispatchEvent(
+            new CustomEvent("finishConnect", {
+                detail: {
+                    type: "finishConnect"
+                },
+            })
+        );
+    }
+}

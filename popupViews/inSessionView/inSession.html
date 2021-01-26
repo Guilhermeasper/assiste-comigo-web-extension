@@ -6,6 +6,7 @@
             href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&display=swap"
             rel="stylesheet"
         />
+        <script src="./emojis.js"></script>
         <script src="./../../libs/jquery.js"></script>
         <link rel="stylesheet" href="./../styles.css" />
         <link rel="stylesheet" href="./inSession.css" />
@@ -13,19 +14,21 @@
     </head>
 
     <body>
+        <img id="informationIcon" alt="Information" src="./../../icons/info.svg">
         <div id="content">
+            
             <div class="innerContent flex">
                 <img id="title" alt="Assiste comigo" src="./../../icons/assiste-comigo-title.svg">
-                <button id="urlCopyButton">Copiar URL</button>
+                <button id="urlCopyButton" data-locale="urlCopyButton">Copiar URL</button>
             </div>
             <div class="innerContent">
-                <div id="info" class="text">Conectado à sessão</div>
+                <div id="info" class="text" data-locale="connectedToSession">Conectado à sessão</div>
             </div>
             <div class="innerContent">
-                <div id="emojis" class="text">🍻 🍴 🔪 🌍</div>
+                <div id="emojis" class="text"></div>
             </div>
             <div class="innerContent">
-                <button class="button" id="disconnectButton">
+                <button class="button" id="disconnectButton" data-locale="disconnectButton">
                     Desconectar
                 </button>
             </div>

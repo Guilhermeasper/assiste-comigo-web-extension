@@ -1,0 +1,42 @@
+{
+    "appTitle": {
+        "message": "Assiste Comigo"
+    },
+    "appDesc": {
+        "message": "Watch movies, series and anime with the ones you like.",
+        "description":"The description of the application."
+    },
+    "homepageMessage": {
+        "message": "Open a video to create a session"
+    },
+    "homepageMessageLink": {
+        "message": ""
+    },
+    "newSessionButton": {
+        "message": "New session"
+    },
+    "urlCopyButton": {
+        "message": "Copy URL"
+    },
+    "connectedToSession": {
+        "message": "Connected to the session"
+    },
+    "disconnectButton": {
+        "message": "Disconnect"
+    },
+    "aboutPageTitle": {
+        "message": "About"
+    },
+    "aboutTextCreated": {
+        "message": "Assiste Comigo was created and developed by"
+    },
+    "aboutTextVisual": {
+        "message": "Every visual identity was made with great care by"
+    },
+    "aboutTextThanks": {
+        "message": "Special thanks to Tiago, Marconi, Ricardo and Devaneios staff for their support and support during the development."
+    },
+    "aboutTextContribution": {
+        "message": "Did you like the extension? Consider supporting the project on Patreon, currently all extension code is maintained by me alone, as well as server costs."
+    }
+  }

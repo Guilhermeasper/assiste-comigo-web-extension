@@ -1,9 +1,5 @@
-button {
-    width: 24px;
-    height: 24px;
-    background: url("./../../icons/assiste-comigo-icon.svg");
-    background-size: 24px 24px;
-    background-repeat: no-repeat;
-    margin-left: 456px;
-    opacity: 10%;
+#internalPlayerLink {
+    color: #1c50cf;
+    font-weight: 600;
+    cursor: pointer;
 }

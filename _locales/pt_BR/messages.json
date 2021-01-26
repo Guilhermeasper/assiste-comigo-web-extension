@@ -1,0 +1,42 @@
+{
+    "appTitle": {
+        "message": "Assiste Comigo"
+    },
+    "appDesc": {
+        "message": "Assista a filmes, séries e animes com quem você gosta.",
+        "description":"The description of the application."
+    },
+    "homepageMessage": {
+        "message": "Abra um vídeo para criar uma sessão"
+    },
+    "homepageMessageLink": {
+        "message": ""
+    },
+    "newSessionButton": {
+        "message": "Nova sessão"
+    },
+    "urlCopyButton": {
+        "message": "Copiar URL"
+    },
+    "connectedToSession": {
+        "message": "Conectado à sessão"
+    },
+    "disconnectButton": {
+        "message": "Desconectar"
+    },
+    "aboutPageTitle": {
+        "message": "Sobre"
+    },
+    "aboutTextCreated": {
+        "message": "Assiste Comigo foi criada e desenvolvida por"
+    },
+    "aboutTextVisual": {
+        "message": "Toda identidade visual foi feita com muito carinho por"
+    },
+    "aboutTextThanks": {
+        "message": "Um agradecimento especial a Tiago, Marconi, Ricardo e ao pessoal do Devaneios pelo apoio e suporte durante o desenvolvimento."
+    },
+    "aboutTextContribution": {
+        "message": "Gostou da extensão? Considere apoiar o projeto no Patreon, atualmente todo código da extensão é mantido apenas por mim, bem como custos com servidor."
+    }
+  }

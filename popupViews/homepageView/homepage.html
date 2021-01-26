@@ -8,12 +8,12 @@
         />
         <script src="./../../libs/jquery.js"></script>
         <link rel="stylesheet" href="./../styles.css" />
-        <link rel="stylesheet" href="homepage.css" />
+        <link rel="stylesheet" href="./homepage.css" />
         <script type="module" src="homepage.js"></script>
     </head>
 
     <body>
-        <!-- <button class="button" id="player"></button> -->
+        <img id="informationIcon" alt="Information" src="./../../icons/info.svg">
         <div id="content">
             <div class="innerContent">
                 <img
@@ -23,9 +23,16 @@
                 />
             </div>
             <div class="innerContent">
-                <div id="info" class="text">
-                    Abra um vídeo para criar uma sessão
+                <div id="info" class="text" data-locale="homepageMessage">
+                    Abra um vídeo para criar uma sessão ou <br />
                 </div>
+                <div
+                        id="internalPlayerLink"
+                        class="text"
+                        data-locale="homepageMessageLink"
+                    >
+                        escolha um vídeo um do seu PC</div
+                    >
             </div>
         </div>
     </body>

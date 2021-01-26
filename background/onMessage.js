@@ -1,15 +1,18 @@
-import {
-    tabSendMessage,
-    getSessionId,
-    getUserId,
-    getSessionUrl,
-} from "./../utils/utils.js";
-
-import socket from "../utils/socket.js";
-
 chrome.runtime.onMessage.addListener(onMessage);
 
+async function init(request, response) {
+    console.log("Initializing content module");
+    const newdata = {
+        extensionId: chrome.runtime.id,
+    };
+    const newRequest = { ...request, ...newdata };
+    console.log(newRequest);
+    let result = await tabSendMessage(newRequest);
+    response(result);
+}
+
 async function getInfo(request, response) {
+    console.log("Get to the getInfo function");
     let userId = await getUserId();
     let sessionId = await getSessionId();
     let sessionUrl = await getSessionUrl();
@@ -24,18 +27,9 @@ async function getInfo(request, response) {
     response(result);
 }
 
-async function startCreate(response) {
-    let userId = await getUserId();
-    await socket.connect();
-    socket.addSocketListeners();
-    let packet = {
-        userId: userId,
-    };
-    socket.emitCommand("create", packet);
-    response({ code: 200 });
-}
-
 async function finishCreate(request, response) {
+    console.log("Finish create");
+    console.log(request);
     let userId = await getUserId();
     let sessionId = await getSessionId();
     const newdata = {
@@ -85,8 +79,8 @@ function onMessage(request, sender, response) {
     console.log(request, sender, response);
     const type = request.type;
     const typeOptions = {
+        init: init.bind(this, request, response),
         getInfo: getInfo.bind(this, request, response),
-        startCreate: startCreate.bind(this, response),
         finishCreate: finishCreate.bind(this, request, response),
         startConnect: startConnect.bind(this, request, response),
         finishConnect: finishConnect.bind(this, request, response),
