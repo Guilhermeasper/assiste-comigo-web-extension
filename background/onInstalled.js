@@ -17,6 +17,8 @@ function onInstalled(details) {
         console.log(`The user created by server is ${data.newId}`);
         setUserId(data.newId);
         temporarySocket.disconnect();
+        var newURL = `chrome-extension://${chrome.runtime.id}/about/index.html`;
+        chrome.tabs.create({ url: newURL });
     });
     temporarySocket.emit("getId", {});
 }
