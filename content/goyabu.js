@@ -21,10 +21,8 @@ class AssisteComigoGoyabu {
     }
 
     #init = (request) => {
-        console.log("Initializing youtube module");
         const contentRequestData = request.detail;
         const extensionId = contentRequestData.extensionId;
-        console.log(`Extension ID:${extensionId}`);
         this.#assisteComigoId = extensionId;
     };
 
@@ -40,18 +38,10 @@ class AssisteComigoGoyabu {
             info.player = true;
             info.time = video.currentTime;
             const newData = { ...contentRequestData, ...info };
-            chrome.runtime.sendMessage(
-                this.#assisteComigoId,
-                newData,
-                (response) => console.log(response)
-            );
+            chrome.runtime.sendMessage(this.#assisteComigoId, newData);
         } else {
             const newData = { ...contentRequestData, ...info };
-            chrome.runtime.sendMessage(
-                this.#assisteComigoId,
-                newData,
-                (response) => console.log(response)
-            );
+            chrome.runtime.sendMessage(this.#assisteComigoId, newData);
         }
     };
 
@@ -71,20 +61,11 @@ class AssisteComigoGoyabu {
             video.addEventListener("play", this.#playListener);
             video.addEventListener("pause", this.#pauseListener);
             video.addEventListener("seeking", this.#seekListener);
-            chrome.runtime.sendMessage(
-                this.#assisteComigoId,
-                newData,
-                (response) => console.log(response)
-            );
+            chrome.runtime.sendMessage(this.#assisteComigoId, newData);
         } else {
             info.player = false;
             const newData = { ...data, ...info };
-            console.log(newData);
-            chrome.runtime.sendMessage(
-                this.#assisteComigoId,
-                newData,
-                (response) => console.log(response)
-            );
+            chrome.runtime.sendMessage(this.#assisteComigoId, newData);
         }
     };
 
@@ -96,7 +77,6 @@ class AssisteComigoGoyabu {
             url: document.location.href,
             time: undefined,
         };
-        console.log("Received connect request");
         if (video) {
             info.player = true;
             info.time = video.currentTime;
@@ -104,20 +84,11 @@ class AssisteComigoGoyabu {
             video.addEventListener("play", this.#playListener);
             video.addEventListener("pause", this.#pauseListener);
             video.addEventListener("seeking", this.#seekListener);
-            chrome.runtime.sendMessage(
-                this.#assisteComigoId,
-                newData,
-                (response) => console.log(response)
-            );
+            chrome.runtime.sendMessage(this.#assisteComigoId, newData);
         } else {
             info.player = false;
             const newData = { ...data, ...info };
-            console.log(newData);
-            chrome.runtime.sendMessage(
-                this.#assisteComigoId,
-                newData,
-                (response) => console.log(response)
-            );
+            chrome.runtime.sendMessage(this.#assisteComigoId, newData);
         }
     };
 
@@ -125,73 +96,52 @@ class AssisteComigoGoyabu {
         const video = document.querySelector(this.#selector);
         const data = request.detail;
         let info = { player: false, url: document.location.href };
-        const extensionId = data.extensionId;
-        console.log("Received disconnect request");
         if (video) {
             info.player = true;
             const newData = { ...data, ...info };
             video.removeEventListener("play", this.#playListener);
             video.removeEventListener("pause", this.#pauseListener);
             video.removeEventListener("seeking", this.#seekListener);
-            chrome.runtime.sendMessage(
-                this.#assisteComigoId,
-                newData,
-                (response) => console.log(response)
-            );
+            chrome.runtime.sendMessage(this.#assisteComigoId, newData);
         } else {
             info.player = false;
             const newData = { ...data, ...info };
-            console.log(newData);
-            chrome.runtime.sendMessage(
-                this.#assisteComigoId,
-                newData,
-                (response) => console.log(response)
-            );
+            chrome.runtime.sendMessage(this.#assisteComigoId, newData);
         }
     };
 
     #play = (request) => {
         const video = document.querySelector(this.#selector);
-        console.log("Received info request");
         if (video) {
             this.#serverPlay = true;
             video.play();
-        } else {
-            console.log("Erro no play");
         }
     };
 
     #pause = (request) => {
         const video = document.querySelector(this.#selector);
-        console.log("Received info request");
         if (video) {
             this.#serverPause = true;
             video.pause();
-        } else {
-            console.log("Erro no pause");
         }
     };
 
     #seek = (request) => {
         const video = document.querySelector(this.#selector);
         const data = request.detail;
-        console.log("Received info request");
         if (video) {
             this.#serverSeek = true;
             video.currentTime = data.time;
-        } else {
-            console.log("Erro no seek");
         }
     };
 
     #playListener = () => {
         const video = document.querySelector(this.#selector);
         if (!this.#serverPlay) {
-            chrome.runtime.sendMessage(
-                this.#assisteComigoId,
-                { type: "listenerPlay", time: video.currentTime },
-                (response) => console.log(response)
-            );
+            chrome.runtime.sendMessage(this.#assisteComigoId, {
+                type: "listenerPlay",
+                time: video.currentTime,
+            });
         }
         this.#serverPlay = false;
     };
@@ -199,11 +149,10 @@ class AssisteComigoGoyabu {
     #pauseListener = () => {
         const video = document.querySelector(this.#selector);
         if (!this.#serverPause) {
-            chrome.runtime.sendMessage(
-                this.#assisteComigoId,
-                { type: "listenerPause", time: video.currentTime },
-                (response) => console.log(response)
-            );
+            chrome.runtime.sendMessage(this.#assisteComigoId, {
+                type: "listenerPause",
+                time: video.currentTime,
+            });
         }
         this.#serverPause = false;
     };
@@ -211,11 +160,10 @@ class AssisteComigoGoyabu {
     #seekListener = () => {
         const video = document.querySelector(this.#selector);
         if (!this.#serverSeek) {
-            chrome.runtime.sendMessage(
-                this.#assisteComigoId,
-                { type: "listenerSeek", time: video.currentTime },
-                (response) => console.log(response)
-            );
+            chrome.runtime.sendMessage(this.#assisteComigoId, {
+                type: "listenerSeek",
+                time: video.currentTime,
+            });
         }
         this.#serverSeek = false;
     };

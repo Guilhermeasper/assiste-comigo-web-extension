@@ -75,8 +75,12 @@ class AssisteComigoNeflix {
         const requestData = request.detail;
         let info = { url: document.location.href };
         const newData = { ...requestData, ...info };
-        chrome.runtime.sendMessage(this.#assisteComigoId, newData, this.#sendMessageCallback);
-    }
+        chrome.runtime.sendMessage(
+            this.#assisteComigoId,
+            newData,
+            this.#sendMessageCallback
+        );
+    };
 
     #playbackCommands = (request) => {
         const requestData = request.detail;
@@ -85,7 +89,7 @@ class AssisteComigoNeflix {
         switch (requestType) {
             case "play":
                 this.#serverPlay = true;
-                player.play()
+                player.play();
                 break;
             case "pause":
                 this.#serverPause = true;
@@ -96,10 +100,9 @@ class AssisteComigoNeflix {
                 player.seek(requestData.time);
                 break;
             default:
-                console.log(`Can't find ${requestType} command`);
                 break;
         }
-    }
+    };
 
     #playListener = () => {
         const player = this.#getNetflixPlayer();
@@ -151,7 +154,7 @@ class AssisteComigoNeflix {
         video.removeEventListener("play", this.#playListener);
         video.removeEventListener("pause", this.#pauseListener);
         video.removeEventListener("seeking", this.#seekListener);
-    }
+    };
 
     #addEventListerners = (video) => {
         video.addEventListener("play", this.#playListener);
@@ -159,9 +162,7 @@ class AssisteComigoNeflix {
         video.addEventListener("seeking", this.#seekListener);
     };
 
-    #sendMessageCallback = (response) => {
-        console.log(response);
-    };
+    #sendMessageCallback = (response) => {};
 
     #generateInformartionPacket = (requestData, playerExists, currentTime) => {
         let addtionalInfo = {
