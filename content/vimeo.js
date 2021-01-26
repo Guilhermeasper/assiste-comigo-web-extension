@@ -131,7 +131,7 @@ class VimeoAssisteComigo {
             const newData = { ...data, ...info };
             video.removeEventListener("play", this.#playListener);
             video.removeEventListener("pause", this.#pauseListener);
-            video.removeEventListener("seeked", this.#seekListener);
+            video.removeEventListener("seeking", this.#seekListener);
             chrome.runtime.sendMessage(
                 this.#assisteComigoId,
                 newData,

@@ -150,7 +150,7 @@ class AssisteComigoNeflix {
     #removeEventListeners = (video) => {
         video.removeEventListener("play", this.#playListener);
         video.removeEventListener("pause", this.#pauseListener);
-        video.removeEventListener("seeked", this.#seekListener);
+        video.removeEventListener("seeking", this.#seekListener);
     }
 
     #addEventListerners = (video) => {
