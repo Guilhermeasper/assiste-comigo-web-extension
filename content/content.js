@@ -34,10 +34,8 @@ function onMessage(request, sender, response) {
     try {
         onMessageCommands[type]();
     } catch (error) {
-        response({ code: 400 });
-        return true;
+        document.dispatchEvent(new CustomEvent(type, { detail: request }));
     }
-    document.dispatchEvent(new CustomEvent(type, { detail: request }));
     response({ code: 200 });
     return true;
 }
@@ -103,6 +101,7 @@ async function disconnect() {
 function injectScript(scriptName) {
     var s = document.createElement("script");
     const url = `content/${scriptName}.js`;
+    console.log(url);
     s.src = chrome.runtime.getURL(url);
     s.onload = function () {
         this.remove();

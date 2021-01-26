@@ -7,15 +7,12 @@ class Socket {
     }
 
     async connect() {
-        console.log("Connecting to server");
         this.socket = await io.connect(this._address, {
             transports: ["websocket"],
         });
-        console.log("Connected to the server");
     }
 
     emitCommand(type, data) {
-        console.log("Sending information to server");
         this.socket.emit(type, data);
     }
 
@@ -77,7 +74,6 @@ class Socket {
 
     async sessionCreated(data) {
         await setSessionId(data.newId);
-        console.log(`Session id coming from server is ${data.newId}`);
         document.dispatchEvent(
             new CustomEvent("finishCreate", {
                 detail: {
