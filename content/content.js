@@ -17,7 +17,16 @@ document.addEventListener("DOMContentLoaded", domLoaded());
 function domLoaded() {
     const pageHost = getPageHost();
     chrome.runtime.onMessage.addListener(onMessage);
-    injectScript(contentScriptsOptions[pageHost]);
+    var s = document.createElement("script");
+    const url = `content/htmlVideoController.js`;
+    console.log(url);
+    s.src = chrome.runtime.getURL(url);
+    s.onload = function () {
+        this.remove();
+        chrome.runtime.sendMessage({ type: "init" });
+        injectScript(contentScriptsOptions[pageHost]);
+    };
+    (document.head || document.documentElement).appendChild(s);
 }
 
 function onMessage(request, sender, response) {
@@ -34,8 +43,9 @@ function onMessage(request, sender, response) {
     try {
         onMessageCommands[type]();
     } catch (error) {
-        document.dispatchEvent(new CustomEvent(type, { detail: request }));
+        
     }
+    document.dispatchEvent(new CustomEvent(type, { detail: request }));
     response({ code: 200 });
     return true;
 }

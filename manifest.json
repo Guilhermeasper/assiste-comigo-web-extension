@@ -63,7 +63,8 @@
         "content/telecine.js",
         "content/viki.js",
         "content/vimeo.js",
-        "content/goyabu.js"
+        "content/goyabu.js",
+        "content/htmlVideoController.js"
       ],
       "matches" : [
         "https://www.primevideo.com/*",
