@@ -6,4 +6,3 @@ importScripts("utils/workerUtils.js");
 importScripts('background/onInstalled.js');
 importScripts('background/onMessage.js');
 importScripts('background/onMessageExternal.js');
-importScripts('background/onUpdated.js');

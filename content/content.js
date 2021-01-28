@@ -1,32 +1,37 @@
 const socket = new Socket();
 
 const contentScriptsOptions = {
-    "www.primevideo.com": primevideoScript,
-    "www.anitube.site": anitubeScript,
-    "www.youtube.com": youtubeScript,
-    "www.viki.com": vikiScript,
-    "vimeo.com": vimeoScript,
-    "www.crunchyroll.com": crunchyrollScript,
-    "www.netflix.com": netflixScript,
-    "tv.apple.com": appleTVScript,
-    "goyabu.com": goyabuScript
+    "www.primevideo.com": "primevideo",
+    "www.anitube.site": "anitube",
+    "www.youtube.com": "youtube",
+    "www.viki.com": "viki",
+    "vimeo.com": "vimeo",
+    "www.crunchyroll.com": "crunchyroll",
+    "www.netflix.com": "netflix",
+    "tv.apple.com": "appletv",
+    "goyabu.com": "goyabu",
 };
 
 document.addEventListener("DOMContentLoaded", domLoaded());
 
 function domLoaded() {
-
-    console.log("Main content script loaded");
     const pageHost = getPageHost();
     chrome.runtime.onMessage.addListener(onMessage);
-    contentScriptsOptions[pageHost]();
+    var s = document.createElement("script");
+    const url = `content/htmlVideoController.js`;
+    console.log(url);
+    s.src = chrome.runtime.getURL(url);
+    s.onload = function () {
+        this.remove();
+        chrome.runtime.sendMessage({ type: "init" });
+        injectScript(contentScriptsOptions[pageHost]);
+    };
+    (document.head || document.documentElement).appendChild(s);
 }
 
 function onMessage(request, sender, response) {
-    console.log(`New Message Arrived:`);
-    console.log(request);
     const type = request.type;
-    
+
     const onMessageCommands = {
         startCreate: startCreate.bind(this, request, response),
         startConnect: startConnect.bind(this, request, response),
@@ -38,7 +43,7 @@ function onMessage(request, sender, response) {
     try {
         onMessageCommands[type]();
     } catch (error) {
-        console.log(error)
+        
     }
     document.dispatchEvent(new CustomEvent(type, { detail: request }));
     response({ code: 200 });
@@ -99,63 +104,20 @@ async function listenerSeek(request, response) {
     socket.emitCommand("seek", packet);
 }
 
-async function disconnect(){
+async function disconnect() {
     await socket.disconnect();
 }
 
-function injectScript(url) {
+function injectScript(scriptName) {
     var s = document.createElement("script");
+    const url = `content/${scriptName}.js`;
+    console.log(url);
     s.src = chrome.runtime.getURL(url);
     s.onload = function () {
         this.remove();
         chrome.runtime.sendMessage({ type: "init" });
     };
     (document.head || document.documentElement).appendChild(s);
-}
-
-function vimeoScript() {
-    injectScript("content/vimeo.js");
-    console.log("Vimeo");
-}
-
-function crunchyrollScript() {
-    injectScript("content/crunchyroll.js");
-    console.log("Crunchyroll");
-}
-
-function vikiScript() {
-    injectScript("content/viki.js");
-    console.log("Viki");
-}
-
-function youtubeScript() {
-    injectScript("content/youtube.js");
-    console.log("Youtube");
-}
-
-function netflixScript() {
-    injectScript("content/netflix.js");
-    console.log("Netflix");
-}
-
-function anitubeScript() {
-    injectScript("content/anitube.js");
-    console.log("Anitube");
-}
-
-function primevideoScript() {
-    injectScript("content/primevideo.js");
-    console.log("Primevideo");
-}
-
-function appleTVScript() {
-    injectScript("content/appletv.js");
-    console.log("AppleTV");
-}
-
-function goyabuScript() {
-    injectScript("content/goyabu.js");
-    console.log("Goyabu");
 }
 
 function getPageHost() {
@@ -168,7 +130,7 @@ function getPageUrl() {
     return pageUrl;
 }
 
-function getSessionIdFromURL(){
+function getSessionIdFromURL() {
     let url = document.location.href.split("?")[1];
     const urlParams = new URLSearchParams(url);
     const sessionId = urlParams.get("assistecomigo");

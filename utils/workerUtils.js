@@ -59,7 +59,6 @@ function getSessionId() {
     return new Promise((resolve, reject) => {
         try {
             chrome.storage.local.get(["sessionId"], (result) => {
-                console.log("sessionId value currently is " + result.sessionId);
                 resolve(result.sessionId);
             });
         } catch (error) {
@@ -72,7 +71,6 @@ function getUserId() {
     return new Promise((resolve, reject) => {
         try {
             chrome.storage.local.get(["userId"], (result) => {
-                console.log("User id value currently is " + result.userId);
                 resolve(result.userId);
             });
         } catch (error) {
@@ -85,7 +83,6 @@ function getSessionUrl() {
     return new Promise((resolve, reject) => {
         try {
             chrome.storage.local.get(["sessionUrl"], (result) => {
-                console.log(`Getting session url: ${result.sessionUrl}`);
                 resolve(result.sessionUrl);
             });
         } catch (error) {
@@ -98,7 +95,6 @@ function setSessionId(newSessionId) {
     return new Promise((resolve, reject) => {
         try {
             chrome.storage.local.set({ sessionId: newSessionId }, function () {
-                console.log("SID value is set to " + newSessionId);
                 resolve(newSessionId);
             });
         } catch (error) {
@@ -110,7 +106,6 @@ function setSessionId(newSessionId) {
 function setSessionUrl(sessionUrl) {
     return new Promise((resolve, reject) => {
         try {
-            console.log(`Setting new session url to ${sessionUrl}`);
             chrome.storage.local.set({ sessionUrl: sessionUrl }, function () {
                 resolve(sessionUrl);
             });
@@ -138,7 +133,6 @@ function clearInfo() {
             chrome.storage.local.remove(
                 ["sessionId", "sessionUrl"],
                 function () {
-                    console.log("Info removed");
                     resolve({ code: 200 });
                 }
             );

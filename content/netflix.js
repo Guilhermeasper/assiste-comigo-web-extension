@@ -3,6 +3,8 @@ class AssisteComigoNeflix {
     #serverPause;
     #serverPlay;
     #serverSeek;
+    #player;
+    #video;
 
     constructor() {
         this.#serverPause = false;
@@ -11,7 +13,6 @@ class AssisteComigoNeflix {
         document.addEventListener("init", this.#init);
         document.addEventListener("getInfo", this.#getInfo);
         document.addEventListener("finishCreate", this.#startSession);
-        document.addEventListener("startConnect", this.#startConnect);
         document.addEventListener("finishConnect", this.#startSession);
         document.addEventListener("disconnect", this.#completeEndSession);
         document.addEventListener("play", this.#playbackCommands);
@@ -23,12 +24,13 @@ class AssisteComigoNeflix {
         const contentRequestData = request.detail;
         const extensionId = contentRequestData.extensionId;
         this.#assisteComigoId = extensionId;
+        this.#player = this.#getNetflixPlayer();
+        this.#video = this.#getHtmlVideo();
     };
 
     #prepareInformation = (requestData) => {
-        const player = this.#getNetflixPlayer();
-        const playerExists = this.#checkIfPlayerExists(player);
-        const playerCurrentTime = this.#getPlayerCurrentTime(player);
+        const playerExists = this.#checkIfPlayerExists();
+        const playerCurrentTime = this.#getPlayerCurrentTime();
         const responseDataPacket = this.#generateInformartionPacket(
             requestData,
             playerExists,
@@ -38,6 +40,8 @@ class AssisteComigoNeflix {
     };
 
     #getInfo = (request) => {
+        this.#player = this.#getNetflixPlayer();
+        this.#video = this.#getHtmlVideo();
         const requestData = request.detail;
         const responseDataPacket = this.#prepareInformation(requestData);
         chrome.runtime.sendMessage(
@@ -49,9 +53,8 @@ class AssisteComigoNeflix {
 
     #startSession = (request) => {
         const requestData = request.detail;
-        const video = this.#getHtmlVideo();
         const responseDataPacket = this.#prepareInformation(requestData);
-        if (video) this.#addEventListerners(video);
+        if (this.#video) this.#addEventListerners(this.#video);
         chrome.runtime.sendMessage(
             this.#assisteComigoId,
             responseDataPacket,
@@ -61,9 +64,8 @@ class AssisteComigoNeflix {
 
     #completeEndSession = (request) => {
         const requestData = request.detail;
-        const video = this.#getHtmlVideo();
         const responseDataPacket = this.#prepareInformation(requestData);
-        if (video) this.#removeEventListeners(video);
+        if (this.#video) this.#removeEventListeners(this.#video);
         chrome.runtime.sendMessage(
             this.#assisteComigoId,
             responseDataPacket,
@@ -71,42 +73,32 @@ class AssisteComigoNeflix {
         );
     };
 
-    #startConnect = (request) => {
-        const requestData = request.detail;
-        let info = { url: document.location.href };
-        const newData = { ...requestData, ...info };
-        chrome.runtime.sendMessage(this.#assisteComigoId, newData, this.#sendMessageCallback);
-    }
-
     #playbackCommands = (request) => {
         const requestData = request.detail;
         const requestType = requestData.type;
-        const player = getNetflixPlayer();
         switch (requestType) {
             case "play":
                 this.#serverPlay = true;
-                player.play()
+                this.#player.play();
                 break;
             case "pause":
                 this.#serverPause = true;
-                player.pause();
+                this.#player.pause();
                 break;
             case "seek":
                 this.#serverSeek = true;
-                player.seek(requestData.time);
+                this.#player.seek(requestData.time);
                 break;
             default:
-                console.log(`Can't find ${requestType} command`);
                 break;
         }
-    }
+    };
 
     #playListener = () => {
-        const player = this.#getNetflixPlayer();
         if (!this.#serverPlay) {
             chrome.runtime.sendMessage(
                 this.#assisteComigoId,
-                { type: "listenerPlay", time: player.getCurrentTime() },
+                { type: "listenerPlay", time: this.#player.getCurrentTime() },
                 this.#sendMessageCallback
             );
         }
@@ -118,7 +110,7 @@ class AssisteComigoNeflix {
         if (!this.#serverPause) {
             chrome.runtime.sendMessage(
                 this.#assisteComigoId,
-                { type: "listenerPause", time: player.getCurrentTime() },
+                { type: "listenerPause", time: this.#player.getCurrentTime() },
                 this.#sendMessageCallback
             );
         }
@@ -130,7 +122,7 @@ class AssisteComigoNeflix {
         if (!this.#serverSeek) {
             chrome.runtime.sendMessage(
                 this.#assisteComigoId,
-                { type: "listenerSeek", time: player.getCurrentTime() },
+                { type: "listenerSeek", time: this.#player.getCurrentTime() },
                 this.#sendMessageCallback
             );
         }
@@ -151,7 +143,7 @@ class AssisteComigoNeflix {
         video.removeEventListener("play", this.#playListener);
         video.removeEventListener("pause", this.#pauseListener);
         video.removeEventListener("seeking", this.#seekListener);
-    }
+    };
 
     #addEventListerners = (video) => {
         video.addEventListener("play", this.#playListener);
@@ -159,9 +151,7 @@ class AssisteComigoNeflix {
         video.addEventListener("seeking", this.#seekListener);
     };
 
-    #sendMessageCallback = (response) => {
-        console.log(response);
-    };
+    #sendMessageCallback = (response) => {};
 
     #generateInformartionPacket = (requestData, playerExists, currentTime) => {
         let addtionalInfo = {
@@ -173,16 +163,16 @@ class AssisteComigoNeflix {
         return responseData;
     };
 
-    #checkIfPlayerExists = (player) => {
-        if (player) {
+    #checkIfPlayerExists = () => {
+        if (this.#player) {
             return true;
         }
         return false;
     };
 
     #getPlayerCurrentTime = (player) => {
-        if (player) {
-            return !!player && player.getCurrentTime();
+        if (this.#player) {
+            return this.#player.getCurrentTime();
         }
         return;
     };

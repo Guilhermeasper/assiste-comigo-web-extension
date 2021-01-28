@@ -1,12 +1,11 @@
 class Crunchyroll {
     #assisteComigoId;
-    #selector;
     #serverPause;
     #serverPlay;
     #serverSeek;
+    #video;
 
     constructor() {
-        this.#selector = "#player0";
         this.#serverPause = false;
         this.#serverPlay = false;
         this.#serverSeek = false;
@@ -21,47 +20,41 @@ class Crunchyroll {
     }
 
     #init = (request) => {
-        console.log("Initializing crunchyroll module");
         const contentRequestData = request.detail;
         const extensionId = contentRequestData.extensionId;
-        console.log(`Extension ID:${extensionId}`);
         this.#assisteComigoId = extensionId;
+        try{
+            this.#video = VILOS_PLAYERJS;
+        }catch(error){
+
+        }
+        
     };
 
-    #getVideo = () => {
-        const video = VILOS_PLAYERJS;
-        return video;
-    }
-
     #getInfo = (request) => {
-        const video = this.#getVideo();
+        try{
+            this.#video = VILOS_PLAYERJS;
+        }catch(error){
+
+        }
         const contentRequestData = request.detail;
         let info = {
             player: false,
             url: document.location.href,
             time: undefined,
         };
-        if (video) {
+        if (this.#video) {
             info.player = true;
-            info.time = video.currentTime;
+            info.time = this.#video.getCurrentTime(() => {});
             const newData = { ...contentRequestData, ...info };
-            chrome.runtime.sendMessage(
-                this.#assisteComigoId,
-                newData,
-                (response) => console.log(response)
-            );
+            chrome.runtime.sendMessage(this.#assisteComigoId, newData);
         } else {
             const newData = { ...contentRequestData, ...info };
-            chrome.runtime.sendMessage(
-                this.#assisteComigoId,
-                newData,
-                (response) => console.log(response)
-            );
+            chrome.runtime.sendMessage(this.#assisteComigoId, newData);
         }
     };
 
     #finishCreate = (request) => {
-        const video = this.#getVideo();
         const data = request.detail;
         let info = {
             player: false,
@@ -69,158 +62,109 @@ class Crunchyroll {
             time: undefined,
         };
 
-        if (video) {
+        if (this.#video) {
             info.player = true;
-            info.time = video.currentTime;
+            info.time = this.#video.getCurrentTime(() => {});
             const newData = { ...data, ...info };
-            video.on("play", this.#playListener);
-            video.on("pause", this.#pauseListener);
-            video.on("seeked", this.#seekListener);
-            chrome.runtime.sendMessage(
-                this.#assisteComigoId,
-                newData,
-                (response) => console.log(response)
-            );
+            this.#video.on("play", this.#playListener);
+            this.#video.on("pause", this.#pauseListener);
+            this.#video.on("seeked", this.#seekListener);
+            chrome.runtime.sendMessage(this.#assisteComigoId, newData);
         } else {
             info.player = false;
             const newData = { ...data, ...info };
-            console.log(newData);
-            chrome.runtime.sendMessage(
-                this.#assisteComigoId,
-                newData,
-                (response) => console.log(response)
-            );
+            chrome.runtime.sendMessage(this.#assisteComigoId, newData);
         }
     };
 
     #finishConnect = (request) => {
-        const video = this.#getVideo();
         const data = request.detail;
         let info = {
             player: false,
             url: document.location.href,
             time: undefined,
         };
-        console.log("Received connect request");
-        if (video) {
+        if (this.#video) {
             info.player = true;
-            info.time = video.currentTime;
+            info.time = this.#video.getCurrentTime(() => {});
             const newData = { ...data, ...info };
-            video.on("play", this.#playListener);
-            video.on("pause", this.#pauseListener);
-            video.on("seeked", this.#seekListener);
-            chrome.runtime.sendMessage(
-                this.#assisteComigoId,
-                newData,
-                (response) => console.log(response)
-            );
+            this.#video.on("play", this.#playListener);
+            this.#video.on("pause", this.#pauseListener);
+            this.#video.on("seeked", this.#seekListener);
+            chrome.runtime.sendMessage(this.#assisteComigoId, newData);
         } else {
             info.player = false;
             const newData = { ...data, ...info };
-            console.log(newData);
-            chrome.runtime.sendMessage(
-                this.#assisteComigoId,
-                newData,
-                (response) => console.log(response)
-            );
+            chrome.runtime.sendMessage(this.#assisteComigoId, newData);
         }
     };
 
     #disconnect = (request) => {
-        const video = this.#getVideo();
         const data = request.detail;
         let info = { player: false, url: document.location.href };
         const extensionId = data.extensionId;
-        console.log("Received disconnect request");
-        if (video) {
+        if (this.#video) {
             info.player = true;
             const newData = { ...data, ...info };
-            video.off("play", this.#playListener);
-            video.off("pause", this.#pauseListener);
-            video.off("seeked", this.#seekListener);
-            chrome.runtime.sendMessage(
-                this.#assisteComigoId,
-                newData,
-                (response) => console.log(response)
-            );
+            this.#video.off("play", this.#playListener);
+            this.#video.off("pause", this.#pauseListener);
+            this.#video.off("seeked", this.#seekListener);
+            chrome.runtime.sendMessage(this.#assisteComigoId, newData);
         } else {
             info.player = false;
             const newData = { ...data, ...info };
-            console.log(newData);
-            chrome.runtime.sendMessage(
-                this.#assisteComigoId,
-                newData,
-                (response) => console.log(response)
-            );
+            chrome.runtime.sendMessage(this.#assisteComigoId, newData);
         }
     };
 
     #play = (request) => {
-        const video = this.#getVideo();
-        console.log("Received info request");
-        if (video) {
+        if (this.#video) {
             this.#serverPlay = true;
-            video.play();
-        } else {
-            console.log("Erro no play");
+            this.#video.play();
         }
     };
 
     #pause = (request) => {
-        const video = this.#getVideo();
-        console.log("Received info request");
-        if (video) {
+        if (this.#video) {
             this.#serverPause = true;
-            video.pause();
-        } else {
-            console.log("Erro no pause");
+            this.#video.pause();
         }
     };
 
     #seek = (request) => {
-        const video = this.#getVideo();
         const data = request.detail;
-        console.log("Received info request");
-        if (video) {
+        if (this.#video) {
             this.#serverSeek = true;
-            video.setCurrentTime(data.time);
-        } else {
-            console.log("Erro no seek");
+            this.#video.setCurrentTime(data.time);
         }
     };
 
     #playListener = () => {
-        const video = this.#getVideo();
         if (!this.#serverPlay) {
-            chrome.runtime.sendMessage(
-                this.#assisteComigoId,
-                { type: "listenerPlay", time: video.getCurrentTime(()=>console.log("Play")) },
-                (response) => console.log(response)
-            );
+            chrome.runtime.sendMessage(this.#assisteComigoId, {
+                type: "listenerPlay",
+                time: this.#video.getCurrentTime(() => {}),
+            });
         }
         this.#serverPlay = false;
     };
 
     #pauseListener = () => {
-        const video = this.#getVideo();
         if (!this.#serverPause) {
-            chrome.runtime.sendMessage(
-                this.#assisteComigoId,
-                { type: "listenerPause", time: video.getCurrentTime(()=>console.log("Play")) },
-                (response) => console.log(response)
-            );
+            chrome.runtime.sendMessage(this.#assisteComigoId, {
+                type: "listenerPause",
+                time: this.#video.getCurrentTime(() => {}),
+            });
         }
         this.#serverPause = false;
     };
 
     #seekListener = () => {
-        const video = this.#getVideo();
         if (!this.#serverSeek) {
-            chrome.runtime.sendMessage(
-                this.#assisteComigoId,
-                { type: "listenerSeek", time: video.getCurrentTime(()=>console.log("Play")) },
-                (response) => console.log(response)
-            );
+            chrome.runtime.sendMessage(this.#assisteComigoId, {
+                type: "listenerSeek",
+                time: this.#video.getCurrentTime(() => {}),
+            });
         }
         this.#serverSeek = false;
     };

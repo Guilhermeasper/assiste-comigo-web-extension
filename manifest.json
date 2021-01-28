@@ -1,6 +1,6 @@
 {
   "name": "__MSG_appTitle__",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "__MSG_appDesc__",
   "default_locale": "pt_BR",
   "icons": {
@@ -9,18 +9,7 @@
     "48": "./icons/ac48.png",
     "128": "./icons/ac128.png"
   },
-  "permissions": ["tabs", "activeTab", "declarativeContent", "storage"],
-  "host_permissions": [
-    "https://www.primevideo.com/*",
-    "https://www.viki.com/*",
-    "https://www.anitube.site/*",
-    "https://www.youtube.com/*",
-    "https://www.netflix.com/*",
-    "https://www.crunchyroll.com/*",
-    "https://www.vimeo.com/*",
-    "https://tv.apple.com/*",
-    "https://goyabu.com/*"
-  ],
+  "permissions": ["storage"],
   "action": {
     "default_title": "__MSG_appTitle__",
     "default_icon": "./icons/ac48.png",
@@ -74,7 +63,8 @@
         "content/telecine.js",
         "content/viki.js",
         "content/vimeo.js",
-        "content/goyabu.js"
+        "content/goyabu.js",
+        "content/htmlVideoController.js"
       ],
       "matches" : [
         "https://www.primevideo.com/*",
