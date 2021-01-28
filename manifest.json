@@ -1,6 +1,6 @@
 {
   "name": "__MSG_appTitle__",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "__MSG_appDesc__",
   "default_locale": "pt_BR",
   "icons": {
