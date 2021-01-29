@@ -1,5 +1,5 @@
 const socket = new Socket();
-
+var sessionIdFromURL;
 const contentScriptsOptions = {
     "www.primevideo.com": "primevideo",
     "www.anitube.site": "anitube",
@@ -16,15 +16,14 @@ document.addEventListener("DOMContentLoaded", domLoaded());
 
 function domLoaded() {
     const pageHost = getPageHost();
+    sessionIdFromURL = getSessionIdFromURL();
     chrome.runtime.onMessage.addListener(onMessage);
     var s = document.createElement("script");
     const url = `content/htmlVideoController.js`;
-    console.log(url);
     s.src = chrome.runtime.getURL(url);
     s.onload = function () {
-        this.remove();
-        chrome.runtime.sendMessage({ type: "init" });
         injectScript(contentScriptsOptions[pageHost]);
+        this.remove();
     };
     (document.head || document.documentElement).appendChild(s);
 }
@@ -42,9 +41,7 @@ function onMessage(request, sender, response) {
     };
     try {
         onMessageCommands[type]();
-    } catch (error) {
-        
-    }
+    } catch (error) {}
     document.dispatchEvent(new CustomEvent(type, { detail: request }));
     response({ code: 200 });
     return true;
@@ -62,7 +59,7 @@ async function startCreate() {
 
 async function startConnect() {
     let userId = await getUserId();
-    const sessionId = getSessionIdFromURL();
+    const sessionId = (await getSessionId()) || getSessionIdFromURL();
     await setSessionId(sessionId);
     let packet = {
         userId: userId,
@@ -113,11 +110,19 @@ function injectScript(scriptName) {
     const url = `content/${scriptName}.js`;
     console.log(url);
     s.src = chrome.runtime.getURL(url);
-    s.onload = function () {
-        this.remove();
+    s.onload = async function () {
+        if (sessionIdFromURL) {
+            waitForVideo();
+        }
         chrome.runtime.sendMessage({ type: "init" });
+        this.remove();
     };
     (document.head || document.documentElement).appendChild(s);
+}
+
+function waitForVideo() {
+    if (document.querySelector("video")) startConnect();
+    else requestAnimationFrame(waitForVideo);
 }
 
 function getPageHost() {
