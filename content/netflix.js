@@ -52,6 +52,8 @@ class AssisteComigoNeflix {
     };
 
     #startSession = (request) => {
+        this.#player = this.#getNetflixPlayer();
+        this.#video = this.#getHtmlVideo();
         const requestData = request.detail;
         const responseDataPacket = this.#prepareInformation(requestData);
         if (this.#video) this.#addEventListerners(this.#video);
@@ -139,16 +141,18 @@ class AssisteComigoNeflix {
         return player;
     };
 
-    #removeEventListeners = (video) => {
-        video.removeEventListener("play", this.#playListener);
-        video.removeEventListener("pause", this.#pauseListener);
-        video.removeEventListener("seeking", this.#seekListener);
+    #removeEventListeners = () => {
+        this.#video.removeEventListener("play", this.#playListener);
+        this.#video.removeEventListener("pause", this.#pauseListener);
+        this.#video.removeEventListener("seeking", this.#seekListener);
     };
 
-    #addEventListerners = (video) => {
-        video.addEventListener("play", this.#playListener);
-        video.addEventListener("pause", this.#pauseListener);
-        video.addEventListener("seeking", this.#seekListener);
+    #addEventListerners = () => {
+        this.#video = this.#getHtmlVideo();
+        this.#video.addEventListener("play", this.#playListener);
+        this.#video.addEventListener("pause", this.#pauseListener);
+        this.#video.addEventListener("seeking", this.#seekListener);
+        console.log("Event listeners added");
     };
 
     #sendMessageCallback = (response) => {};
