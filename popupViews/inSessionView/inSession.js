@@ -48,7 +48,8 @@ async function onMessage(request, sender, response) {
     console.log(player, userId, sessionId);
     if (userId && player && sessionId) {
         emojisHTMLElement.innerText = convertUUIDToEmoji(sessionId);
-        urlCopyButton.addEventListener("click", copyToClipboard(sessionUrl));
+        twemoji.parse(emojisHTMLElement);
+        urlCopyButton.addEventListener("click", copyToClipboard.bind(this, sessionUrl));
     } else {
         goToErrorPage();
     }
