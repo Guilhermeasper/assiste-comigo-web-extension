@@ -6,7 +6,7 @@
             href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&display=swap"
             rel="stylesheet"
         />
-        <script src="./../../libs/jquery.js"></script>
+        <script src="./../../utils/workerUtils.js"></script>
         <link rel="stylesheet" href="./../styles.css" />
         <link rel="stylesheet" href="./createSession.css" />
         <script type="module" src="./createSession.js"></script>
@@ -18,7 +18,10 @@
                 <img id="title" alt="Assiste comigo" src="./../../icons/assiste-comigo-title.svg">
             </div>
             <div class="innerContent">
-                <button class="button" id="buttonCreate" data-locale="newSessionButton">Nova Sessão</button>
+                <button class="button" id="createButton" data-locale="newSessionButton">Nova Sessão</button>
+            </div>
+            <div class="innerContent">
+                <button class="button" id="joinButton" data-locale="joinSessionButton">Juntar a Sessão</button>
             </div>
         </div>
     </body>
