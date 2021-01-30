@@ -24,7 +24,7 @@ async function domLoaded() {
 
 function onMessage(request, sender, response) {
     const type = request.type;
-
+    console.log(request);
     const onMessageCommands = {
         startCreate: startCreate.bind(this, request, response),
         startConnect: startConnect.bind(this, request, response),
@@ -42,7 +42,8 @@ function onMessage(request, sender, response) {
 }
 
 async function startCreate() {
-    let userId = await getUserId();
+    let userId = await getFromSyncStorage("userId");
+    console.log(userId);
     let packet = {
         userId: userId,
     };
@@ -52,9 +53,9 @@ async function startCreate() {
 }
 
 async function startConnect() {
-    let userId = await getUserId();
-    const sessionId = (await getSessionId()) || getSessionIdFromURL();
-    await setSessionId(sessionId);
+    let userId = await getFromSyncStorage("userId");
+    const sessionId = (await getFromSyncStorage("sessionId")) || getSessionIdFromURL();
+    await setToSyncStorage("sessionId", sessionId);
     let packet = {
         userId: userId,
         sessionId: sessionId,
@@ -65,8 +66,8 @@ async function startConnect() {
 }
 
 async function listenerPlay(request, response) {
-    let userId = await getUserId();
-    let sessionId = await getSessionId();
+    let userId = await getFromSyncStorage("userId");
+    let sessionId = await getFromSyncStorage("sessionId");
     let packet = {
         userId: userId,
         sessionId: sessionId,
@@ -75,8 +76,8 @@ async function listenerPlay(request, response) {
     socket.emitCommand("play", packet);
 }
 async function listenerPause(request, response) {
-    let userId = await getUserId();
-    let sessionId = await getSessionId();
+    let userId = await getFromSyncStorage("userId");
+    let sessionId = await getFromSyncStorage("sessionId");
     let packet = {
         userId: userId,
         sessionId: sessionId,
@@ -85,8 +86,8 @@ async function listenerPause(request, response) {
     socket.emitCommand("pause", packet);
 }
 async function listenerSeek(request, response) {
-    let userId = await getUserId();
-    let sessionId = await getSessionId();
+    let userId = await getFromSyncStorage("userId");
+    let sessionId = await getFromSyncStorage("sessionId");
     let packet = {
         userId: userId,
         sessionId: sessionId,

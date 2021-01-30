@@ -58,8 +58,8 @@ async function joinButtonCallback() {
     
     if(validateURL(urlParams) && validateUUID(urlParams)){
         console.log(validateUUID(urlParams));
-        await setSessionId(urlParams.get("assistecomigo"));
-        await setSessionUrl(sessionURL);
+        await setToSyncStorage("sessionId", urlParams.get("assistecomigo"));
+        await setToSyncStorage("sessionURL", sessionURL);
         chrome.runtime.sendMessage({
             type: "startConnect",
         });

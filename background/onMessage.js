@@ -12,9 +12,9 @@ async function init(request, response) {
 
 async function getInfo(request, response) {
     console.log("Get to the getInfo function");
-    const userId = await syncStorageGet("userId");
-    const sessionId = await syncStorageGet("sessionId");
-    const sessionUrl = await syncStorageGet("sessionUrl");
+    const userId = await getFromSyncStorage("userId");
+    const sessionId = await getFromSyncStorage("sessionId");
+    const sessionUrl = await getFromSyncStorage("sessionUrl");
     const extensionId = chrome.runtime.id;
     const newdata = {
         userId: userId,
@@ -28,8 +28,8 @@ async function getInfo(request, response) {
 }
 
 async function finishCreate(request, response) {
-    let userId = await syncStorageGet("userId");
-    let sessionId = await syncStorageGet("sessionId");
+    let userId = await getFromSyncStorage("userId");
+    let sessionId = await getFromSyncStorage("sessionId");
     const newdata = {
         userId: userId,
         extensionId: chrome.runtime.id,
@@ -41,7 +41,7 @@ async function finishCreate(request, response) {
 }
 
 async function startConnect(request, response) {
-    let userId = await syncStorageGet("userId");
+    let userId = await getFromSyncStorage("userId");
     const newdata = {
         userId: userId,
         extensionId: chrome.runtime.id,
@@ -52,7 +52,7 @@ async function startConnect(request, response) {
 }
 
 async function finishConnect(request, response) {
-    let userId = await getUserId();
+    let userId = await getFromSyncStorage("userId");
     const newdata = {
         userId: userId,
         extensionId: chrome.runtime.id,
@@ -63,7 +63,7 @@ async function finishConnect(request, response) {
 }
 
 async function disconnect(request, response) {
-    let userId = await getUserId();
+    let userId = await getFromSyncStorage("userId");
     const newdata = {
         userId: userId,
         extensionId: chrome.runtime.id,
@@ -74,7 +74,6 @@ async function disconnect(request, response) {
 }
 
 function onMessage(request, sender, response) {
-    console.log(request, sender, response);
     const type = request.type;
     const typeOptions = {
         init: init.bind(this, request, response),

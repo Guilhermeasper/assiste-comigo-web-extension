@@ -52,10 +52,10 @@ function getInfoExternal(request, response) {
 async function startConnectExternal(request, response, url, urlParams){
     if (urlParams.has("assistecomigo")) {
         const sessionId = urlParams.get("assistecomigo");
-        await setSessionId(sessionId);
-        let userId = await getUserId();
+        await setToSyncStorage("sessionId", sessionId);
+        let userId = await getFromSyncStorage("userId");
         let sessionUrl = await parseUrl(url, sessionId);
-        await setSessionUrl(sessionUrl);
+        await setToSyncStorage("sessionUrl", sessionUrl);
         response({ code: 200});
     } else {
         response({ code: 400 });
@@ -69,9 +69,11 @@ async function startConnectExternal(request, response, url, urlParams){
  * @param {String} url 
  */
 async function finishConnectExternal(request, response, url, urlParams) {
-    let userId = await getUserId();
-    const sessionId = await getSessionId();
-    await setSessionUrl(url);
+    const currentTabId = await getTabId();
+    await setToSyncStorage("sessionTabId", currentTabId);
+    let userId = await getFromSyncStorage("userId");
+    const sessionId = await getFromSyncStorage("sessionId");
+    await setToSyncStorage("sessionUrl", url);
     const newdata = {
         sessionUrl: url,
         sessionId: sessionId,
@@ -90,11 +92,13 @@ async function finishConnectExternal(request, response, url, urlParams) {
  */
 async function finishCreateExternal(request, response, url) {
     console.log(request);
-    let userId = await getUserId();
+    let userId = await getFromSyncStorage("userId");
+    const currentTabId = await getTabId();
+    await setToSyncStorage("sessionTabId", currentTabId);
     const sessionId = request.sessionId;
     const sessionUrl = new URL(url);
     sessionUrl.searchParams.append("assistecomigo", sessionId);
-    await setSessionUrl(sessionUrl.href);
+    await setToSyncStorage("sessionUrl", sessionUrl.href);
     const newdata = {
         sessionUrl: sessionUrl.href,
         userId: userId,

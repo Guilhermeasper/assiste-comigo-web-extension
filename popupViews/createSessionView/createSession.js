@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", DOMContentLoaded);
 async function onMessage(request, sender, response) {
     const requestType = request.type;
     if (requestType == "finishCreate") {
-        const userId = await getUserId();
+        const userId = await getFromSyncStorage("userId");
         if (!userId) {
             window.location.assign("./../errorView/error.html");
         } else {

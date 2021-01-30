@@ -5,8 +5,6 @@ import {
     goToInSessionPage,
 } from "./../../utils/popupNavigate.js";
 
-import { getUserId, getSessionId } from "./../../utils/utils.js";
-
 const externalSession = document.getElementById("internalPlayerLink");
 const informationIcon = document.getElementById("informationIcon");
 
@@ -22,8 +20,8 @@ chrome.runtime.onMessage.addListener(onMessage);
 async function onMessage(request, sender, response) {
     const player = request.player;
     const url = request.url;
-    const userId = await getUserId();
-    const sessionId = await getSessionId();
+    const userId = await getFromSyncStorage("userId");
+    const sessionId = await getFromSyncStorage("sessionId");
     const urlParams = new URLSearchParams(url.split("?")[1]);
 
     if (!userId) {
@@ -42,9 +40,15 @@ async function onMessage(request, sender, response) {
 /**
  * Function fired when the dom is completely loaded
  */
-function DOMContentLoaded() {
+async function DOMContentLoaded() {
     informationIcon.addEventListener("click", informationIconCallback);
     externalSession.addEventListener("click", onButtonExternalSessionClick);
+    const currentTabId = await getTabId();
+    const sessionTabId = await getFromSyncStorage("sessionTabId");
+    console.log(sessionTabId);
+    if(sessionTabId && currentTabId !== sessionTabId){
+        goToErrorPage();
+    }
     try {
         chrome.runtime.sendMessage({ type: "getInfo" });
     } catch (error) {
