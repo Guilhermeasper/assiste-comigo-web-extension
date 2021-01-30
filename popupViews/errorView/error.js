@@ -7,7 +7,7 @@ function DOMContentLoaded(){
         ["sessionId", "sessionUrl"],
         function () {
             console.log("Info removed");
-            window.location.assign("./../homepageView/homepage.html");
+            //window.location.assign("./../homepageView/homepage.html");
         }
     );
 }
