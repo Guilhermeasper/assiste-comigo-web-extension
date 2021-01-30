@@ -13,19 +13,13 @@ const contentScriptsOptions = {
 };
 
 document.addEventListener("DOMContentLoaded", domLoaded());
+chrome.runtime.onMessage.addListener(onMessage);
 
-function domLoaded() {
+async function domLoaded() {
     const pageHost = getPageHost();
+    const currentSite = contentScriptsOptions[pageHost];
     sessionIdFromURL = getSessionIdFromURL();
-    chrome.runtime.onMessage.addListener(onMessage);
-    var s = document.createElement("script");
-    const url = `content/htmlVideoController.js`;
-    s.src = chrome.runtime.getURL(url);
-    s.onload = function () {
-        injectScript(contentScriptsOptions[pageHost]);
-        this.remove();
-    };
-    (document.head || document.documentElement).appendChild(s);
+    injectHtmlVideoControllerScript(currentSite);
 }
 
 function onMessage(request, sender, response) {
@@ -105,24 +99,26 @@ async function disconnect() {
     await socket.disconnect();
 }
 
-function injectScript(scriptName) {
+function injectHtmlVideoControllerScript(scriptName) {
     var s = document.createElement("script");
-    const url = `content/${scriptName}.js`;
-    console.log(url);
+    const url = `content/htmlVideoController.js`;
     s.src = chrome.runtime.getURL(url);
-    s.onload = async function () {
-        if (sessionIdFromURL) {
-            waitForVideo();
-        }
-        chrome.runtime.sendMessage({ type: "init" });
+    s.onload = function () {
+        injectScript(scriptName);
         this.remove();
     };
     (document.head || document.documentElement).appendChild(s);
 }
 
-function waitForVideo() {
-    if (document.querySelector("video")) startConnect();
-    else requestAnimationFrame(waitForVideo);
+function injectScript(scriptName) {
+    var s = document.createElement("script");
+    const url = `content/${scriptName}.js`;
+    console.log(url);
+    s.src = chrome.runtime.getURL(url);
+    s.onload = function () {
+        chrome.runtime.sendMessage({ type: "init" });
+    };
+    (document.head || document.documentElement).appendChild(s);
 }
 
 function getPageHost() {

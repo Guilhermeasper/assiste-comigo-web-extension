@@ -120,18 +120,6 @@ export function setSessionUrl(sessionUrl) {
     });
 }
 
-export function setUserId(userId) {
-    return new Promise((resolve, reject) => {
-        try {
-            chrome.storage.local.set({ userId: userId }, function () {
-                resolve("userId value is set to " + userId);
-            });
-        } catch (error) {
-            reject(error);
-        }
-    });
-}
-
 export function clearInfo() {
     return new Promise((resolve, reject) => {
         try {
@@ -153,7 +141,7 @@ export function getTabId() {
         try {
             chrome.tabs.query({ currentWindow: true, active: true }, (tabs) => {
                 var activeTab = tabs[0];
-                resolve(activeTab);
+                resolve(activeTab.id);
             });
         } catch (error) {
             reject(error);

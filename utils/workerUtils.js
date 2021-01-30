@@ -27,6 +27,24 @@ function tabSendMessage(message) {
     });
 }
 
+function syncStorageSet(key, value) {
+    return new Promise((resolve, reject) => {
+        chrome.storage.sync.set({ [key]: value }, function () {
+            console.log(`${key} value is set to ${value}`);
+            resolve(value);
+        });
+    });
+}
+
+function syncStorageGet(key) {
+    return new Promise((resolve, reject) => {
+        chrome.storage.sync.get(["key"], function (result) {
+            console.log(`${key} value is set to ${result[key]}`);
+            resolve(result[key]);
+        });
+    });
+}
+
 function getTabUrl() {
     return new Promise((resolve, reject) => {
         try {
@@ -108,18 +126,6 @@ function setSessionUrl(sessionUrl) {
         try {
             chrome.storage.local.set({ sessionUrl: sessionUrl }, function () {
                 resolve(sessionUrl);
-            });
-        } catch (error) {
-            reject(error);
-        }
-    });
-}
-
-function setUserId(userId) {
-    return new Promise((resolve, reject) => {
-        try {
-            chrome.storage.local.set({ userId: userId }, function () {
-                resolve("userId value is set to " + userId);
             });
         } catch (error) {
             reject(error);

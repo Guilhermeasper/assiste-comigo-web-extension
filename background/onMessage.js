@@ -6,20 +6,20 @@ async function init(request, response) {
         extensionId: chrome.runtime.id,
     };
     const newRequest = { ...request, ...newdata };
-    console.log(newRequest);
     let result = await tabSendMessage(newRequest);
     response(result);
 }
 
 async function getInfo(request, response) {
     console.log("Get to the getInfo function");
-    let userId = await getUserId();
-    let sessionId = await getSessionId();
-    let sessionUrl = await getSessionUrl();
+    const userId = await syncStorageGet("userId");
+    const sessionId = await syncStorageGet("sessionId");
+    const sessionUrl = await syncStorageGet("sessionUrl");
+    const extensionId = chrome.runtime.id;
     const newdata = {
         userId: userId,
         sessionId: sessionId,
-        extensionId: chrome.runtime.id,
+        extensionId: extensionId,
         sessionUrl: sessionUrl,
     };
     const newRequest = { ...request, ...newdata };
@@ -28,10 +28,8 @@ async function getInfo(request, response) {
 }
 
 async function finishCreate(request, response) {
-    console.log("Finish create");
-    console.log(request);
-    let userId = await getUserId();
-    let sessionId = await getSessionId();
+    let userId = await syncStorageGet("userId");
+    let sessionId = await syncStorageGet("sessionId");
     const newdata = {
         userId: userId,
         extensionId: chrome.runtime.id,
@@ -43,7 +41,7 @@ async function finishCreate(request, response) {
 }
 
 async function startConnect(request, response) {
-    let userId = await getUserId();
+    let userId = await syncStorageGet("userId");
     const newdata = {
         userId: userId,
         extensionId: chrome.runtime.id,
