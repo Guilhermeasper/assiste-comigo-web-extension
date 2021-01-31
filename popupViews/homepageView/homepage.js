@@ -23,7 +23,7 @@ async function onMessage(request, sender, response) {
     const userId = await getFromSyncStorage("userId");
     const sessionId = await getFromSyncStorage("sessionId");
     const urlParams = new URLSearchParams(url.split("?")[1]);
-
+    console.log(request);
     if (!userId) {
         goToErrorPage();
     } else if (player) {
@@ -47,6 +47,7 @@ async function DOMContentLoaded() {
     const sessionTabId = await getFromSyncStorage("sessionTabId");
     console.log(sessionTabId);
     if(sessionTabId && currentTabId !== sessionTabId){
+        await setToSyncStorage("errorMessage", "alreadyInSessionError");
         goToErrorPage();
     }
     try {

@@ -17,6 +17,7 @@ function onInstalled(details) {
         console.log(`The user created by server is ${data.newId}`);
         const userId = data.newId;
         setToSyncStorage("userId", userId);
+        setToSyncStorage("errorMessage", "genericError");
         temporarySocket.disconnect();
         var newURL = `chrome-extension://${chrome.runtime.id}/about/index.html`;
         chrome.tabs.create({ url: newURL });
