@@ -13,13 +13,25 @@
         "message": ""
     },
     "newSessionButton": {
-        "message": "New session"
+        "message": "Create Session"
+    },
+    "joinSessionButton": {
+        "message": "Join Session"
+    },
+    "backSessionButton": {
+        "message": "Back"
+    },
+    "sessionURL": {
+        "message": "Session URL:"
     },
     "urlCopyButton": {
         "message": "Copy URL"
     },
     "connectedToSession": {
         "message": "Connected to the session"
+    },
+    "placeholderSessionURL": {
+        "message": "Insert the session URL here"
     },
     "disconnectButton": {
         "message": "Disconnect"
@@ -38,5 +50,11 @@
     },
     "aboutTextContribution": {
         "message": "Did you like the extension? Consider supporting the project on Patreon, currently all extension code is maintained by me alone, as well as server costs."
+    },
+    "genericError": {
+        "message": "Something went wrong"
+    },
+    "alreadyInSessionError": {
+        "message": "There is a session in progress in another tab"
     }
   }

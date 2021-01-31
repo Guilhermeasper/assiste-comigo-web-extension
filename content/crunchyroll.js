@@ -23,20 +23,15 @@ class Crunchyroll {
         const contentRequestData = request.detail;
         const extensionId = contentRequestData.extensionId;
         this.#assisteComigoId = extensionId;
-        try{
+        try {
             this.#video = VILOS_PLAYERJS;
-        }catch(error){
-
-        }
-        
+        } catch (error) {}
     };
 
     #getInfo = (request) => {
-        try{
+        try {
             this.#video = VILOS_PLAYERJS;
-        }catch(error){
-
-        }
+        } catch (error) {}
         const contentRequestData = request.detail;
         let info = {
             player: false,
@@ -44,10 +39,12 @@ class Crunchyroll {
             time: undefined,
         };
         if (this.#video) {
-            info.player = true;
-            info.time = this.#video.getCurrentTime(() => {});
-            const newData = { ...contentRequestData, ...info };
-            chrome.runtime.sendMessage(this.#assisteComigoId, newData);
+            this.#video.getCurrentTime((time) => {
+                info.player = true;
+                info.time = time;
+                const newData = { ...contentRequestData, ...info };
+                chrome.runtime.sendMessage(this.#assisteComigoId, newData);
+            });
         } else {
             const newData = { ...contentRequestData, ...info };
             chrome.runtime.sendMessage(this.#assisteComigoId, newData);
@@ -63,13 +60,15 @@ class Crunchyroll {
         };
 
         if (this.#video) {
-            info.player = true;
-            info.time = this.#video.getCurrentTime(() => {});
-            const newData = { ...data, ...info };
-            this.#video.on("play", this.#playListener);
-            this.#video.on("pause", this.#pauseListener);
-            this.#video.on("seeked", this.#seekListener);
-            chrome.runtime.sendMessage(this.#assisteComigoId, newData);
+            this.#video.getCurrentTime((time) => {
+                info.player = true;
+                info.time = time;
+                const newData = { ...data, ...info };
+                this.#video.on("play", this.#playListener);
+                this.#video.on("pause", this.#pauseListener);
+                this.#video.on("seeked", this.#seekListener);
+                chrome.runtime.sendMessage(this.#assisteComigoId, newData);
+            });
         } else {
             info.player = false;
             const newData = { ...data, ...info };
@@ -85,13 +84,15 @@ class Crunchyroll {
             time: undefined,
         };
         if (this.#video) {
-            info.player = true;
-            info.time = this.#video.getCurrentTime(() => {});
-            const newData = { ...data, ...info };
-            this.#video.on("play", this.#playListener);
-            this.#video.on("pause", this.#pauseListener);
-            this.#video.on("seeked", this.#seekListener);
-            chrome.runtime.sendMessage(this.#assisteComigoId, newData);
+            this.#video.getCurrentTime((time) => {
+                info.player = true;
+                info.time = time;
+                const newData = { ...data, ...info };
+                this.#video.on("play", this.#playListener);
+                this.#video.on("pause", this.#pauseListener);
+                this.#video.on("seeked", this.#seekListener);
+                chrome.runtime.sendMessage(this.#assisteComigoId, newData);
+            });
         } else {
             info.player = false;
             const newData = { ...data, ...info };
@@ -102,7 +103,6 @@ class Crunchyroll {
     #disconnect = (request) => {
         const data = request.detail;
         let info = { player: false, url: document.location.href };
-        const extensionId = data.extensionId;
         if (this.#video) {
             info.player = true;
             const newData = { ...data, ...info };
@@ -141,9 +141,11 @@ class Crunchyroll {
 
     #playListener = () => {
         if (!this.#serverPlay) {
-            chrome.runtime.sendMessage(this.#assisteComigoId, {
-                type: "listenerPlay",
-                time: this.#video.getCurrentTime(() => {}),
+            this.#video.getCurrentTime((time) => {
+                chrome.runtime.sendMessage(this.#assisteComigoId, {
+                    type: "listenerPlay",
+                    time: time,
+                });
             });
         }
         this.#serverPlay = false;
@@ -151,9 +153,11 @@ class Crunchyroll {
 
     #pauseListener = () => {
         if (!this.#serverPause) {
-            chrome.runtime.sendMessage(this.#assisteComigoId, {
-                type: "listenerPause",
-                time: this.#video.getCurrentTime(() => {}),
+            this.#video.getCurrentTime((time) => {
+                chrome.runtime.sendMessage(this.#assisteComigoId, {
+                    type: "listenerPause",
+                    time: time,
+                });
             });
         }
         this.#serverPause = false;
@@ -161,9 +165,11 @@ class Crunchyroll {
 
     #seekListener = () => {
         if (!this.#serverSeek) {
-            chrome.runtime.sendMessage(this.#assisteComigoId, {
-                type: "listenerSeek",
-                time: this.#video.getCurrentTime(() => {}),
+            this.#video.getCurrentTime((time) => {
+                chrome.runtime.sendMessage(this.#assisteComigoId, {
+                    type: "listenerSeek",
+                    time: time,
+                });
             });
         }
         this.#serverSeek = false;

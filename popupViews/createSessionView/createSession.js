@@ -1,11 +1,9 @@
-const buttonCreate = document.getElementById("buttonCreate");
+const createButton = document.getElementById("createButton");
+const joinButton = document.getElementById("joinButton");
+const informationIcon = document.getElementById("informationIcon");
 
 chrome.runtime.onMessage.addListener(onMessage);
-buttonCreate.addEventListener("click", onButtonCreateClick);
-
 document.addEventListener("DOMContentLoaded", DOMContentLoaded);
-
-import {tabSendMessage} from './../../utils/utils.js';
 
 /**
  * Listener from messages coming from the background
@@ -13,22 +11,14 @@ import {tabSendMessage} from './../../utils/utils.js';
  * @param {Object} sender - Object cotaining sender information
  * @param {Object} response - Callback to respond message received
  */
-function onMessage(request, sender, response){
-    const player = request.player;
-    const userId = request.userId;
-    const sessionId = request.sessionId;
-    const url = request.url;
-    const urlParams = new URLSearchParams(url);
-    console.log(request);
-    if (!userId) {
-        window.location.assign("./../errorView/error.html");
-    } else {
-        if (player && (sessionId || urlParams.has("assistecomigo"))) {
+async function onMessage(request, sender, response) {
+    const requestType = request.type;
+    if (requestType == "finishCreate") {
+        const userId = await getFromSyncStorage("userId");
+        if (!userId) {
+            window.location.assign("./../errorView/error.html");
+        } else {
             window.location.assign("./../inSessionView/inSession.html");
-        } else if (player && !sessionId) {
-            // window.location.assign(
-            //     "./../createSessionView/createSession.html"
-            // );
         }
     }
 }
@@ -36,22 +26,28 @@ function onMessage(request, sender, response){
 /**
  * Function fired when create button is clicked
  */
-function onButtonCreateClick(){
-    // chrome.runtime.sendMessage({ type: "startCreate" });
-    tabSendMessage({type: "startCreate"}).then((response) => {
-        console.log(response);
-    });
+function onCreateButtonClick() {
+    tabSendMessage({ type: "startCreate" });
 }
 
-function DOMContentLoaded(){
-    const informationIcon = document.getElementById("informationIcon");
+function onJoinButtonClick() {
+    window.location.assign("./../connectView/connect.html");
+}
+
+function DOMContentLoaded() {
+    createButton.addEventListener("click", onCreateButtonClick);
+    joinButton.addEventListener("click", onJoinButtonClick);
     informationIcon.addEventListener("click", informationIconCallback);
+    loadI18NData();
+}
+
+function informationIconCallback() {
+    var newURL = `chrome-extension://${chrome.runtime.id}/about/index.html`;
+    chrome.tabs.create({ url: newURL });
+}
+
+function loadI18NData() {
     document.querySelectorAll("[data-locale]").forEach((elem) => {
         elem.innerText = chrome.i18n.getMessage(elem.dataset.locale);
     });
-}
-
-function informationIconCallback(){
-    var newURL = `chrome-extension://${chrome.runtime.id}/about/index.html`;
-    chrome.tabs.create({ url: newURL });
 }

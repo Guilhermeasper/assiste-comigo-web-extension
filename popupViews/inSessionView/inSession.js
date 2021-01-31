@@ -1,4 +1,3 @@
-import { copyToClipboard, getSessionId, getUserId, getSessionUrl } from "./../../utils/utils.js";
 import { goToErrorPage, goToHomepagePage } from "./../../utils/popupNavigate.js";
 
 const urlCopyButton = document.getElementById("urlCopyButton");
@@ -42,13 +41,14 @@ function onDisconnectButtonClick() {
  */
 async function onMessage(request, sender, response) {
     const player = request.player;
-    const userId = await getUserId();
-    const sessionId = await getSessionId();
-    const sessionUrl = await getSessionUrl();
+    const userId = await getFromSyncStorage("userId");
+    const sessionId = await getFromSyncStorage("sessionId");
+    const sessionUrl = await getFromSyncStorage("sessionUrl");
     console.log(player, userId, sessionId);
     if (userId && player && sessionId) {
         emojisHTMLElement.innerText = convertUUIDToEmoji(sessionId);
-        urlCopyButton.addEventListener("click", copyToClipboard(sessionUrl));
+        twemoji.parse(emojisHTMLElement);
+        urlCopyButton.addEventListener("click", copyToClipboard.bind(this, sessionUrl));
     } else {
         goToErrorPage();
     }

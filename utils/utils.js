@@ -55,83 +55,6 @@ export function copyToClipboard(url) {
     document.body.removeChild(textAreaElement);
 }
 
-export function getSessionId() {
-    return new Promise((resolve, reject) => {
-        try {
-            chrome.storage.local.get(["sessionId"], (result) => {
-                console.log("sessionId value currently is " + result.sessionId);
-                resolve(result.sessionId);
-            });
-        } catch (error) {
-            reject(error);
-        }
-    });
-}
-
-export function getUserId() {
-    return new Promise((resolve, reject) => {
-        try {
-            chrome.storage.local.get(["userId"], (result) => {
-                console.log("User id value currently is " + result.userId);
-                resolve(result.userId);
-            });
-        } catch (error) {
-            reject(error);
-        }
-    });
-}
-
-export function getSessionUrl() {
-    return new Promise((resolve, reject) => {
-        try {
-            chrome.storage.local.get(["sessionUrl"], (result) => {
-                console.log(`Getting session url: ${result.sessionUrl}`);
-                resolve(result.sessionUrl);
-            });
-        } catch (error) {
-            reject(error);
-        }
-    });
-}
-
-export function setSessionId(newSessionId) {
-    return new Promise((resolve, reject) => {
-        try {
-            chrome.storage.local.set({ sessionId: newSessionId }, function () {
-                console.log("SID value is set to " + newSessionId);
-                resolve(newSessionId);
-            });
-        } catch (error) {
-            reject(error);
-        }
-    });
-}
-
-export function setSessionUrl(sessionUrl) {
-    return new Promise((resolve, reject) => {
-        try {
-            console.log(`Setting new session url to ${sessionUrl}`);
-            chrome.storage.local.set({ sessionUrl: sessionUrl }, function () {
-                resolve(sessionUrl);
-            });
-        } catch (error) {
-            reject(error);
-        }
-    });
-}
-
-export function setUserId(userId) {
-    return new Promise((resolve, reject) => {
-        try {
-            chrome.storage.local.set({ userId: userId }, function () {
-                resolve("userId value is set to " + userId);
-            });
-        } catch (error) {
-            reject(error);
-        }
-    });
-}
-
 export function clearInfo() {
     return new Promise((resolve, reject) => {
         try {
@@ -153,7 +76,7 @@ export function getTabId() {
         try {
             chrome.tabs.query({ currentWindow: true, active: true }, (tabs) => {
                 var activeTab = tabs[0];
-                resolve(activeTab);
+                resolve(activeTab.id);
             });
         } catch (error) {
             reject(error);

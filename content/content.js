@@ -1,5 +1,6 @@
 const socket = new Socket();
-
+var sessionIdFromURL;
+var currentTabId;
 const contentScriptsOptions = {
     "www.primevideo.com": "primevideo",
     "www.anitube.site": "anitube",
@@ -13,25 +14,17 @@ const contentScriptsOptions = {
 };
 
 document.addEventListener("DOMContentLoaded", domLoaded());
+chrome.runtime.onMessage.addListener(onMessage);
 
-function domLoaded() {
+async function domLoaded() {
     const pageHost = getPageHost();
-    chrome.runtime.onMessage.addListener(onMessage);
-    var s = document.createElement("script");
-    const url = `content/htmlVideoController.js`;
-    console.log(url);
-    s.src = chrome.runtime.getURL(url);
-    s.onload = function () {
-        this.remove();
-        chrome.runtime.sendMessage({ type: "init" });
-        injectScript(contentScriptsOptions[pageHost]);
-    };
-    (document.head || document.documentElement).appendChild(s);
+    const currentSite = contentScriptsOptions[pageHost];
+    sessionIdFromURL = getSessionIdFromURL();
+    injectHtmlVideoControllerScript(currentSite);
 }
 
 function onMessage(request, sender, response) {
     const type = request.type;
-
     const onMessageCommands = {
         startCreate: startCreate.bind(this, request, response),
         startConnect: startConnect.bind(this, request, response),
@@ -42,16 +35,14 @@ function onMessage(request, sender, response) {
     };
     try {
         onMessageCommands[type]();
-    } catch (error) {
-        
-    }
+    } catch (error) {}
     document.dispatchEvent(new CustomEvent(type, { detail: request }));
     response({ code: 200 });
     return true;
 }
 
 async function startCreate() {
-    let userId = await getUserId();
+    let userId = await getFromSyncStorage("userId");
     let packet = {
         userId: userId,
     };
@@ -61,9 +52,9 @@ async function startCreate() {
 }
 
 async function startConnect() {
-    let userId = await getUserId();
-    const sessionId = getSessionIdFromURL();
-    await setSessionId(sessionId);
+    let userId = await getFromSyncStorage("userId");
+    const sessionId = (await getFromSyncStorage("sessionId")) || getSessionIdFromURL();
+    await setToSyncStorage("sessionId", sessionId);
     let packet = {
         userId: userId,
         sessionId: sessionId,
@@ -74,8 +65,8 @@ async function startConnect() {
 }
 
 async function listenerPlay(request, response) {
-    let userId = await getUserId();
-    let sessionId = await getSessionId();
+    let userId = await getFromSyncStorage("userId");
+    let sessionId = await getFromSyncStorage("sessionId");
     let packet = {
         userId: userId,
         sessionId: sessionId,
@@ -84,8 +75,8 @@ async function listenerPlay(request, response) {
     socket.emitCommand("play", packet);
 }
 async function listenerPause(request, response) {
-    let userId = await getUserId();
-    let sessionId = await getSessionId();
+    let userId = await getFromSyncStorage("userId");
+    let sessionId = await getFromSyncStorage("sessionId");
     let packet = {
         userId: userId,
         sessionId: sessionId,
@@ -94,8 +85,8 @@ async function listenerPause(request, response) {
     socket.emitCommand("pause", packet);
 }
 async function listenerSeek(request, response) {
-    let userId = await getUserId();
-    let sessionId = await getSessionId();
+    let userId = await getFromSyncStorage("userId");
+    let sessionId = await getFromSyncStorage("sessionId");
     let packet = {
         userId: userId,
         sessionId: sessionId,
@@ -108,14 +99,23 @@ async function disconnect() {
     await socket.disconnect();
 }
 
+function injectHtmlVideoControllerScript(scriptName) {
+    var s = document.createElement("script");
+    const url = `content/htmlVideoController.js`;
+    s.src = chrome.runtime.getURL(url);
+    s.onload = function () {
+        injectScript(scriptName);
+        this.remove();
+    };
+    (document.head || document.documentElement).appendChild(s);
+}
+
 function injectScript(scriptName) {
     var s = document.createElement("script");
     const url = `content/${scriptName}.js`;
-    console.log(url);
     s.src = chrome.runtime.getURL(url);
-    s.onload = function () {
-        this.remove();
-        chrome.runtime.sendMessage({ type: "init" });
+    s.onload = async function () {
+        chrome.runtime.sendMessage({ type: "init"});
     };
     (document.head || document.documentElement).appendChild(s);
 }

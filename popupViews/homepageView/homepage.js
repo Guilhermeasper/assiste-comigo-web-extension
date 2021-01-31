@@ -5,7 +5,8 @@ import {
     goToInSessionPage,
 } from "./../../utils/popupNavigate.js";
 
-import { getUserId, getSessionId } from "./../../utils/utils.js";
+const externalSession = document.getElementById("internalPlayerLink");
+const informationIcon = document.getElementById("informationIcon");
 
 document.addEventListener("DOMContentLoaded", DOMContentLoaded);
 chrome.runtime.onMessage.addListener(onMessage);
@@ -17,57 +18,58 @@ chrome.runtime.onMessage.addListener(onMessage);
  * @param {Object} response - Callback to respond message received
  */
 async function onMessage(request, sender, response) {
-    console.log(request);
     const player = request.player;
     const url = request.url;
-    const userId = await getUserId();
-    const sessionId = await getSessionId();
-
+    const userId = await getFromSyncStorage("userId");
+    const sessionId = await getFromSyncStorage("sessionId");
+    const urlParams = new URLSearchParams(url.split("?")[1]);
+    console.log(request);
     if (!userId) {
         goToErrorPage();
-    } else {
-        if (player && sessionId) {
+    } else if (player) {
+        if (sessionId) {
             goToInSessionPage();
-        } else if (!sessionId && url.includes("assistecomigo=")) {
+        } else if (!sessionId && urlParams.has("assistecomigo")) {
             goToConnectPage();
-        } else if (player && !sessionId) {
+        } else {
             goToCreateSessionPage();
         }
     }
 }
 
 /**
- * Callback from the send message function
- * @param {Object} result Answer from the send message
- */
-function sendMessageClosure(result) {
-    if (!result) {
-        console.log("Erro"); //goToErrorPage();
-    }
-}
-
-/**
  * Function fired when the dom is completely loaded
  */
-function DOMContentLoaded() {
-    let infoPacket = { type: "getInfo" };
-    const externalSession = document.getElementById("internalPlayerLink");
-    const informationIcon = document.getElementById("informationIcon");
+async function DOMContentLoaded() {
     informationIcon.addEventListener("click", informationIconCallback);
     externalSession.addEventListener("click", onButtonExternalSessionClick);
-    chrome.runtime.sendMessage(infoPacket, sendMessageClosure);
-    document.querySelectorAll("[data-locale]").forEach((elem) => {
-        elem.innerText = chrome.i18n.getMessage(elem.dataset.locale);
-    });
+    const currentTabId = await getTabId();
+    const sessionTabId = await getFromSyncStorage("sessionTabId");
+    console.log(sessionTabId);
+    if(sessionTabId && currentTabId !== sessionTabId){
+        await setToSyncStorage("errorMessage", "alreadyInSessionError");
+        goToErrorPage();
+    }
+    try {
+        chrome.runtime.sendMessage({ type: "getInfo" });
+    } catch (error) {
+        console.log(error);
+    }
+    loadI18NData();
 }
 
 function onButtonExternalSessionClick() {
     var newURL = `chrome-extension://${chrome.runtime.id}/internalPlayer/mainPage/index.html`;
     chrome.tabs.create({ url: newURL });
-    console.log("Nova guia");
 }
 
-function informationIconCallback(){
+function informationIconCallback() {
     var newURL = `chrome-extension://${chrome.runtime.id}/about/index.html`;
     chrome.tabs.create({ url: newURL });
+}
+
+function loadI18NData() {
+    document.querySelectorAll("[data-locale]").forEach((elem) => {
+        elem.innerText = chrome.i18n.getMessage(elem.dataset.locale);
+    });
 }

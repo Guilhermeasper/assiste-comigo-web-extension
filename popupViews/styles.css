@@ -19,7 +19,8 @@ body {
 .text,
 button {
     font-family: "Manrope", sans-serif;
-    font-size: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
 }
 
 #informationIcon {
@@ -45,11 +46,9 @@ button {
 
 button {
     background-color: red;
-    height: 25px;
-    width: 120px;
+    height: 2rem;
+    width: 140px;
     border-radius: 1rem;
-    font-size: 13px;
-    font-weight: 600;
     color: white;
 }
 

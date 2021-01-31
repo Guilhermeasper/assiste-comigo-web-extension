@@ -32,8 +32,8 @@ class Socket {
         this.socket.on("joinedSession", this.joinedSession);
 
         this.socket.on("reconnect", async () => {
-            let userId = await getUserId();
-            let sessionId = await getSessionId();
+            let userId = await getFromSyncStorage("userId");
+            let sessionId = await getFromSyncStorage("sessionId");
             this.socket.emit("rejoin", {
                 userId: userId,
                 sessionId: sessionId,
@@ -73,7 +73,9 @@ class Socket {
     }
 
     async sessionCreated(data) {
-        await setSessionId(data.newId);
+        const sessionId = data.newId;
+        
+        await setToSyncStorage("sessionId", sessionId);
         document.dispatchEvent(
             new CustomEvent("finishCreate", {
                 detail: {
@@ -84,7 +86,7 @@ class Socket {
         );
     }
 
-    joinedSession(data) {
+    async joinedSession(data) {
         document.dispatchEvent(
             new CustomEvent("finishConnect", {
                 detail: {

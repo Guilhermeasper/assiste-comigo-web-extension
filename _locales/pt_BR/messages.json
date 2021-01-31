@@ -13,13 +13,25 @@
         "message": ""
     },
     "newSessionButton": {
-        "message": "Nova sessão"
+        "message": "Criar Sessão"
+    },
+    "joinSessionButton": {
+        "message": "Juntar-se a Sessão"
+    },
+    "backSessionButton": {
+        "message": "Voltar"
+    },
+    "sessionURL": {
+        "message": "URL da Sessão:"
     },
     "urlCopyButton": {
         "message": "Copiar URL"
     },
     "connectedToSession": {
         "message": "Conectado à sessão"
+    },
+    "placeholderSessionURL": {
+        "message": "Insira a URL da sessão aqui"
     },
     "disconnectButton": {
         "message": "Desconectar"
@@ -38,5 +50,11 @@
     },
     "aboutTextContribution": {
         "message": "Gostou da extensão? Considere apoiar o projeto no Patreon, atualmente todo código da extensão é mantido apenas por mim, bem como custos com servidor."
+    },
+    "genericError": {
+        "message": "Algo deu errado"
+    },
+    "alreadyInSessionError": {
+        "message": "Há uma sessão em andamento em outra aba"
     }
   }

@@ -1,0 +1,19 @@
+#sessionURL {
+    background-color: rgb(235, 234, 221);
+    border-radius: 8px;
+    height: 26px;
+    width: 215px;
+    font-size: 12px;
+    margin-top: 8px;
+    padding: 8px;
+}
+
+#joinButton {
+    margin-top: 10px;
+    margin-left: 6px;
+}
+
+#backButton {
+    width: 70px;
+    margin-top: 10px;
+}

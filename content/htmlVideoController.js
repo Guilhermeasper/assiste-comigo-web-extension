@@ -163,7 +163,7 @@ class htmlVideoController {
     };
 
     #checkIfPlayerExists = () => {
-        if (this.#htmlVideo) {
+        if (this.#htmlVideo && this.#htmlVideo.readyState >= 2) {
             return true;
         }
         return false;

@@ -27,6 +27,28 @@ function tabSendMessage(message) {
     });
 }
 
+function tabSendMessageId(message, id) {
+    chrome.tabs.sendMessage(id, message);
+}
+
+function setToSyncStorage(key, value) {
+    return new Promise((resolve, reject) => {
+        chrome.storage.sync.set({ [key]: value }, function () {
+            // console.log(`${key} value is set to ${value}`);
+            resolve(value);
+        });
+    });
+}
+
+function getFromSyncStorage(key) {
+    return new Promise((resolve, reject) => {
+        chrome.storage.sync.get([key], function (result) {
+            // console.log(`${key} value is set to ${result[key]}`);
+            resolve(result[key]);
+        });
+    });
+}
+
 function getTabUrl() {
     return new Promise((resolve, reject) => {
         try {
@@ -55,83 +77,11 @@ function copyToClipboard(url) {
     document.body.removeChild(textAreaElement);
 }
 
-function getSessionId() {
-    return new Promise((resolve, reject) => {
-        try {
-            chrome.storage.local.get(["sessionId"], (result) => {
-                resolve(result.sessionId);
-            });
-        } catch (error) {
-            reject(error);
-        }
-    });
-}
-
-function getUserId() {
-    return new Promise((resolve, reject) => {
-        try {
-            chrome.storage.local.get(["userId"], (result) => {
-                resolve(result.userId);
-            });
-        } catch (error) {
-            reject(error);
-        }
-    });
-}
-
-function getSessionUrl() {
-    return new Promise((resolve, reject) => {
-        try {
-            chrome.storage.local.get(["sessionUrl"], (result) => {
-                resolve(result.sessionUrl);
-            });
-        } catch (error) {
-            reject(error);
-        }
-    });
-}
-
-function setSessionId(newSessionId) {
-    return new Promise((resolve, reject) => {
-        try {
-            chrome.storage.local.set({ sessionId: newSessionId }, function () {
-                resolve(newSessionId);
-            });
-        } catch (error) {
-            reject(error);
-        }
-    });
-}
-
-function setSessionUrl(sessionUrl) {
-    return new Promise((resolve, reject) => {
-        try {
-            chrome.storage.local.set({ sessionUrl: sessionUrl }, function () {
-                resolve(sessionUrl);
-            });
-        } catch (error) {
-            reject(error);
-        }
-    });
-}
-
-function setUserId(userId) {
-    return new Promise((resolve, reject) => {
-        try {
-            chrome.storage.local.set({ userId: userId }, function () {
-                resolve("userId value is set to " + userId);
-            });
-        } catch (error) {
-            reject(error);
-        }
-    });
-}
-
 function clearInfo() {
     return new Promise((resolve, reject) => {
         try {
-            chrome.storage.local.remove(
-                ["sessionId", "sessionUrl"],
+            chrome.storage.sync.remove(
+                ["sessionId", "sessionUrl", "sessionTabId"],
                 function () {
                     resolve({ code: 200 });
                 }
@@ -147,7 +97,7 @@ function getTabId() {
         try {
             chrome.tabs.query({ currentWindow: true, active: true }, (tabs) => {
                 var activeTab = tabs[0];
-                resolve(activeTab);
+                resolve(activeTab.id);
             });
         } catch (error) {
             reject(error);
