@@ -1,1 +1,1 @@
-const assisteComigoVimeo = new htmlVideoController("div.vp-video-wrapper > div.vp-video > div > video");
+const assisteComigoVimeo = new htmlVideoController("video");
