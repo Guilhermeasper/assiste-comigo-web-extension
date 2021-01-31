@@ -1,5 +1,6 @@
 const socket = new Socket();
 var sessionIdFromURL;
+var currentTabId;
 const contentScriptsOptions = {
     "www.primevideo.com": "primevideo",
     "www.anitube.site": "anitube",
@@ -24,7 +25,6 @@ async function domLoaded() {
 
 function onMessage(request, sender, response) {
     const type = request.type;
-    console.log(request);
     const onMessageCommands = {
         startCreate: startCreate.bind(this, request, response),
         startConnect: startConnect.bind(this, request, response),
@@ -43,7 +43,6 @@ function onMessage(request, sender, response) {
 
 async function startCreate() {
     let userId = await getFromSyncStorage("userId");
-    console.log(userId);
     let packet = {
         userId: userId,
     };
@@ -114,10 +113,9 @@ function injectHtmlVideoControllerScript(scriptName) {
 function injectScript(scriptName) {
     var s = document.createElement("script");
     const url = `content/${scriptName}.js`;
-    console.log(url);
     s.src = chrome.runtime.getURL(url);
-    s.onload = function () {
-        chrome.runtime.sendMessage({ type: "init" });
+    s.onload = async function () {
+        chrome.runtime.sendMessage({ type: "init"});
     };
     (document.head || document.documentElement).appendChild(s);
 }

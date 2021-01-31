@@ -152,7 +152,6 @@ class AssisteComigoNeflix {
         this.#video.addEventListener("play", this.#playListener);
         this.#video.addEventListener("pause", this.#pauseListener);
         this.#video.addEventListener("seeking", this.#seekListener);
-        console.log("Event listeners added");
     };
 
     #sendMessageCallback = (response) => {};
