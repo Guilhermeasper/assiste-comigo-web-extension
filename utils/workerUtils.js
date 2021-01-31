@@ -27,10 +27,14 @@ function tabSendMessage(message) {
     });
 }
 
+function tabSendMessageId(message, id) {
+    chrome.tabs.sendMessage(id, message);
+}
+
 function setToSyncStorage(key, value) {
     return new Promise((resolve, reject) => {
         chrome.storage.sync.set({ [key]: value }, function () {
-            console.log(`${key} value is set to ${value}`);
+            // console.log(`${key} value is set to ${value}`);
             resolve(value);
         });
     });
@@ -39,7 +43,7 @@ function setToSyncStorage(key, value) {
 function getFromSyncStorage(key) {
     return new Promise((resolve, reject) => {
         chrome.storage.sync.get([key], function (result) {
-            console.log(`${key} value is set to ${result[key]}`);
+            // console.log(`${key} value is set to ${result[key]}`);
             resolve(result[key]);
         });
     });
