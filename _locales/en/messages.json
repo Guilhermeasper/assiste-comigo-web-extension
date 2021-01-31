@@ -50,5 +50,11 @@
     },
     "aboutTextContribution": {
         "message": "Did you like the extension? Consider supporting the project on Patreon, currently all extension code is maintained by me alone, as well as server costs."
+    },
+    "genericError": {
+        "message": "Something went wrong"
+    },
+    "alreadyInSessionError": {
+        "message": "There is a session in progress in another tab"
     }
   }

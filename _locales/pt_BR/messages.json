@@ -50,5 +50,11 @@
     },
     "aboutTextContribution": {
         "message": "Gostou da extensão? Considere apoiar o projeto no Patreon, atualmente todo código da extensão é mantido apenas por mim, bem como custos com servidor."
+    },
+    "genericError": {
+        "message": "Algo deu errado"
+    },
+    "alreadyInSessionError": {
+        "message": "Há uma sessão em andamento em outra aba"
     }
   }
