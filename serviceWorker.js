@@ -7,3 +7,4 @@ importScripts('background/onInstalled.js');
 importScripts('background/onMessage.js');
 importScripts('background/onMessageExternal.js');
 importScripts('background/onRemovedTabs.js');
+importScripts('background/onTabsUpdated.js');
