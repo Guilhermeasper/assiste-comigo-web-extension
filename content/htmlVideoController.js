@@ -22,6 +22,7 @@ class htmlVideoController {
     }
 
     #init = (request) => {
+        console.log("Initialized");
         const contentRequestData = request.detail;
         const extensionId = contentRequestData.extensionId;
         this.#assisteComigoId = extensionId;
