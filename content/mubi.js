@@ -1,0 +1,1 @@
+const assisteComigoMubi = new htmlVideoController("#mubi-player_Clpp_html5_mse_api");

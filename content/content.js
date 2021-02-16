@@ -11,6 +11,7 @@ const contentScriptsOptions = {
     "www.netflix.com": "netflix",
     "tv.apple.com": "appletv",
     "goyabu.com": "goyabu",
+    "mubi.com": "mubi"
 };
 
 document.addEventListener("DOMContentLoaded", domLoaded());
@@ -53,7 +54,8 @@ async function startCreate() {
 
 async function startConnect() {
     let userId = await getFromSyncStorage("userId");
-    const sessionId = (await getFromSyncStorage("sessionId")) || getSessionIdFromURL();
+    const sessionId =
+        (await getFromSyncStorage("sessionId")) || getSessionIdFromURL();
     await setToSyncStorage("sessionId", sessionId);
     let packet = {
         userId: userId,
@@ -115,7 +117,7 @@ function injectScript(scriptName) {
     const url = `content/${scriptName}.js`;
     s.src = chrome.runtime.getURL(url);
     s.onload = async function () {
-        chrome.runtime.sendMessage({ type: "init"});
+        chrome.runtime.sendMessage({ type: "init" });
     };
     (document.head || document.documentElement).appendChild(s);
 }
