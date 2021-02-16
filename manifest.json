@@ -18,16 +18,16 @@
     "externally_connectable": {
         "matches": [
             "*://*.primevideo.com/*",
-                "*://*.viki.com/*",
-                "*://mubi.com/*",
-                "*://*.anitube.site/*",
-                "*://*.youtube.com/*",
-                "*://*.crunchyroll.com/*",
-                "*://*.vimeo.com/*",
-                "*://*.netflix.com/*",
-                "*://tv.apple.com/*",
-                "*://goyabu.com/*",
-                "*://*.9anime.to/*"
+            "*://*.viki.com/*",
+            "*://mubi.com/*",
+            "*://*.anitube.site/*",
+            "*://*.youtube.com/*",
+            "*://*.crunchyroll.com/*",
+            "*://*.vimeo.com/*",
+            "*://*.netflix.com/*",
+            "*://tv.apple.com/*",
+            "*://goyabu.com/*",
+            "*://4anime.to/*"
         ]
     },
     "content_scripts": [
@@ -49,7 +49,7 @@
                 "*://*.netflix.com/*",
                 "*://tv.apple.com/*",
                 "*://goyabu.com/*",
-                "*://*.9anime.to/*"
+                "*://4anime.to/*"
             ],
             "run_at": "document_end"
         }
@@ -60,6 +60,7 @@
     "web_accessible_resources": [
         {
             "resources": [
+                "content/htmlVideoController.js",
                 "content/youtube.js",
                 "content/anitube.js",
                 "content/netflix.js",
@@ -74,8 +75,7 @@
                 "content/mubi.js",
                 "content/vimeo.js",
                 "content/goyabu.js",
-                "content/9anime.js",
-                "content/htmlVideoController.js"
+                "content/4anime.js"
             ],
             "matches": [
                 "*://*.primevideo.com/*",
@@ -88,7 +88,7 @@
                 "*://*.netflix.com/*",
                 "*://tv.apple.com/*",
                 "*://goyabu.com/*",
-                "*://*.9anime.to/*"
+                "*://4anime.to/*"
             ]
         }
     ],

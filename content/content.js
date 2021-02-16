@@ -11,7 +11,8 @@ const contentScriptsOptions = {
     "www.netflix.com": "netflix",
     "tv.apple.com": "appletv",
     "goyabu.com": "goyabu",
-    "mubi.com": "mubi"
+    "mubi.com": "mubi",
+    "4anime.to": "4anime"
 };
 
 document.addEventListener("DOMContentLoaded", domLoaded());
@@ -22,6 +23,7 @@ async function domLoaded() {
     const currentSite = contentScriptsOptions[pageHost];
     sessionIdFromURL = getSessionIdFromURL();
     injectHtmlVideoControllerScript(currentSite);
+    console.log("Content script loaded sucessfully (｡◕‿◕｡)");
 }
 
 function onMessage(request, sender, response) {
