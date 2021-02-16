@@ -108,7 +108,6 @@ class AssisteComigoNeflix {
     };
 
     #pauseListener = () => {
-        const player = this.#getNetflixPlayer();
         if (!this.#serverPause) {
             chrome.runtime.sendMessage(
                 this.#assisteComigoId,
@@ -120,7 +119,6 @@ class AssisteComigoNeflix {
     };
 
     #seekListener = () => {
-        const player = this.#getNetflixPlayer();
         if (!this.#serverSeek) {
             chrome.runtime.sendMessage(
                 this.#assisteComigoId,
