@@ -3,23 +3,13 @@
  * @param {Object} message Object containing the message to be sent
  */
 function tabSendMessage(message) {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
         try {
-            chrome.tabs.query({ currentWindow: true, active: true }, (tabs) => {
-                let activeTab = tabs[0];
-                try {
-                    const newdata = { tabId: activeTab.id };
-                    const newMessage = { ...message, ...newdata };
-                    chrome.tabs.sendMessage(
-                        activeTab.id,
-                        newMessage,
-                        (answer) => {
-                            resolve(answer);
-                        }
-                    );
-                } catch (error) {
-                    reject(error);
-                }
+            const tabId = await getTabId();
+            const newdata = { tabId: tabId };
+            const newMessage = { ...message, ...newdata };
+            chrome.tabs.sendMessage(tabId, newMessage, (answer) => {
+                resolve(answer);
             });
         } catch (error) {
             reject(error);
