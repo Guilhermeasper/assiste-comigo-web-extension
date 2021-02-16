@@ -94,3 +94,25 @@ function getTabId() {
         }
     });
 }
+
+async function sendLogMessageToServer(message) {
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+    let userId = await getFromSyncStorage("userId");
+    var urlencoded = new URLSearchParams();
+    urlencoded.append("message", message);
+    urlencoded.append("userId", userId);
+
+    var requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        mode: "no-cors",
+        body: urlencoded,
+        redirect: "follow",
+    };
+
+    fetch("http://localhost:443/logging", requestOptions)
+        .then((response) => console.log(response))
+        .then((result) => console.log(result))
+        .catch((error) => console.log("error", error));
+}
