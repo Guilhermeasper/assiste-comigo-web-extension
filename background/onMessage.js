@@ -84,6 +84,11 @@ function onMessage(request, sender, response) {
         finishConnect: finishConnect.bind(this, request, sender, response),
         disconnect: disconnect.bind(this, request, sender, response),
     };
-    typeOptions[type]();
+    try {
+        typeOptions[type]();
+    } catch (error) {}
+
     return true;
 }
+
+

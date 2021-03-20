@@ -3,23 +3,13 @@
  * @param {Object} message Object containing the message to be sent
  */
 function tabSendMessage(message) {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
         try {
-            chrome.tabs.query({ currentWindow: true, active: true }, (tabs) => {
-                let activeTab = tabs[0];
-                try {
-                    const newdata = { tabId: activeTab.id };
-                    const newMessage = { ...message, ...newdata };
-                    chrome.tabs.sendMessage(
-                        activeTab.id,
-                        newMessage,
-                        (answer) => {
-                            resolve(answer);
-                        }
-                    );
-                } catch (error) {
-                    reject(error);
-                }
+            const tabId = await getTabId();
+            const newdata = { tabId: tabId };
+            const newMessage = { ...message, ...newdata };
+            chrome.tabs.sendMessage(tabId, newMessage, (answer) => {
+                resolve(answer);
             });
         } catch (error) {
             reject(error);
@@ -103,4 +93,26 @@ function getTabId() {
             reject(error);
         }
     });
+}
+
+async function sendLogMessageToServer(message) {
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+    let userId = await getFromSyncStorage("userId");
+    var urlencoded = new URLSearchParams();
+    urlencoded.append("message", message);
+    urlencoded.append("userId", userId);
+
+    var requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        mode: "no-cors",
+        body: urlencoded,
+        redirect: "follow",
+    };
+
+    fetch("http://localhost:443/logging", requestOptions)
+        .then((response) => console.log(response))
+        .then((result) => console.log(result))
+        .catch((error) => console.log("error", error));
 }

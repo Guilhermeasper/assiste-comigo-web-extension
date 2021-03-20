@@ -1,83 +1,96 @@
 {
-  "name": "__MSG_appTitle__",
-  "version": "1.1.0",
-  "description": "__MSG_appDesc__",
-  "default_locale": "pt_BR",
-  "icons": {
-    "16": "./icons/ac16.png",
-    "32": "./icons/ac32.png",
-    "48": "./icons/ac48.png",
-    "128": "./icons/ac128.png"
-  },
-  "permissions": ["storage"],
-  "action": {
-    "default_title": "__MSG_appTitle__",
-    "default_icon": "./icons/ac48.png",
-    "default_popup": "./popupViews/homepageView/homepage.html"
-  },
-  "externally_connectable": {
-    "matches": [
-      "https://www.primevideo.com/*",
-      "https://www.viki.com/*",
-      "https://www.anitube.site/*",
-      "https://www.youtube.com/*",
-      "https://www.netflix.com/*",
-      "https://www.crunchyroll.com/*",
-      "https://www.vimeo.com/*",
-      "https://tv.apple.com/*",
-      "https://goyabu.com/*"
-    ]
-  },
-  "content_scripts": [
-    {
-      "js": ["./libs/socket.io.js", "./utils/workerUtils.js", "./utils/socket.js", "./content/content.js"],
-      "matches": [
-        "*://*.primevideo.com/*",
-        "*://*.viki.com/*",
-        "*://*.anitube.site/*",
-        "*://*.youtube.com/*",
-        "*://*.crunchyroll.com/*",
-        "*://*.vimeo.com/*",
-        "*://*.netflix.com/*",
-        "*://tv.apple.com/*",
-        "*://goyabu.com/*"
-      ],
-      "run_at": "document_end"
-    }
-  ],
-  "background": {
-    "service_worker": "./serviceWorker.js"
-  },
-  "web_accessible_resources": [
-    {
-      "resources": [
-        "content/youtube.js",
-        "content/anitube.js",
-        "content/netflix.js",
-        "content/appletv.js",
-        "content/crunchyroll.js",
-        "content/disney.js",
-        "content/globoplay.js",
-        "content/hulu.js",
-        "content/primevideo.js",
-        "content/telecine.js",
-        "content/viki.js",
-        "content/vimeo.js",
-        "content/goyabu.js",
-        "content/htmlVideoController.js"
-      ],
-      "matches" : [
-        "https://www.primevideo.com/*",
-        "https://www.viki.com/*",
-        "https://www.anitube.site/*",
-        "https://www.youtube.com/*",
-        "https://www.netflix.com/*",
-        "https://www.crunchyroll.com/*",
-        "https://www.vimeo.com/*",
-        "https://tv.apple.com/*",
-        "https://goyabu.com/*"
-      ]
-    }
-  ],
-  "manifest_version": 3
+    "name": "__MSG_appTitle__",
+    "version": "1.1.1",
+    "description": "__MSG_appDesc__",
+    "default_locale": "pt_BR",
+    "icons": {
+        "16": "./icons/ac16.png",
+        "32": "./icons/ac32.png",
+        "48": "./icons/ac48.png",
+        "128": "./icons/ac128.png"
+    },
+    "permissions": ["storage"],
+    "action": {
+        "default_title": "__MSG_appTitle__",
+        "default_icon": "./icons/ac48.png",
+        "default_popup": "./popupViews/homepageView/homepage.html"
+    },
+    "externally_connectable": {
+        "matches": [
+            "*://*.primevideo.com/*",
+            "*://*.viki.com/*",
+            "*://mubi.com/*",
+            "*://*.anitube.site/*",
+            "*://*.youtube.com/*",
+            "*://*.crunchyroll.com/*",
+            "*://*.vimeo.com/*",
+            "*://*.netflix.com/*",
+            "*://tv.apple.com/*",
+            "*://goyabu.com/*",
+            "*://4anime.to/*"
+        ]
+    },
+    "content_scripts": [
+        {
+            "js": [
+                "./libs/socket.io.js",
+                "./utils/workerUtils.js",
+                "./utils/socket.js",
+                "./content/content.js"
+            ],
+            "matches": [
+                "*://*.primevideo.com/*",
+                "*://*.viki.com/*",
+                "*://mubi.com/*",
+                "*://*.anitube.site/*",
+                "*://*.youtube.com/*",
+                "*://*.crunchyroll.com/*",
+                "*://*.vimeo.com/*",
+                "*://*.netflix.com/*",
+                "*://tv.apple.com/*",
+                "*://goyabu.com/*",
+                "*://4anime.to/*"
+            ],
+            "run_at": "document_end"
+        }
+    ],
+    "background": {
+        "service_worker": "./serviceWorker.js"
+    },
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "content/htmlVideoController.js",
+                "content/youtube.js",
+                "content/anitube.js",
+                "content/netflix.js",
+                "content/appletv.js",
+                "content/crunchyroll.js",
+                "content/disney.js",
+                "content/globoplay.js",
+                "content/hulu.js",
+                "content/primevideo.js",
+                "content/telecine.js",
+                "content/viki.js",
+                "content/mubi.js",
+                "content/vimeo.js",
+                "content/goyabu.js",
+                "content/4anime.js"
+            ],
+            "matches": [
+                "*://*.primevideo.com/*",
+                "*://*.viki.com/*",
+                "*://mubi.com/*",
+                "*://*.anitube.site/*",
+                "*://*.youtube.com/*",
+                "*://*.crunchyroll.com/*",
+                "*://*.vimeo.com/*",
+                "*://*.netflix.com/*",
+                "*://tv.apple.com/*",
+                "*://goyabu.com/*",
+                "*://4anime.to/*"
+            ]
+        }
+    ],
+    "manifest_version": 3
 }
