@@ -39,7 +39,7 @@ To add the extension to Google Chrome or Microsoft Edge, just access the [extens
 To run the extension from the source code, access [the extensions page in your browser](chrome://extensions) and activate developer mode. Selecione a opção _Load unpacked_ and navigate to the root navigate to the extension's source code root directory.
 
 <div align="center">
-	<a href="https://github.com/melissafalcao/Assiste-Comigo-Web-Extension/blob/master/README.md" target="_blank" rel="noreferrer">
+	<a href="https://github.com/melissafalcao/Assiste-Comigo-Web-Extension/blob/master/README.md">
 		Leia essa página em português.
 	</a>
 </div>
