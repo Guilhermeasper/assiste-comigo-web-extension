@@ -1,0 +1,1 @@
+const assisteComigoGloboplay = new htmlVideoController('video[id^="c"]');
