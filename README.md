@@ -37,3 +37,9 @@ Para adicionar a extensão ao Google Chrome ou ao Microsoft Edge, acesse a [pág
 ## Executando do código-fonte
 
 Para executar a extensão a partir do código-fonte, acesse [a página de extensões no seu navegador](chrome://extensions) e ative o modo de desenvolvedor. Selecione a opção _Carregar sem compactação_ e navegue até ao diretório raiz do código-fonte da extensão.
+
+<div align="center">
+	<a href="https://github.com/melissafalcao/Assiste-Comigo-Web-Extension/blob/master/README-EN.md">
+		Read this page in English.
+	</a>
+</div>
