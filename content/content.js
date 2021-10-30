@@ -12,7 +12,8 @@ const contentScriptsOptions = {
     "tv.apple.com": "appletv",
     "goyabu.com": "goyabu",
     "mubi.com": "mubi",
-    "4anime.to": "4anime"
+    "4anime.to": "4anime",
+    "globoplay.globo.com": "globoplay",
 };
 
 document.addEventListener("DOMContentLoaded", domLoaded());

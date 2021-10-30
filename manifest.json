@@ -27,7 +27,8 @@
             "*://*.netflix.com/*",
             "*://tv.apple.com/*",
             "*://goyabu.com/*",
-            "*://4anime.to/*"
+            "*://4anime.to/*",
+            "*://globoplay.globo.com/*"
         ]
     },
     "content_scripts": [
@@ -49,7 +50,8 @@
                 "*://*.netflix.com/*",
                 "*://tv.apple.com/*",
                 "*://goyabu.com/*",
-                "*://4anime.to/*"
+                "*://4anime.to/*",
+                "*://globoplay.globo.com/*"
             ],
             "run_at": "document_end"
         }
@@ -88,7 +90,8 @@
                 "*://*.netflix.com/*",
                 "*://tv.apple.com/*",
                 "*://goyabu.com/*",
-                "*://4anime.to/*"
+                "*://4anime.to/*",
+                "*://globoplay.globo.com/*"
             ]
         }
     ],
