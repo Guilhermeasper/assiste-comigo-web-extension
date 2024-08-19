@@ -1,14 +1,14 @@
-import { Orchestrator } from '@shared/orchestrator';
+import { Dispatcher } from '@shared/dispatcher';
 import { Handler } from '@shared/types';
 
-const orchestrator = Orchestrator.getInstance();
+const dispatcher = Dispatcher.getInstance();
 
 export const pause: Handler = {
   event: 'pause',
   origin: 'popup',
   bidirectional: false,
   handler: (payload: unknown) => {
-    orchestrator.sendMessageToActiveTab({
+    dispatcher.sendMessageToActiveTab({
       type: 'pause',
       payload,
       source: 'background',

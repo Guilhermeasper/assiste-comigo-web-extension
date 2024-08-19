@@ -4,12 +4,12 @@ import {
   ASSISTE_COMIGO_PLATFORMS_SELECTOR,
 } from '@background/platforms';
 import reloadContentScript from '@background/reload-content-script';
-import { Orchestrator } from '@shared/orchestrator';
+import { Dispatcher } from '@shared/dispatcher';
 import { SessionStorage } from '@shared/storage';
 import { Handler } from '@shared/types';
 import { AssisteComigoMessage } from '@shared/types/message.type';
 
-const orchestrator = Orchestrator.getInstance();
+const dispatcher = Dispatcher.getInstance();
 
 export const getState: Handler = {
   event: 'get-state',
@@ -25,7 +25,7 @@ export const getState: Handler = {
       if (activeSession)
         return new BackgroundBaseMessage('session-active', { platform });
 
-      const activeTabState = await orchestrator.sendMessageToActiveTab(
+      const activeTabState = await dispatcher.sendMessageToActiveTab(
         new BackgroundBaseMessage('watching', { platform }),
       );
 
@@ -42,7 +42,7 @@ export const getState: Handler = {
 
 async function checkPlatformCompatibility(): Promise<string | null> {
   try {
-    const activeTabResponse = await orchestrator.sendMessageToActiveTab({
+    const activeTabResponse = await dispatcher.sendMessageToActiveTab({
       type: 'get-hostname',
       source: 'background',
     });

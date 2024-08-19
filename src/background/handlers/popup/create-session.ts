@@ -1,9 +1,9 @@
 import SocketManager from '@background/socket-manager';
-import { Orchestrator } from '@shared/orchestrator';
+import { Dispatcher } from '@shared/dispatcher';
 import { SessionStorage } from '@shared/storage';
 import { Handler } from '@shared/types';
 
-const orchestrator = Orchestrator.getInstance();
+const dispatcher = Dispatcher.getInstance();
 
 export const createSession: Handler = {
   event: 'create-session',
@@ -12,7 +12,7 @@ export const createSession: Handler = {
   handler: (payload: unknown) => {
     SessionStorage.set('activeSession', 'true');
     SocketManager.getInstance().onMessage('play', () => {
-      orchestrator.sendMessageToActiveTab({
+      dispatcher.sendMessageToActiveTab({
         type: 'play',
         payload: null,
         source: 'background',
@@ -20,14 +20,14 @@ export const createSession: Handler = {
     });
 
     SocketManager.getInstance().onMessage('pause', () => {
-      orchestrator.sendMessageToActiveTab({
+      dispatcher.sendMessageToActiveTab({
         type: 'pause',
         payload: null,
         source: 'background',
       });
     });
 
-    const createSessionResponse = orchestrator.sendMessageToActiveTab({
+    const createSessionResponse = dispatcher.sendMessageToActiveTab({
       type: 'create-session',
       payload: { platform: (payload as any)?.platform },
       source: 'background',

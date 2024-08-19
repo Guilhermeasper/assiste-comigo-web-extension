@@ -1,12 +1,12 @@
-import { Orchestrator } from '@shared/orchestrator';
+import { Dispatcher } from '@shared/dispatcher';
 import { Handler } from '@shared/types';
 import * as handlers from '@content/handlers';
 
-const orchestrator = Orchestrator.getInstance();
+const dispatcher = Dispatcher.getInstance();
 
 export function registerHandlers() {
   Array.from(Object.values(handlers)).forEach((handler: Handler) => {
-    orchestrator.register(
+    dispatcher.register(
       handler.event,
       handler.origin,
       handler.handler,

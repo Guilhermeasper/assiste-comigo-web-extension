@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import './app.scss';
-import { Orchestrator } from '@shared/orchestrator';
+import { Dispatcher } from '@shared/dispatcher';
 import { useNavigate } from 'react-router-dom';
 import { AssisteComigoMessage } from '@shared/types/message.type';
 
 function Start() {
   const navigate = useNavigate();
 
-  const orchestrator = Orchestrator.getInstance();
+  const dispatcher = Dispatcher.getInstance();
 
   function getStateHandler(
     response: AssisteComigoMessage<{ platform?: string; player?: boolean }>,
@@ -39,7 +39,10 @@ function Start() {
 
   function sendMessage() {
     try {
-      orchestrator.sendMessage('get-state', {}, 'popup', getStateHandler);
+      dispatcher.sendMessage(
+        { type: 'get-state', source: 'popup' },
+        getStateHandler,
+      );
     } catch (error) {
       navigate('/error', {
         state: { reason: 'Não foi possível se conectar com o service Worker' },

@@ -1,8 +1,8 @@
-import { Orchestrator } from '@shared/orchestrator';
+import { Dispatcher } from '@shared/dispatcher';
 import { platform } from 'os';
 
 export class AssisteComigoPlayer {
-  orchestrator = Orchestrator.getInstance();
+  dispatcher = Dispatcher.getInstance();
   platform = { name: '' };
   videoElement: HTMLVideoElement | null = null;
   waitingServerPlay = false;
@@ -54,10 +54,12 @@ export class AssisteComigoPlayer {
     }
     this.waitingServerPlay = true;
     try {
-      this.orchestrator.sendMessage(
-        'play',
-        { platform: this.platform.name },
-        'content',
+      this.dispatcher.sendMessage(
+        {
+          type: 'play',
+          payload: { platform: this.platform.name },
+          source: 'content',
+        },
         () => {},
       );
     } catch (error) {
@@ -72,10 +74,12 @@ export class AssisteComigoPlayer {
     }
     this.waitingServerPause = true;
     try {
-      this.orchestrator.sendMessage(
-        'pause',
-        { platform: this.platform.name },
-        'content',
+      this.dispatcher.sendMessage(
+        {
+          type: 'pause',
+          payload: { platform: this.platform.name },
+          source: 'content',
+        },
         () => {},
       );
     } catch (error) {
@@ -85,10 +89,12 @@ export class AssisteComigoPlayer {
 
   onSeek(): void {
     try {
-      this.orchestrator.sendMessage(
-        'seek',
-        { platform: this.platform.name },
-        'content',
+      this.dispatcher.sendMessage(
+        {
+          type: 'seek',
+          payload: { platform: this.platform.name },
+          source: 'content',
+        },
         () => {},
       );
     } catch (error) {

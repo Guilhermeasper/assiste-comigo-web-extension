@@ -8,19 +8,19 @@ interface Registration {
   bidirectional: boolean;
 }
 
-export class Orchestrator {
+export class Dispatcher {
   public registry: Map<string, Map<string, Registration>> = new Map();
 
   constructor() {
     chrome.runtime.onMessage.addListener(this._messageHandler.bind(this));
   }
 
-  static instance: Orchestrator;
-  static getInstance(): Orchestrator {
-    if (!Orchestrator.instance) {
-      Orchestrator.instance = new Orchestrator();
+  static instance: Dispatcher;
+  static getInstance(): Dispatcher {
+    if (!Dispatcher.instance) {
+      Dispatcher.instance = new Dispatcher();
     }
-    return Orchestrator.instance;
+    return Dispatcher.instance;
   }
 
   register(
@@ -39,13 +39,11 @@ export class Orchestrator {
   }
 
   sendMessage<T>(
-    type: string,
-    payload: unknown,
-    source: Origin,
+    message: AssisteComigoMessage<T>,
     callback: (response: AssisteComigoMessage<T>) => void,
   ) {
     try {
-      chrome.runtime.sendMessage({ type, payload, source }, callback);
+      chrome.runtime.sendMessage(message, callback);
     } catch (error) {
       console.error('Error occurred while sending message:', error);
     }
@@ -102,10 +100,7 @@ export class Orchestrator {
       active: true,
       lastFocusedWindow: true,
     });
-    const response = await chrome.tabs.sendMessage(
-      tab?.id as number | undefined,
-      message,
-    );
+    const response = await chrome.tabs.sendMessage(tab?.id as number, message);
     return response;
   }
 }

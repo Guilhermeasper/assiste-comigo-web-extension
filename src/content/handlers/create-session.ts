@@ -1,9 +1,9 @@
 import { Handler } from '@shared/types';
 import * as platforms from '@content/platforms';
-import { Orchestrator } from '@shared/orchestrator';
+import { Dispatcher } from '@shared/dispatcher';
 import { AssisteComigoPlayer } from '@content/player';
 
-const orchestrator = Orchestrator.getInstance();
+const dispatcher = Dispatcher.getInstance();
 
 export const createSession: Handler = {
   event: 'create-session',
