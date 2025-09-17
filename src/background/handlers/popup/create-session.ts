@@ -12,26 +12,35 @@ export const createSession: Handler = {
   handler: (payload: unknown) => {
     SessionStorage.set('activeSession', 'true');
     SocketManager.getInstance().onMessage('play', () => {
-      dispatcher.sendMessageToActiveTab({
-        type: 'play',
-        payload: null,
-        source: 'background',
-      });
+      dispatcher.sendMessage(
+        {
+          type: 'play',
+          payload: null,
+          source: 'background',
+        },
+        true,
+      );
     });
 
     SocketManager.getInstance().onMessage('pause', () => {
-      dispatcher.sendMessageToActiveTab({
-        type: 'pause',
-        payload: null,
-        source: 'background',
-      });
+      dispatcher.sendMessage(
+        {
+          type: 'pause',
+          payload: null,
+          source: 'background',
+        },
+        true,
+      );
     });
 
-    const createSessionResponse = dispatcher.sendMessageToActiveTab({
-      type: 'create-session',
-      payload: { platform: (payload as any)?.platform },
-      source: 'background',
-    });
+    const createSessionResponse = dispatcher.sendMessage(
+      {
+        type: 'create-session',
+        payload: { platform: (payload as any)?.platform },
+        source: 'background',
+      },
+      true,
+    );
 
     return createSessionResponse;
   },

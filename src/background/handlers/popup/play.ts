@@ -8,7 +8,7 @@ export const play: Handler = {
   origin: 'popup',
   bidirectional: false,
   handler: (payload: unknown) => {
-    dispatcher.sendMessageToActiveTab({
+    dispatcher.sendMessage({
       type: 'play',
       payload,
       source: 'background',

@@ -9,7 +9,7 @@ export default {
   content_scripts: [
     {
       js: ['./content.js'],
-      matches: ['https://*.youtube.com/*'],
+      matches: ['<all_urls>'],
       run_at: 'document_end',
     },
   ],

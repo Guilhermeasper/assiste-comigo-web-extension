@@ -25,8 +25,9 @@ export const getState: Handler = {
       if (activeSession)
         return new BackgroundBaseMessage('session-active', { platform });
 
-      const activeTabState = await dispatcher.sendMessageToActiveTab(
+      const activeTabState = await dispatcher.sendMessage(
         new BackgroundBaseMessage('watching', { platform }),
+        true,
       );
 
       const watching = activeTabState?.watching;
@@ -42,7 +43,7 @@ export const getState: Handler = {
 
 async function checkPlatformCompatibility(): Promise<string | null> {
   try {
-    const activeTabResponse = await dispatcher.sendMessageToActiveTab({
+    const activeTabResponse = await dispatcher.sendMessage({
       type: 'get-hostname',
       source: 'background',
     });

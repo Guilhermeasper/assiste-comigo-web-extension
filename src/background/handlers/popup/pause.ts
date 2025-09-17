@@ -8,7 +8,7 @@ export const pause: Handler = {
   origin: 'popup',
   bidirectional: false,
   handler: (payload: unknown) => {
-    dispatcher.sendMessageToActiveTab({
+    dispatcher.sendMessage({
       type: 'pause',
       payload,
       source: 'background',

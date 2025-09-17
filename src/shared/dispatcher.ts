@@ -38,14 +38,38 @@ export class Dispatcher {
     typeRegistry.set(source, { handler, bidirectional });
   }
 
-  sendMessage<T>(
+  async sendMessage<T>(
     message: AssisteComigoMessage<T>,
-    callback: (response: AssisteComigoMessage<T>) => void,
-  ) {
+  ): Promise<AssisteComigoMessage<T> | null>;
+  async sendMessage<T>(
+    message: AssisteComigoMessage<T>,
+    toActiveTab: boolean,
+  ): Promise<AssisteComigoMessage<T> | null>;
+
+  async sendMessage<T>(
+    message: AssisteComigoMessage<T>,
+    toActiveTab?: boolean,
+  ): Promise<AssisteComigoMessage<T> | null> {
     try {
-      chrome.runtime.sendMessage(message, callback);
+      if (toActiveTab) {
+        const [tab] = await chrome.tabs.query({
+          active: true,
+          lastFocusedWindow: true,
+        });
+        const response = await chrome.tabs.sendMessage(
+          tab?.id as number,
+          message,
+        );
+        return response;
+      } else {
+        const response = (await chrome.runtime.sendMessage(
+          message,
+        )) as AssisteComigoMessage<T>;
+        return response;
+      }
     } catch (error) {
       console.error('Error occurred while sending message:', error);
+      return null;
     }
   }
 
@@ -93,14 +117,5 @@ export class Dispatcher {
       });
       return;
     }
-  }
-
-  async sendMessageToActiveTab<T>(message: AssisteComigoMessage<T>) {
-    const [tab] = await chrome.tabs.query({
-      active: true,
-      lastFocusedWindow: true,
-    });
-    const response = await chrome.tabs.sendMessage(tab?.id as number, message);
-    return response;
   }
 }

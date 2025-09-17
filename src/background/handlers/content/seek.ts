@@ -1,6 +1,6 @@
 import { Handler } from '@shared/types';
 
-export const play: Handler = {
+export const seek: Handler = {
   event: 'seek',
   origin: 'content',
   bidirectional: false,
