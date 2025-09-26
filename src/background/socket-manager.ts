@@ -177,41 +177,13 @@ class SocketManager {
 
   // Session management methods
   public async createSession(videoInfo: VideoInfo): Promise<string> {
-    return new Promise((resolve, reject) => {
-      const timeout = setTimeout(() => {
-        this.offMessage('session-created', responseHandler);
-        reject(new Error('Session creation timeout'));
-      }, 10000);
-
-      const responseHandler = (data: any) => {
-        clearTimeout(timeout);
-        if (data.success) {
-          resolve(data.sessionId);
-        } else {
-          reject(new Error(data.error || 'Failed to create session'));
-        }
-      };
-
-      this.socket?.once('session-created', responseHandler);
-      this.sendMessage('create-session', { videoInfo });
-    });
+    this.sendMessage('create-session', { videoInfo });
+    return 'TEMP-SESSION-ID'; // Temporário para teste
   }
 
   public async joinSession(sessionId: string): Promise<any> {
-    return new Promise((resolve, reject) => {
-      // const timeout = setTimeout(() => {
-      //   this.offMessage('session-joined', responseHandler);
-      //   reject(new Error('Session join timeout'));
-      // }, 5000);
-
-      const responseHandler = (data: any) => {
-        // clearTimeout(timeout);
-        resolve(data);
-      };
-
-      this.socket?.once('session-joined', responseHandler);
-      this.sendMessage('join-session', { sessionId });
-    });
+    this.sendMessage('join-session', { sessionId });
+    return { success: true }; // Temporário para teste
   }
 
   public leaveSession(sessionId: string): void {

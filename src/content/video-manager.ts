@@ -79,10 +79,10 @@ export class VideoManager {
     this.currentVideos.set(video.element, video);
 
     // Start observing visibility
-    this.videoDetector.startObserving(video.element);
+    // this.videoDetector.startObserving(video.element);
 
     // Track for removal detection
-    this.removalObserver.trackVideo(video);
+    // this.removalObserver.trackVideo(video);
 
     // Set up video event listeners if it's a native video
     if (video.element instanceof HTMLVideoElement) {
@@ -173,32 +173,41 @@ export class VideoManager {
     this.listenerManager.setEventCallbacks({
       onPlay: (video) => {
         console.log('VideoManager: Video play event', video);
-
-        this.sessionManager.sendVideoPlay(
-          video.metadata.url,
-          video.currentTime,
-        );
+        this.sendVideoEvent('play', { currentTime: video.currentTime });
       },
       onPause: (video) => {
         console.log('VideoManager: Video pause event', video);
-        // This will be connected to session sync later
+        this.sendVideoEvent('pause', { currentTime: video.currentTime });
       },
       onSeeked: (video) => {
         console.log('VideoManager: Video seek event', video);
-        // This will be connected to session sync later
+        this.sendVideoEvent('seek', {
+          currentTime: video.currentTime,
+          targetTime: video.currentTime,
+        });
       },
       onWaiting: (video) => {
         console.log('VideoManager: Video buffering event', video);
-        // This will be connected to session sync later
+        this.sendVideoEvent('buffering', { currentTime: video.currentTime });
       },
       onCanPlay: (video) => {
         console.log('VideoManager: Video ready event', video);
-        // This will be connected to session sync later
+        this.sendVideoEvent('ready', { currentTime: video.currentTime });
       },
       onTimeUpdate: (video) => {
-        // This will be connected to session sync later
-        // Don't log this one as it fires frequently
+        // Don't send frequent timeupdate events
       },
+    });
+  }
+
+  async sendVideoEvent(event: string, data: any): Promise<void> {
+    const { Dispatcher } = await import('@shared/dispatcher');
+    const dispatcher = Dispatcher.getInstance();
+
+    dispatcher.sendMessage({
+      type: `video-${event}`,
+      payload: data,
+      source: 'content',
     });
   }
 
@@ -208,22 +217,23 @@ export class VideoManager {
   ): Promise<void> {
     this.overlayManager.updateSessionState(isActive, sessionInfo);
 
+    const sessionState = await this.sessionManager.getCurrentSession();
+    if (sessionState.videoInfo) {
+      const currentVideo = this.findVideoByUrl(sessionState.videoInfo.url);
+      if (currentVideo) {
+        const { VideoSyncManager } = await import(
+          '@content/sync/video-sync-manager'
+        );
+        const videoSyncManager = VideoSyncManager.getInstance();
+        videoSyncManager.setCurrentVideo(currentVideo);
+      }
+    }
+
     if (isActive) {
       // Hide all overlays when session becomes active
       this.overlayManager.hideAllOverlays();
 
       // Set the current video for synchronization if we have one
-      const sessionState = await this.sessionManager.getCurrentSession();
-      if (sessionState.videoInfo) {
-        const currentVideo = this.findVideoByUrl(sessionState.videoInfo.url);
-        if (currentVideo) {
-          const { VideoSyncManager } = await import(
-            '@content/sync/video-sync-manager'
-          );
-          const videoSyncManager = VideoSyncManager.getInstance();
-          videoSyncManager.setCurrentVideo(currentVideo);
-        }
-      }
     }
   }
 
