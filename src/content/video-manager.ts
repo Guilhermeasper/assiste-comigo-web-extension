@@ -78,12 +78,6 @@ export class VideoManager {
   private setupVideoInteraction(video: VideoElement): void {
     this.currentVideos.set(video.element, video);
 
-    // Start observing visibility
-    // this.videoDetector.startObserving(video.element);
-
-    // Track for removal detection
-    // this.removalObserver.trackVideo(video);
-
     // Set up video event listeners if it's a native video
     if (video.element instanceof HTMLVideoElement) {
       this.listenerManager.addListeners(video.element);
@@ -99,28 +93,10 @@ export class VideoManager {
     const element = video.element;
 
     const onMouseEnter = () => {
-      // Clear any existing timeout
-      // const existingTimeout = this.hoverTimeouts.get(element);
-      // if (existingTimeout) {
-      //   clearTimeout(existingTimeout);
-      // }
-
-      // Set delay before showing overlay
-      // const timeout = window.setTimeout(() => {
       this.overlayManager.showOverlay(video);
-      // this.hoverTimeouts.delete(element);
-      // }, 300);
-
-      // this.hoverTimeouts.set(element, timeout);
     };
 
     const onMouseLeave = () => {
-      // Clear show timeout
-      // const timeout = this.hoverTimeouts.get(element);
-      // if (timeout) {
-      //   clearTimeout(timeout);
-      //   this.hoverTimeouts.delete(element);
-      // }
       this.overlayManager.hideOverlay(element);
     };
 
@@ -201,6 +177,14 @@ export class VideoManager {
   }
 
   async sendVideoEvent(event: string, data: any): Promise<void> {
+    const { VideoSyncManager } = await import('@content/sync/video-sync-manager');
+    const videoSyncManager = VideoSyncManager.getInstance();
+
+    if (videoSyncManager.isProcessingServerEvent()) {
+      console.log(`VideoManager: Ignoring ${event} event, caused by server sync`);
+      return;
+    }
+
     const { Dispatcher } = await import('@shared/dispatcher');
     const dispatcher = Dispatcher.getInstance();
 

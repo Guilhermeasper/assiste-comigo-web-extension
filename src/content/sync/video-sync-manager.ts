@@ -39,6 +39,14 @@ export class VideoSyncManager {
     }
   }
 
+  isProcessingServerEvent(): boolean {
+    return this.isFromServer;
+  }
+
+  resetServerEventFlag(): void {
+    this.isFromServer = false;
+  }
+
   private setupServerEventListeners(): void {
     // These will be called when events are received from the server
     this.dispatcher.register(
@@ -80,6 +88,8 @@ export class VideoSyncManager {
     // Play the video
     this.currentVideo.play().catch((error) => {
       console.error('VideoSyncManager: Failed to play video:', error);
+    }).finally(() => {
+      setTimeout(() => this.resetServerEventFlag(), 100);
     });
   }
 
@@ -99,6 +109,7 @@ export class VideoSyncManager {
 
     // Pause the video
     this.currentVideo.pause();
+    setTimeout(() => this.resetServerEventFlag(), 100);
   }
 
   private handleServerSeek(data: any): void {
@@ -108,6 +119,7 @@ export class VideoSyncManager {
 
     // Seek to the target time
     this.currentVideo.currentTime = data.targetTime || 0;
+    setTimeout(() => this.resetServerEventFlag(), 100);
   }
 
   private handleServerBuffering(data: any): void {
@@ -116,6 +128,7 @@ export class VideoSyncManager {
     // Pause during other user's buffering
     this.isFromServer = true;
     this.currentVideo.pause();
+    setTimeout(() => this.resetServerEventFlag(), 100);
   }
 
   cleanup(): void {
